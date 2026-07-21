@@ -26,12 +26,19 @@
           </div>
           <h1 class="wave-name" aria-label="SAMNICK BIGA RAOUL AUBIN">
             <span
-              v-for="(char, idx) in 'SAMNICK BIGA RAOUL AUBIN'.split('')"
-              :key="idx"
-              class="wave-char"
-              :style="{ animationDelay: `${idx * 0.04}s` }"
+              v-for="(word, wIdx) in ['SAMNICK', 'BIGA', 'RAOUL', 'AUBIN']"
+              :key="wIdx"
+              class="wave-word"
             >
-              {{ char === ' ' ? '\u00A0' : char }}
+              <span
+                v-for="(char, cIdx) in word.split('')"
+                :key="cIdx"
+                class="wave-char"
+                :style="{ animationDelay: `${(wIdx * 7 + cIdx) * 0.05}s` }"
+              >
+                {{ char }}
+              </span>
+              <span v-if="wIdx < 3" class="wave-space">&nbsp;</span>
             </span>
           </h1>
           <h2>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</h2>
