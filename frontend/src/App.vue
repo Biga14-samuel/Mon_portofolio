@@ -255,7 +255,7 @@
       </section>
     </main>
 
-    <div v-if="caseStudyItem" class="modal-backdrop" role="presentation" @click.self="closeCaseStudy">
+    <div v-if="caseStudyItem" class="modal-backdrop" role="presentation" @click.self="closeCaseStudy" @dblclick="closeCaseStudy">
       <section
         ref="caseModal"
         class="case-modal"
@@ -263,11 +263,18 @@
         aria-modal="true"
         aria-labelledby="case-title"
         @scroll="updateCaseProgress"
+        @dblclick="closeCaseStudy"
       >
         <div class="case-progress" aria-hidden="true">
           <span :style="{ width: `${caseProgress}%` }"></span>
         </div>
-        <button class="case-close" type="button" aria-label="Fermer l'étude de cas" @click="closeCaseStudy">×</button>
+        <div class="case-nav-header">
+          <button class="case-back-button" type="button" aria-label="Retourner en arrière" @click="closeCaseStudy">
+            <ArrowLeft :size="20" aria-hidden="true" />
+            <span>Retour</span>
+          </button>
+          <button class="case-close" type="button" aria-label="Fermer la vue" @click="closeCaseStudy">×</button>
+        </div>
         <div class="case-hero">
           <PillBadge :tone="tagTone(caseStudyItem.category)">{{ caseStudyItem.category }}</PillBadge>
           <h2 id="case-title">{{ caseStudyItem.title }}</h2>
@@ -359,7 +366,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
-import { LockKeyhole, Plus } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft } from 'lucide-vue-next';
 import ContentSection from './components/ContentSection.vue';
 import ItemForm from './components/ItemForm.vue';
 import PillBadge from './components/PillBadge.vue';
