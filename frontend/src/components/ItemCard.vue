@@ -1,7 +1,18 @@
 <template>
   <article class="item-card" :class="item.type">
-    <div v-if="item.image_url" class="item-card__image-container">
-      <img :src="item.image_url" :alt="`Image de ${item.title}`" loading="lazy" />
+    <div v-if="imagesList.length" class="item-card__image-container">
+      <Transition name="fade" mode="out-in">
+        <img :key="imagesList[currentImageIndex]" :src="imagesList[currentImageIndex]" :alt="`Image de ${item.title}`" loading="lazy" />
+      </Transition>
+      <div v-if="imagesList.length > 1" class="slideshow-dots">
+        <span
+          v-for="(_, idx) in imagesList"
+          :key="idx"
+          class="slideshow-dot"
+          :class="{ active: idx === currentImageIndex }"
+          @click.stop="currentImageIndex = idx"
+        ></span>
+      </div>
     </div>
     <div class="item-card__meta">
       <PillBadge :tone="item.type === 'realisation' ? 'orange' : 'aubergine'">{{ labels[item.type] }}</PillBadge>
@@ -35,11 +46,12 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Pencil, Trash2, Github, ExternalLink } from 'lucide-vue-next';
 import PillBadge from './PillBadge.vue';
 import { tagTone } from '../services/tags';
 
-defineProps({
+const props = defineProps({
   item: {
     type: Object,
     required: true,
@@ -57,10 +69,31 @@ const labels = {
   competence: 'Competence',
   realisation: 'Realisation',
 };
+
+const currentImageIndex = ref(0);
+let timer = null;
+
+const imagesList = computed(() => {
+  if (!props.item.image_url) return [];
+  return props.item.image_url.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean);
+});
+
+onMounted(() => {
+  if (imagesList.value.length > 1) {
+    timer = setInterval(() => {
+      currentImageIndex.value = (currentImageIndex.value + 1) % imagesList.value.length;
+    }, 3200);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (timer) clearInterval(timer);
+});
 </script>
 
 <style scoped>
 .item-card__image-container {
+  position: relative;
   width: 100%;
   height: 180px;
   overflow: hidden;
@@ -73,6 +106,40 @@ const labels = {
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+}
+
+.slideshow-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.slideshow-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.slideshow-dot.active {
+  background: #ffffff;
+  transform: scale(1.25);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .item-card:hover .item-card__image-container img {
