@@ -11,10 +11,11 @@
     <label>
       Tag / catégorie
       <select v-model="form.category" required>
-        <option v-for="category in categoriesByType[form.type]" :key="category" :value="category">
+        <option v-for="category in availableCategories" :key="category" :value="category">
           {{ category }}
         </option>
       </select>
+      <small v-if="availableCategories.length === 0" style="color: var(--accent);">Aucun tag. Veuillez en ajouter via "Gérer les tags".</small>
     </label>
     <label>
       Titre
@@ -28,10 +29,65 @@
       Description
       <textarea v-model.trim="form.description" required minlength="10" rows="5" placeholder="Detail de l'element"></textarea>
     </label>
+    <div class="form-row">
+      <label>
+        Lien GitHub (optionnel)
+        <input v-model.trim="form.github_url" type="url" maxlength="500" placeholder="https://github.com/..." />
+      </label>
+      <label>
+        Lien Démo (optionnel)
+        <input v-model.trim="form.demo_url" type="url" maxlength="500" placeholder="https://..." />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        URL Image (optionnel)
+        <input v-model.trim="form.image_url" type="url" maxlength="500" placeholder="https://..." />
+      </label>
+      <label>
+        Ordre d'affichage
+        <input v-model.number="form.display_order" type="number" min="0" max="100000" />
+      </label>
+    </div>
     <label v-if="form.type === 'realisation'" class="checkbox-row">
       <input v-model="form.featured" type="checkbox" />
       <span>Mettre cette réalisation à la une</span>
     </label>
+
+    <fieldset v-if="form.type === 'realisation'" class="rich-content-fieldset">
+      <legend>Contenu détaillé (Étude de cas)</legend>
+      <label>
+        Objectif du projet
+        <textarea v-model="form.content.objective" rows="3" placeholder="Pourquoi ce projet ?"></textarea>
+      </label>
+      <div class="form-row">
+        <label>
+          Outils intégrés
+          <input v-model="form.content.tools" placeholder="Ex: Wazuh, Suricata, Docker (séparés par virgules)" />
+        </label>
+        <label>
+          Schéma d'architecture (URL Image)
+          <input v-model="form.content.architecture_image" type="url" placeholder="https://..." />
+        </label>
+      </div>
+      <label>
+        Architecture / Méthode
+        <textarea v-model="form.content.architecture" rows="4" placeholder="Comment ça marche ?"></textarea>
+      </label>
+      <label>
+        Flux d'alerte
+        <textarea v-model="form.content.alert_flow" rows="3" placeholder="Comment les alertes sont traitées ?"></textarea>
+      </label>
+      <label>
+        Ce que j'ai appris
+        <textarea v-model="form.content.lessons" rows="3" placeholder="Quels défis rencontrés ?"></textarea>
+      </label>
+      <label>
+        Impact du projet
+        <textarea v-model="form.content.impact" rows="2" placeholder="Résultat final ?"></textarea>
+      </label>
+    </fieldset>
+
     <p v-if="error" class="form-error" role="alert">{{ error }}</p>
     <div class="form-actions">
       <button type="button" class="button secondary" @click="$emit('cancel')">Annuler</button>
@@ -41,7 +97,8 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, computed, onMounted } from 'vue';
+import { getTags } from '../services/api';
 
 const props = defineProps({
   item: {
@@ -52,50 +109,73 @@ const props = defineProps({
 
 const emit = defineEmits(['submit', 'cancel']);
 const error = ref('');
+const allTags = ref([]);
+
 const form = reactive({
   type: 'parcours',
-  category: 'Cursus',
+  category: '',
   featured: false,
   title: '',
   subtitle: '',
   description: '',
+  github_url: '',
+  demo_url: '',
+  image_url: '',
+  display_order: 0,
+  content: {
+    objective: '',
+    architecture: '',
+    architecture_image: '',
+    alert_flow: '',
+    tools: '',
+    lessons: '',
+    impact: '',
+  }
 });
 
-const categoriesByType = {
-  parcours: ['Cursus', 'Diplôme', 'Certification', 'Formation', 'Stage', 'Expérience professionnelle'],
-  competence: [
-    'Sécurité / Cybersécurité',
-    'Administration réseau',
-    'Administration système',
-    'Méthodologie / Gestion de projet',
-    'Base de données',
-    'Compétences transversales',
-    'Infographie',
-    'Programmation web',
-    'Automatisation / Scripting',
-    'Virtualisation',
-  ],
-  realisation: [
-    'Réseau sécurité',
-    'Cybersécurité',
-    'Fibre optique',
-    'Maintenance',
-    'Conception',
-    'Administration système',
-    'Programmation web',
-    'Base de données',
-  ],
-};
+onMounted(async () => {
+  try {
+    allTags.value = await getTags();
+    if (!form.category && availableCategories.value.length > 0) {
+      form.category = availableCategories.value[0];
+    }
+  } catch (e) {
+    console.error("Erreur chargement tags", e);
+  }
+});
+
+const availableCategories = computed(() => {
+  return allTags.value.filter(t => t.type === form.type).map(t => t.name);
+});
 
 watch(
   () => props.item,
   (item) => {
     form.type = item?.type || 'parcours';
-    form.category = item?.category || categoriesByType[form.type][0];
+    form.category = item?.category || '';
     form.featured = Boolean(item?.featured);
     form.title = item?.title || '';
     form.subtitle = item?.subtitle || '';
     form.description = item?.description || '';
+    form.github_url = item?.github_url || '';
+    form.demo_url = item?.demo_url || '';
+    form.image_url = item?.image_url || '';
+    form.display_order = item?.display_order || 0;
+    
+    if (item?.content) {
+      form.content = { ...item.content };
+    } else {
+      form.content = {
+        objective: '',
+        architecture: '',
+        architecture_image: '',
+        alert_flow: '',
+        tools: '',
+        lessons: '',
+        impact: '',
+      };
+    }
+    
     error.value = '';
   },
   { immediate: true },
@@ -106,6 +186,10 @@ function submit() {
     error.value = 'Veuillez renseigner un titre, un sous-titre et une description suffisamment detailles.';
     return;
   }
+  if (!form.category) {
+    error.value = 'Veuillez sélectionner un tag / catégorie.';
+    return;
+  }
 
   emit('submit', { ...form });
 }
@@ -113,8 +197,8 @@ function submit() {
 watch(
   () => form.type,
   (type) => {
-    if (!categoriesByType[type].includes(form.category)) {
-      form.category = categoriesByType[type][0];
+    if (availableCategories.value.length > 0 && !availableCategories.value.includes(form.category)) {
+      form.category = availableCategories.value[0];
     }
     if (type !== 'realisation') {
       form.featured = false;
@@ -122,3 +206,28 @@ watch(
   },
 );
 </script>
+
+<style scoped>
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+.form-row label {
+  flex: 1;
+}
+.rich-content-fieldset {
+  border: 1px solid var(--border);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--surface-1);
+}
+.rich-content-fieldset legend {
+  padding: 0 0.5rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+</style>

@@ -61,3 +61,23 @@ export function deleteItem(id, token) {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
+
+export function getTags(type = '') {
+  const query = type ? `?type=${encodeURIComponent(type)}` : '';
+  return request(`/api/tags${query}`);
+}
+
+export function createTag(tag, token) {
+  return request('/api/tags', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(tag),
+  });
+}
+
+export function deleteTag(id, token) {
+  return request(`/api/tags/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}

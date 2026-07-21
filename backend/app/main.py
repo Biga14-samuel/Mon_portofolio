@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .auth import (
@@ -13,8 +14,8 @@ from .auth import (
 )
 from .config import Settings, get_settings
 from .database import get_db
-from .models import ITEM_TYPES, Item
-from .schemas import ItemCreate, ItemRead, ItemType, ItemUpdate, LoginRequest, TokenResponse
+from .models import ITEM_TYPES, Item, Tag
+from .schemas import ItemCreate, ItemRead, ItemType, ItemUpdate, LoginRequest, TagCreate, TagRead, TokenResponse
 
 app = FastAPI(title="Portfolio API", version="1.0.0")
 settings = get_settings()
@@ -48,10 +49,54 @@ def login(request: Request, payload: LoginRequest, settings: Settings = Depends(
 
 @app.get("/api/items", response_model=list[ItemRead])
 def list_items(type: ItemType | None = None, db: Session = Depends(get_db)) -> list[Item]:
-    query = select(Item).order_by(Item.created_at.desc(), Item.id.desc())
+    query = select(Item).order_by(Item.display_order.asc(), Item.created_at.desc(), Item.id.desc())
     if type is not None:
         query = query.where(Item.type == type)
     return list(db.scalars(query))
+
+
+@app.get("/api/tags", response_model=list[TagRead])
+def list_tags(type: ItemType | None = None, db: Session = Depends(get_db)) -> list[Tag]:
+    query = select(Tag).order_by(Tag.type.asc(), Tag.name.asc())
+    if type is not None:
+        query = query.where(Tag.type == type)
+    return list(db.scalars(query))
+
+
+@app.post("/api/tags", response_model=TagRead, status_code=status.HTTP_201_CREATED)
+def create_tag(
+    payload: TagCreate,
+    db: Session = Depends(get_db),
+    _: str = Depends(get_current_admin),
+) -> Tag:
+    tag = Tag(type=payload.type, name=payload.name.strip())
+    db.add(tag)
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ce tag existe déjà pour ce type.") from exc
+    db.refresh(tag)
+    return tag
+
+
+@app.delete("/api/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_tag(
+    tag_id: int,
+    db: Session = Depends(get_db),
+    _: str = Depends(get_current_admin),
+) -> Response:
+    tag = db.get(Tag, tag_id)
+    if tag is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag introuvable.")
+
+    in_use = db.scalar(select(func.count()).select_from(Item).where(Item.type == tag.type, Item.category == tag.name))
+    if in_use:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Ce tag est utilisé par un élément.")
+
+    db.delete(tag)
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @app.post("/api/items", response_model=ItemRead, status_code=status.HTTP_201_CREATED)
@@ -65,6 +110,10 @@ def create_item(
         data["featured"] = False
     elif data["featured"]:
         db.query(Item).filter(Item.type == "realisation", Item.featured.is_(True)).update({"featured": False})
+
+    if data["display_order"] == 0:
+        max_order = db.scalar(select(func.max(Item.display_order)).where(Item.type == data["type"])) or 0
+        data["display_order"] = max_order + 10
 
     item = Item(**data)
     db.add(item)
