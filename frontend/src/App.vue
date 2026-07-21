@@ -24,7 +24,16 @@
             <strong>Disponible</strong>
             <span>Stage, emploi junior, mission IT ou cybersécurité.</span>
           </div>
-          <h1>SAMNICK BIGA RAOUL AUBIN</h1>
+          <h1 class="wave-name" aria-label="SAMNICK BIGA RAOUL AUBIN">
+            <span
+              v-for="(char, idx) in 'SAMNICK BIGA RAOUL AUBIN'.split('')"
+              :key="idx"
+              class="wave-char"
+              :style="{ animationDelay: `${idx * 0.04}s` }"
+            >
+              {{ char === ' ' ? '\u00A0' : char }}
+            </span>
+          </h1>
           <h2>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</h2>
           <p>
             Je conçois, sécurise et documente des environnements réseau avec une attention particulière pour la

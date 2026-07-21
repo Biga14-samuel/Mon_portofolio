@@ -153,6 +153,31 @@ main {
   letter-spacing: 0;
 }
 
+.wave-name {
+  display: inline-flex;
+  flex-wrap: wrap;
+  cursor: default;
+}
+
+.wave-char {
+  display: inline-block;
+  transition: transform 0.35s ease;
+  will-change: transform;
+}
+
+.wave-name:hover .wave-char {
+  animation: waveLetter 0.65s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+@keyframes waveLetter {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-12px);
+  }
+}
+
 .hero h2 {
   margin: 0 0 18px;
   color: var(--aubergine);
