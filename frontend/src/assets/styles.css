@@ -30,6 +30,25 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 86px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--outline) var(--surface);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--outline);
+  border-radius: 6px;
+  border: 2px solid var(--surface);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--aubergine);
 }
 
 body {
@@ -58,10 +77,10 @@ a {
   justify-content: space-between;
   gap: 24px;
   padding: 16px clamp(16px, 4vw, 48px);
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid rgba(44, 0, 30, 0.1);
+  background: rgba(244, 240, 243, 0.85); /* Translucent surface-soft */
+  border-bottom: 1px solid rgba(119, 33, 111, 0.1);
   backdrop-filter: blur(14px);
-  box-shadow: 0 2px 12px rgba(44, 0, 30, 0.06);
+  box-shadow: 0 2px 12px rgba(119, 33, 111, 0.06);
 }
 
 .brand {
@@ -346,9 +365,7 @@ main {
   position: relative;
   min-height: 560px;
   padding: 18px;
-  background:
-    linear-gradient(135deg, rgba(233, 84, 32, 0.16), rgba(119, 33, 111, 0.12)),
-    #fff;
+  background: var(--surface-soft);
   animation: heroPhotoIn 900ms cubic-bezier(0.4, 0, 0.2, 1) 120ms both;
 }
 
@@ -427,9 +444,7 @@ main {
   margin: 0 auto 72px;
   padding: clamp(32px, 5vw, 56px);
   border-radius: 20px;
-  background:
-    linear-gradient(135deg, rgba(44, 0, 30, 0.04), rgba(233, 84, 32, 0.06)),
-    #fff;
+  background: var(--surface-soft);
   box-shadow: var(--shadow);
 }
 
@@ -713,9 +728,7 @@ main {
   margin: 0 auto 80px;
   padding: clamp(28px, 5vw, 44px);
   border-radius: 20px;
-  background:
-    linear-gradient(135deg, rgba(119, 33, 111, 0.045), rgba(233, 84, 32, 0.055)),
-    #fff;
+  background: var(--surface-soft);
   box-shadow: var(--shadow);
 }
 
@@ -738,11 +751,7 @@ main {
 }
 
 .animated-word {
-  background: linear-gradient(90deg, var(--ubuntu-orange), var(--aubergine), var(--tag-network), var(--ubuntu-orange));
-  background-size: 240% 100%;
-  background-clip: text;
-  color: transparent;
-  animation: animatedWordFlow 4600ms ease-in-out infinite;
+  color: var(--ubuntu-orange-dark);
 }
 
 .stack-heading p {
@@ -1056,10 +1065,7 @@ textarea {
   align-items: end;
   overflow: hidden;
   border-radius: 20px;
-  background:
-    linear-gradient(135deg, rgba(44, 0, 30, 0.82), rgba(119, 33, 111, 0.62)),
-    radial-gradient(circle at 18% 20%, rgba(233, 84, 32, 0.36), transparent 34%),
-    var(--aubergine-dark);
+  background: var(--aubergine-dark);
   box-shadow: var(--shadow);
   transition:
     transform 260ms ease,
@@ -1094,9 +1100,7 @@ textarea {
 }
 
 .empty-featured {
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(233, 84, 32, 0.08)),
-    #fff;
+  background: var(--surface-soft);
   border: 1px dashed rgba(119, 33, 111, 0.28);
 }
 
@@ -1269,11 +1273,14 @@ td {
   place-items: center;
   padding: 20px;
   background: rgba(44, 0, 30, 0.42);
+  backdrop-filter: blur(8px);
+  animation: modalFadeIn 250ms ease-out forwards;
 }
 
 .modal {
   width: min(100%, 620px);
   padding: 28px;
+  animation: modalSlideUp 350ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .case-modal {
@@ -1284,6 +1291,23 @@ td {
   border-radius: 20px;
   background: #fff;
   box-shadow: var(--shadow-lift);
+  animation: modalSlideUp 400ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .case-progress {
@@ -1461,6 +1485,12 @@ td {
   color: #fff;
 }
 
+.contact-section .pill-badge {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
 .contact-copy {
   display: flex;
   flex-direction: column;
@@ -1544,9 +1574,9 @@ footer {
   gap: 16px;
   flex-wrap: wrap;
   padding: 24px clamp(16px, 4vw, 48px);
-  border-top: 1px solid rgba(233, 84, 32, 0.2);
-  color: var(--muted);
-  background: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  background: var(--aubergine-dark);
 }
 
 @media (max-width: 900px) {

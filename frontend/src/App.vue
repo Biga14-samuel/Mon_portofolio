@@ -3,7 +3,7 @@
     <header class="topbar">
       <a class="brand" href="#accueil" aria-label="Portfolio - accueil">
         <span class="brand-mark" aria-hidden="true"></span>
-        <span>SAMNICK BIGA</span>
+        <span>Portfolio</span>
       </a>
       <nav aria-label="Navigation principale">
         <a href="#apropos">À propos</a>
@@ -19,18 +19,17 @@
     <main id="accueil">
       <section class="hero">
         <div class="hero-copy">
-          <PillBadge tone="orange">Disponible pour stage, emploi ou mission IT</PillBadge>
+          <div class="availability-card" aria-label="Statut professionnel">
+            <span class="availability-dot" aria-hidden="true"></span>
+            <strong>Disponible</strong>
+            <span>Stage, emploi junior, mission IT ou cybersécurité.</span>
+          </div>
           <h1>SAMNICK BIGA RAOUL AUBIN</h1>
-          <h2>Administrateur réseau et sécurité des systèmes | IT Consultant | SOC Analyst Junior</h2>
+          <h2>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</h2>
           <p>
             Je conçois, sécurise et documente des environnements réseau avec une attention particulière pour la
             supervision, la détection et la réponse aux incidents.
           </p>
-          <div class="availability-card" aria-label="Statut professionnel">
-            <span class="availability-dot" aria-hidden="true"></span>
-            <strong>Disponible</strong>
-            <span>Stage, emploi junior, mission IT, administration réseau ou cybersécurité.</span>
-          </div>
           <ul class="hero-facts" aria-label="Informations principales">
             <li>Yaoundé, Cameroun</li>
             <li>Réseaux (Cisco, Fortinet), Systèmes (Linux/Windows), Sécurité (SIEM, EDR)</li>
@@ -38,14 +37,8 @@
           </ul>
           <div class="hero-actions">
             <a class="button primary" href="#realisations">Voir mes projets</a>
-            <a class="button secondary" href="mailto:samuelbiga10@gmail.com">Me contacter</a>
+            <a class="button secondary" href="#contact">Me contacter</a>
             <button class="button tertiary" type="button" disabled title="Le CV sera ajouté plus tard">Télécharger CV</button>
-          </div>
-          <div class="contact-links" aria-label="Liens de contact">
-            <a href="mailto:samuelbiga10@gmail.com">samuelbiga10@gmail.com</a>
-            <a href="tel:+237654881101">+237 654 881 101</a>
-            <a href="https://github.com/Biga14-samuel" target="_blank" rel="noreferrer">GitHub</a>
-            <a href="https://www.linkedin.com/in/aubinbiga" target="_blank" rel="noreferrer">LinkedIn</a>
           </div>
           <a class="scroll-cue" href="#realisations" aria-label="Descendre vers les projets">
             <span></span>
@@ -357,8 +350,8 @@
     </div>
 
     <footer>
-      <strong>SAMNICK BIGA RAOUL AUBIN</strong>
-      <span>Yaoundé, Cameroun - samuelbiga10@gmail.com</span>
+      <strong>&copy; {{ new Date().getFullYear() }} Samnick Biga</strong>
+      <a href="#accueil" style="text-decoration: none;">Retour en haut &uarr;</a>
     </footer>
   </div>
 </template>
