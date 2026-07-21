@@ -26,7 +26,7 @@
           </div>
           <h1 class="wave-name" aria-label="SAMNICK BIGA RAOUL AUBIN">
             <span
-              v-for="(word, wIdx) in ['SAMNICK', 'BIGA', 'RAOUL', 'AUBIN']"
+              v-for="(word, wIdx) in nameWords"
               :key="wIdx"
               class="wave-word"
             >
@@ -34,11 +34,11 @@
                 v-for="(char, cIdx) in word.split('')"
                 :key="cIdx"
                 class="wave-char"
-                :style="{ animationDelay: `${(wIdx * 7 + cIdx) * 0.05}s` }"
+                :style="{ animationDelay: `${getGlobalCharIndex(wIdx, cIdx) * 0.07}s` }"
               >
                 {{ char }}
               </span>
-              <span v-if="wIdx < 3" class="wave-space">&nbsp;</span>
+              <span v-if="wIdx < nameWords.length - 1" class="wave-space">&nbsp;</span>
             </span>
           </h1>
           <h2>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</h2>
@@ -384,6 +384,16 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import { LockKeyhole, Plus, ArrowLeft } from 'lucide-vue-next';
 import ContentSection from './components/ContentSection.vue';
+
+const nameWords = ['SAMNICK', 'BIGA', 'RAOUL', 'AUBIN'];
+
+function getGlobalCharIndex(wIdx, cIdx) {
+  let count = 0;
+  for (let i = 0; i < wIdx; i++) {
+    count += nameWords[i].length + 1;
+  }
+  return count + cIdx;
+}
 import ItemForm from './components/ItemForm.vue';
 import PillBadge from './components/PillBadge.vue';
 import StackToolsSection from './components/StackToolsSection.vue';

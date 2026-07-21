@@ -176,15 +176,24 @@ main {
 }
 
 .wave-name:hover .wave-char {
-  animation: waveLetter 0.65s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+  animation: waveLetter 1.2s ease-in-out infinite;
 }
 
 @keyframes waveLetter {
   0% {
     transform: translateY(0);
   }
+  25% {
+    transform: translateY(-16px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(8px);
+  }
   100% {
-    transform: translateY(-12px);
+    transform: translateY(0);
   }
 }
 
