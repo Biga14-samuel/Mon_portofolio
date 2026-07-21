@@ -34,7 +34,9 @@
                 v-for="(char, cIdx) in word.split('')"
                 :key="cIdx"
                 class="wave-char"
-                :style="{ animationDelay: `${getGlobalCharIndex(wIdx, cIdx) * 0.045}s` }"
+                :style="charStyles[getGlobalCharIndex(wIdx, cIdx)]"
+                @mousemove="handleCharMouseMove($event, getGlobalCharIndex(wIdx, cIdx))"
+                @mouseleave="handleCharMouseLeave(getGlobalCharIndex(wIdx, cIdx))"
               >
                 {{ char }}
               </span>
@@ -386,6 +388,8 @@ import { LockKeyhole, Plus, ArrowLeft } from 'lucide-vue-next';
 import ContentSection from './components/ContentSection.vue';
 
 const nameWords = ['SAMNICK', 'BIGA', 'RAOUL', 'AUBIN'];
+const charStyles = reactive({});
+let lastMouseX = 0;
 
 function getGlobalCharIndex(wIdx, cIdx) {
   let count = 0;
@@ -393,6 +397,28 @@ function getGlobalCharIndex(wIdx, cIdx) {
     count += nameWords[i].length + 1;
   }
   return count + cIdx;
+}
+
+function handleCharMouseMove(e, idx) {
+  const currentX = e.clientX;
+  const deltaX = currentX - (lastMouseX || currentX);
+  lastMouseX = currentX;
+
+  const dir = deltaX > 0 ? 1 : deltaX < 0 ? -1 : 0;
+  const shiftX = dir !== 0 ? dir * 20 : 14;
+  const rotateDeg = dir !== 0 ? dir * 22 : 16;
+
+  charStyles[idx] = {
+    transform: `translate(${shiftX}px, -20px) rotate(${rotateDeg}deg) scale(1.24)`,
+    color: 'var(--ubuntu-orange-dark)',
+  };
+}
+
+function handleCharMouseLeave(idx) {
+  charStyles[idx] = {
+    transform: 'translate(0px, 0px) rotate(0deg) scale(1)',
+    color: 'inherit',
+  };
 }
 import ItemForm from './components/ItemForm.vue';
 import PillBadge from './components/PillBadge.vue';
