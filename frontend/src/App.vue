@@ -34,7 +34,7 @@
                 v-for="(char, cIdx) in word.split('')"
                 :key="cIdx"
                 class="wave-char"
-                :style="{ animationDelay: `${getGlobalCharIndex(wIdx, cIdx) * 0.07}s` }"
+                :style="{ animationDelay: `${getGlobalCharIndex(wIdx, cIdx) * 0.045}s` }"
               >
                 {{ char }}
               </span>
