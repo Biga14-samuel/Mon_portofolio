@@ -1,20 +1,22 @@
 <template>
   <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="#accueil" aria-label="Portfolio - accueil">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>Portfolio</span>
-      </a>
-      <nav aria-label="Navigation principale">
-        <a href="#apropos">À propos</a>
-        <a href="#parcours">Parcours</a>
-        <a href="#competences">Stack & outils</a>
-        <a href="#realisations">Realisations</a>
-        <a href="#contact">Contact</a>
-        <button v-if="!authState.token" class="nav-button" type="button" @click="showLogin = true">Admin</button>
-        <button v-else class="nav-button" type="button" @click="logout">Deconnexion</button>
-      </nav>
-    </header>
+    <div class="topbar-wrapper">
+      <header class="topbar">
+        <a class="brand" href="#accueil" aria-label="Portfolio - accueil">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>Portfolio</span>
+        </a>
+        <nav aria-label="Navigation principale">
+          <a href="#apropos">À propos</a>
+          <a href="#parcours">Parcours</a>
+          <a href="#competences">Stack & outils</a>
+          <a href="#realisations">Réalisations</a>
+          <a href="#contact">Contact</a>
+          <button v-if="!authState.token" class="nav-button" type="button" @click="showLogin = true">Admin</button>
+          <button v-else class="nav-button" type="button" @click="logout">Déconnexion</button>
+        </nav>
+      </header>
+    </div>
 
     <main id="accueil">
       <section class="hero">
