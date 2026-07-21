@@ -77,10 +77,11 @@ a {
   justify-content: space-between;
   gap: 24px;
   padding: 16px clamp(16px, 4vw, 48px);
-  background: rgba(244, 240, 243, 0.85); /* Translucent surface-soft */
-  border-bottom: 1px solid rgba(119, 33, 111, 0.1);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 2px 12px rgba(119, 33, 111, 0.06);
+  background: rgba(244, 240, 243, 0.55);
+  border-bottom: 1px solid rgba(119, 33, 111, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 2px 14px rgba(119, 33, 111, 0.08);
 }
 
 .brand {
