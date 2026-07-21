@@ -54,37 +54,37 @@
       <span>Mettre cette réalisation à la une</span>
     </label>
 
-    <fieldset v-if="form.type === 'realisation'" class="rich-content-fieldset">
-      <legend>Contenu détaillé (Étude de cas)</legend>
+    <fieldset class="rich-content-fieldset">
+      <legend>Contenu détaillé (Vue zoom / Fiche complète)</legend>
       <label>
-        Objectif du projet
-        <textarea v-model="form.content.objective" rows="3" placeholder="Pourquoi ce projet ?"></textarea>
+        {{ form.type === 'realisation' ? 'Objectif du projet' : form.type === 'parcours' ? 'Missions & Objectifs' : 'Contexte & Utilisation' }}
+        <textarea v-model="form.content.objective" rows="3" :placeholder="form.type === 'realisation' ? 'Pourquoi ce projet ?' : 'Quelles étaient vos responsabilités / le contexte ?'"></textarea>
       </label>
       <div class="form-row">
         <label>
-          Outils intégrés
-          <input v-model="form.content.tools" placeholder="Ex: Wazuh, Suricata, Docker (séparés par virgules)" />
+          {{ form.type === 'realisation' ? 'Outils intégrés' : form.type === 'parcours' ? 'Technos / Outils utilisés' : 'Outils associés' }}
+          <input v-model="form.content.tools" placeholder="Ex: Wazuh, Cisco, Linux (séparés par virgules)" />
         </label>
         <label>
-          Schéma d'architecture (URL Image)
+          Media / Illustration / Certificat (URL Image)
           <input v-model="form.content.architecture_image" type="url" placeholder="https://..." />
         </label>
       </div>
       <label>
-        Architecture / Méthode
-        <textarea v-model="form.content.architecture" rows="4" placeholder="Comment ça marche ?"></textarea>
+        {{ form.type === 'realisation' ? 'Architecture / Méthode' : form.type === 'parcours' ? 'Activités clés & Déroulement' : 'Détails techniques & Niveau' }}
+        <textarea v-model="form.content.architecture" rows="4" placeholder="Explication détaillée..."></textarea>
       </label>
       <label>
-        Flux d'alerte
-        <textarea v-model="form.content.alert_flow" rows="3" placeholder="Comment les alertes sont traitées ?"></textarea>
+        {{ form.type === 'realisation' ? 'Flux d\'alerte' : form.type === 'parcours' ? 'Méthodologie & Rôle' : 'Cas d\'usage / Projets liés' }}
+        <textarea v-model="form.content.alert_flow" rows="3" placeholder="Informations complémentaires..."></textarea>
       </label>
       <label>
-        Ce que j'ai appris
-        <textarea v-model="form.content.lessons" rows="3" placeholder="Quels défis rencontrés ?"></textarea>
+        {{ form.type === 'realisation' ? 'Ce que j\'ai appris' : form.type === 'parcours' ? 'Compétences développées' : 'Points forts & Maîtrise' }}
+        <textarea v-model="form.content.lessons" rows="3" placeholder="Acquis techniques ou méthodologiques..."></textarea>
       </label>
       <label>
-        Impact du projet
-        <textarea v-model="form.content.impact" rows="2" placeholder="Résultat final ?"></textarea>
+        {{ form.type === 'realisation' ? 'Impact du projet' : form.type === 'parcours' ? 'Bilan / Résultat' : 'Certifications / Attestation' }}
+        <textarea v-model="form.content.impact" rows="2" placeholder="Résultat final ou validation..."></textarea>
       </label>
     </fieldset>
 

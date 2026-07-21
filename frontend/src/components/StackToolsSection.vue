@@ -26,6 +26,9 @@
               <h3>{{ item.title }}</h3>
               <small>{{ item.subtitle }}</small>
               <p>{{ item.description }}</p>
+              <button class="case-link" type="button" style="margin-top: 0.5rem;" @click="$emit('view-case', item)">
+                Voir le détail
+              </button>
             </div>
             <div v-if="editable" class="card-actions stack-actions" aria-label="Actions administrateur">
               <button class="icon-button" type="button" :aria-label="`Modifier ${item.title}`" @click="$emit('edit', item)">
@@ -57,7 +60,7 @@ const props = defineProps({
   editable: { type: Boolean, default: false },
 });
 
-defineEmits(['edit', 'delete']);
+defineEmits(['edit', 'delete', 'view-case']);
 
 const categoryOrder = [
   'Détection',

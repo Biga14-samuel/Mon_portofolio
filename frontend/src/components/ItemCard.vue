@@ -20,8 +20,8 @@
       </a>
     </div>
 
-    <button v-if="item.type === 'realisation'" class="case-link" type="button" @click="$emit('view-case', item)">
-      Voir l'étude de cas
+    <button class="case-link" type="button" @click="$emit('view-case', item)">
+      {{ item.type === 'realisation' ? "Voir l'étude de cas" : "Voir le détail" }}
     </button>
     <div v-if="editable" class="card-actions" aria-label="Actions administrateur">
       <button class="icon-button" type="button" :aria-label="`Modifier ${item.title}`" @click="$emit('edit', item)">

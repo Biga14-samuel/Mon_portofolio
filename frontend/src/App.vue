@@ -199,6 +199,7 @@
               :editable="Boolean(authState.token)"
               @edit="openEdit"
               @delete="remove"
+              @view-case="openCaseStudy"
             />
             <ContentSection
               id="realisations"
@@ -417,48 +418,44 @@ const caseStudyStack = computed(() => {
 const activeCaseStudy = computed(() => {
   if (!caseStudyItem.value) return [];
   const c = caseStudyItem.value.content || {};
+  const type = caseStudyItem.value.type;
   const sections = [];
   let num = 1;
 
   sections.push({
     number: String(num++).padStart(2, '0'),
-    title: 'Contexte',
+    title: 'Présentation & Contexte',
     body: caseStudyItem.value.description,
   });
 
   if (c.objective) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: 'Objectif',
+      title: type === 'realisation' ? 'Objectif' : type === 'parcours' ? 'Missions & Objectifs' : 'Contexte & Utilisation',
       body: c.objective,
-    });
-  } else if (!c.objective && !c.architecture && !c.impact) {
-    sections.push({
-      number: String(num++).padStart(2, '0'),
-      title: 'Objectif',
-      body: "À préciser dans l'administration lorsque tu complèteras cette réalisation.",
     });
   }
 
   if (c.architecture) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: 'Architecture / méthode',
+      title: type === 'realisation' ? 'Architecture / méthode' : type === 'parcours' ? 'Activités clés & Déroulement' : 'Détails techniques & Niveau',
       body: c.architecture,
       image: c.architecture_image,
     });
-  } else if (!c.objective && !c.architecture && !c.impact) {
+  } else if (c.architecture_image) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: 'Architecture / méthode',
-      body: "À compléter avec l'organisation technique, les étapes de conception ou la méthode de réalisation.",
+      title: 'Illustration / Document',
+      body: '',
+      image: c.architecture_image,
     });
   }
 
   if (c.alert_flow) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: 'Flux d\'alerte',
+      title: type === 'realisation' ? 'Flux d\'alerte' : type === 'parcours' ? 'Méthodologie & Organisation' : 'Cas d\'usage & Projets liés',
       body: c.alert_flow,
     });
   }
@@ -466,7 +463,7 @@ const activeCaseStudy = computed(() => {
   if (c.lessons) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: 'Ce que j\'ai appris',
+      title: type === 'realisation' ? 'Ce que j\'ai appris' : type === 'parcours' ? 'Compétences développées' : 'Points forts & Maîtrise',
       body: c.lessons,
     });
   }
@@ -474,14 +471,16 @@ const activeCaseStudy = computed(() => {
   if (c.impact) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: 'Impact',
+      title: type === 'realisation' ? 'Impact' : type === 'parcours' ? 'Bilan / Résultat' : 'Certifications / Attestation',
       body: c.impact,
     });
-  } else if (!c.objective && !c.architecture && !c.impact) {
+  }
+
+  if (sections.length === 1) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: 'Résultats',
-      body: "À compléter avec les résultats obtenus, les livrables produits ou l'impact du projet.",
+      title: 'Détails complémentaires',
+      body: "Vous pouvez compléter cette fiche depuis l'espace Administration pour ajouter des images, des explications détaillées ou un bilan.",
     });
   }
 
