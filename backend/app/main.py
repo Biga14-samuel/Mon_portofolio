@@ -5,6 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from .auth import (
     check_rate_limit,
@@ -24,6 +27,11 @@ from .schemas import ItemCreate, ItemRead, ItemType, ItemUpdate, LoginRequest, T
 app = FastAPI(title="Portfolio API", version="1.0.0")
 settings = get_settings()
 
+# Setup Rate Limiter
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
@@ -31,6 +39,15 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 
 @app.get("/health")
@@ -192,7 +209,8 @@ def list_testimonials(request: Request, db: Session = Depends(get_db)) -> list[T
 
 
 @app.post("/api/testimonials", response_model=TestimonialRead, status_code=status.HTTP_201_CREATED)
-def create_testimonial(payload: TestimonialCreate, db: Session = Depends(get_db)) -> Testimonial:
+@limiter.limit("5/minute")
+def create_testimonial(request: Request, payload: TestimonialCreate, db: Session = Depends(get_db)) -> Testimonial:
     testimonial = Testimonial(**payload.model_dump())
     db.add(testimonial)
     db.commit()
@@ -233,7 +251,8 @@ def delete_testimonial(
 
 
 @app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
-def send_contact_email(payload: ContactRequest, background_tasks: BackgroundTasks, settings: Settings = Depends(get_settings)) -> dict[str, str]:
+@limiter.limit("3/minute")
+def send_contact_email(request: Request, payload: ContactRequest, background_tasks: BackgroundTasks, settings: Settings = Depends(get_settings)) -> dict[str, str]:
     if not settings.smtp_user or not settings.smtp_password:
         raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="L'envoi d'email n'est pas encore configuré (SMTP manquant).")
 

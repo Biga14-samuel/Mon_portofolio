@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Literal
+import nh3
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, EmailStr
 
 ItemType = Literal["parcours", "competence", "realisation"]
 
@@ -82,6 +83,13 @@ class TestimonialBase(BaseModel):
             return None
         return value
 
+    @field_validator("content", "client_name", "client_company", mode="after")
+    @classmethod
+    def sanitize_html(cls, value: str | None) -> str | None:
+        if isinstance(value, str):
+            # nh3.clean supprime toutes les balises HTML dangereuses (protection XSS)
+            return nh3.clean(value)
+        return value
 
 class TestimonialCreate(TestimonialBase):
     pass
@@ -100,7 +108,14 @@ class TestimonialRead(TestimonialBase):
 
 
 class ContactRequest(BaseModel):
-    email: str = Field(min_length=5, max_length=150)
+    email: EmailStr = Field(max_length=150)
     subject: str | None = Field(default=None, max_length=150)
     message: str = Field(min_length=10, max_length=3000)
+
+    @field_validator("subject", "message", mode="after")
+    @classmethod
+    def sanitize_html(cls, value: str | None) -> str | None:
+        if isinstance(value, str):
+            return nh3.clean(value)
+        return value
 
