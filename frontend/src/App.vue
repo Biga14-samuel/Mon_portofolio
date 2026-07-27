@@ -5,7 +5,7 @@
       <header class="topbar">
         <a href="#accueil" class="brand" @click="playClick" @mouseenter="playHover">
           <DynamicLogo />
-          <span style="margin-left: 12px;">Mon portfolio <span class="brand-dot">.</span></span>
+          <span style="margin-left: 12px;">Mon portfolio</span>
         </a>
         <nav class="nav-links" aria-label="Navigation principale">
           <button class="nav-button" @click="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
