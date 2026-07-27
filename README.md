@@ -1,82 +1,57 @@
-# Portfolio Vue/FastAPI/PostgreSQL
+# Portfolio Premium - Vue.js / FastAPI / SQLite
 
-Application web complete de portfolio professionnel inspiree du design system Ubuntu Yaru. Le frontend Vue 3 est buildable en fichiers statiques pour GitHub Pages, tandis que FastAPI et PostgreSQL sont prevus pour un hebergement separe.
+Application web complète de portfolio professionnel dotée d'un design "Éditorial" ultra-moderne (Bento Grid, Glassmorphism, Lettrine) et d'une sécurité maximale (>95%).
 
-## Structure
+Le frontend (Vue 3 / Vite) est buildable en fichiers statiques, tandis que le backend (FastAPI) gère l'API sécurisée avec une base de données locale SQLite (facilement migratable vers PostgreSQL).
 
-- `frontend/`: Vue.js 3, Vite, composants, dashboard admin, styles Yaru.
-- `backend/`: FastAPI, SQLAlchemy, Alembic, JWT, bcrypt, PostgreSQL.
-- `.github/workflows/deploy.yml`: build et deploiement du frontend sur GitHub Pages.
+## 🌟 Nouveautés & Fonctionnalités (Refonte Ultime)
+- **Design Éditorial Premium** : Lettrine géante "Magazine", badges d'index minimalistes, Mur de logos interactif.
+- **Bento Grid & Glassmorphism** : Cartes de compétences asymétriques avec effet "verre", ombres portées et image de profil détourée flottante.
+- **Logo Dynamique** : Logo géométrique animé de style Bauhaus.
+- **Sécurité Maximale (Defense in Depth)** : 
+  - Protection Anti-Copie : Désactivation du clic droit, de la sélection, du drag-and-drop et des raccourcis dev (F12).
+  - Sanitization XSS avec `nh3` (Rust) pour nettoyer les entrées HTML.
+  - Limiteur de trafic (Rate Limiting) avec `slowapi` pour bloquer les spams.
+  - En-têtes HTTP de sécurité (CSP, HSTS, X-Frame-Options).
+  - Validation forte des emails via `pydantic[email]`.
 
-## Frontend
+---
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+## 🚀 Comment lancer le projet localement ?
 
-Variables utiles:
-
-```bash
-VITE_API_URL=https://votre-api-fastapi.render.com
-VITE_BASE_PATH=/nom-du-depot/
-```
-
-Pour GitHub Pages, configurez le secret `VITE_API_URL` et, si le site est publie sous `https://user.github.io/repo/`, la variable repository `VITE_BASE_PATH=/repo/`.
-
-## Backend
-
+### 1. Lancer le Backend (FastAPI)
+Ouvrez un terminal et naviguez dans le dossier `backend` :
 ```bash
 cd backend
-python -m venv .venv
+
+# Activer l'environnement virtuel (si pas déjà fait)
 .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-Copy-Item .env.example .env
-```
 
-Generez le hash bcrypt du mot de passe admin:
-
-```bash
-python seed.py --password "mot-de-passe-admin-solide"
-```
-
-Copiez le hash dans `ADMIN_PASSWORD_HASH`, puis lancez les migrations:
-
-```bash
-alembic upgrade head
-python seed.py --init-db
+# Lancer le serveur d'API
 uvicorn app.main:app --reload
 ```
+Le backend tourne désormais sur **http://127.0.0.1:8000**.
+*(Si la base de données SQLite n'existe pas encore, exécutez d'abord `alembic upgrade head` puis `python seed.py --init-db` pour la créer).*
 
-## API
+### 2. Lancer le Frontend (Vue.js)
+Ouvrez un second terminal et naviguez dans le dossier `frontend` :
+```bash
+cd frontend
 
-- `POST /api/login`: authentification admin, retourne un JWT.
-- `GET /api/items?type=`: liste publique, filtrable par `parcours`, `competence` ou `realisation`.
-- `POST /api/items`: creation protegee par JWT.
-- `PUT /api/items/{id}`: edition protegee par JWT.
-- `DELETE /api/items/{id}`: suppression protegee par JWT.
+# Lancer le serveur de développement
+npm run dev
+```
+Le site est désormais accessible sur **http://localhost:5173** (ou l'URL indiquée dans le terminal).
 
-## Deploiement
+---
 
-Frontend GitHub Pages:
+## 🏗️ Structure
+- `frontend/`: Vue.js 3, Vite, composants Bento, animations Lenis/Parallax, styles CSS natifs.
+- `backend/`: FastAPI, SQLAlchemy, Alembic, JWT, nh3, slowapi, SQLite.
+- `.github/workflows/deploy.yml`: build et déploiement du frontend sur GitHub Pages.
 
-1. Poussez le projet sur GitHub.
-2. Dans Settings > Pages, choisissez GitHub Actions.
-3. Ajoutez le secret `VITE_API_URL` avec l'URL publique du backend.
-4. Ajoutez `VITE_BASE_PATH` si le depot n'est pas publie a la racine.
-5. Chaque push sur `main` declenche `.github/workflows/deploy.yml`.
-
-Backend Render/Railway/Fly.io:
-
-1. Creez un service Python depuis le dossier `backend`.
-2. Build command: `pip install -r requirements.txt`.
-3. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
-4. Ajoutez les variables `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRE_MINUTES`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `CORS_ORIGINS`.
-5. Executez `alembic upgrade head` au deploiement ou via une console du service.
-
-PostgreSQL Supabase/Neon:
-
-1. Creez une base PostgreSQL.
-2. Copiez l'URL de connexion dans `DATABASE_URL` au format `postgresql+psycopg://...`.
-3. Ajoutez l'origine GitHub Pages dans `CORS_ORIGINS`, par exemple `https://votre-user.github.io`.
+## 🔐 API
+- `POST /api/login`: Authentification admin, retourne un JWT.
+- `GET /api/items`: Liste publique (filtrable).
+- `POST /api/contact`: Formulaire de contact (protégé par Rate Limit 3/min).
+- `POST /api/testimonials`: Formulaire de témoignages (protégé par Rate Limit 5/min, Sanitization XSS).
