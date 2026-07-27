@@ -5,7 +5,7 @@
     </div>
 
     <div v-if="testimonials.length === 0 && !editable" class="empty-state">
-      <p>Aucun témoignage pour le moment. Soyez le premier à partager votre expérience !</p>
+      <p style="text-align: center;">Aucun témoignage pour le moment. Soyez le premier à partager votre expérience !</p>
     </div>
 
     <div v-else class="carousel-container">

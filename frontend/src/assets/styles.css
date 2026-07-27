@@ -55,6 +55,7 @@ body {
   margin: 0;
   min-width: 320px;
   background: var(--surface);
+  overflow-x: hidden;
 }
 
 button,

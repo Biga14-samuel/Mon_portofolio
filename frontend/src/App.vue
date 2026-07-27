@@ -5,7 +5,7 @@
       <header class="topbar">
         <a href="#accueil" class="brand" @click="playClick" @mouseenter="playHover">
           <DynamicLogo />
-          <span style="margin-left: 12px;">Samuel Biga <span class="brand-dot">.</span></span>
+          <span style="margin-left: 12px;">Mon portfolio <span class="brand-dot">.</span></span>
         </a>
         <nav class="nav-links" aria-label="Navigation principale">
           <button class="nav-button" @click="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
@@ -105,11 +105,6 @@
           <p>
             Jeune diplômé en Licence Professionnelle Réseaux et Sécurité Informatique à l'IHTM, je suis passionné par la conception d'architectures sécurisées et l'administration des systèmes. Ma récente expérience chez PANESS IT m'a permis de consolider mes acquis en déployant de A à Z un environnement complet de supervision et de réponse aux incidents.
           </p>
-        </div>
-        <div class="about-visual">
-          <div class="photo-wrapper parallax cutout-wrapper" data-parallax-speed="0.05">
-            <img src="/photo-profil.jpg" alt="Samuel Biga" class="profile-photo cutout-image" />
-          </div>
         </div>
         <div class="about-grid">
           <article class="about-card">
@@ -231,7 +226,7 @@
       <Transition name="filter-swap" mode="out-in">
         <div :key="`${selectedType}-${selectedCategory}`" class="portfolio-results">
           <p v-if="loading" class="empty-state" role="status">Chargement du portfolio...</p>
-          <p v-else-if="loadError" class="form-error" role="alert">{{ loadError }}</p>
+          <p v-else-if="loadError" class="form-error" role="alert" style="text-align: center;">{{ loadError }}</p>
 
           <template v-else>
             <ContentSection
