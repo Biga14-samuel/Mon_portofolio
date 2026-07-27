@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     admin_username: str
     admin_password_hash: str
     cors_origins: str = "http://localhost:5173"
+    smtp_server: str = "smtp.gmail.com"
+    smtp_port: int = 465
+    smtp_user: str = ""
+    smtp_password: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

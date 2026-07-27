@@ -1,5 +1,5 @@
 <template>
-  <section class="stack-section reveal-on-scroll" :id="id" :aria-labelledby="`${id}-title`">
+  <section class="stack-section reveal-on-scroll blueprint-bg" :id="id" :aria-labelledby="`${id}-title`">
     <div class="stack-heading">
       <div>
         <PillBadge tone="aubergine">Stack configurable</PillBadge>
@@ -20,8 +20,8 @@
           <span>{{ group.items.length }} élément{{ group.items.length > 1 ? 's' : '' }}</span>
         </div>
 
-        <div class="stack-tools">
-          <article v-for="item in group.items" :key="item.id" class="stack-tool">
+        <div class="bento-grid">
+          <article v-for="(item, index) in group.items" :key="item.id" class="bento-card stack-tool" :class="getRandomBentoSize(index)">
             <div>
               <h3>{{ item.title }}</h3>
               <small>{{ item.subtitle }}</small>
@@ -98,4 +98,10 @@ const stackGroups = computed(() => {
       return orderA - orderB || a.category.localeCompare(b.category);
     });
 });
+
+const getRandomBentoSize = (index) => {
+  if (index % 5 === 0) return 'span-2 col-span-2 row-span-2';
+  if (index % 3 === 0) return 'span-wide col-span-2 row-span-1';
+  return 'span-1 col-span-1 row-span-1';
+};
 </script>

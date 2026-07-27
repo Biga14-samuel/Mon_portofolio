@@ -67,3 +67,40 @@ class TagRead(TagBase):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class TestimonialBase(BaseModel):
+    client_name: str = Field(min_length=2, max_length=140)
+    client_company: str | None = Field(default=None, max_length=140)
+    linkedin_url: str | None = Field(default=None, max_length=500)
+    content: str = Field(min_length=5, max_length=2000)
+
+    @field_validator("client_company", "linkedin_url", mode="before")
+    @classmethod
+    def empty_string_to_none(cls, value: str | None) -> str | None:
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
+
+class TestimonialCreate(TestimonialBase):
+    pass
+
+
+class TestimonialUpdate(BaseModel):
+    is_visible: bool
+
+
+class TestimonialRead(TestimonialBase):
+    id: int
+    is_visible: bool
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ContactRequest(BaseModel):
+    email: str = Field(min_length=5, max_length=150)
+    subject: str | None = Field(default=None, max_length=150)
+    message: str = Field(min_length=10, max_length=3000)
+

@@ -17,11 +17,8 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    op.add_column("items", sa.Column("category", sa.String(length=80), nullable=False, server_default="General"))
-    op.create_index(op.f("ix_items_category"), "items", ["category"], unique=False)
-    op.alter_column("items", "category", server_default=None)
+    pass
 
 
 def downgrade() -> None:
-    op.drop_index(op.f("ix_items_category"), table_name="items")
-    op.drop_column("items", "category")
+    pass

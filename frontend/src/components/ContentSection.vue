@@ -3,7 +3,7 @@
     <div class="section-heading">
       <h2 :id="`${id}-title`">{{ title }}</h2>
     </div>
-    <div v-if="items.length" class="cards-grid">
+    <div v-if="items.length" :class="layout === 'zig-zag' ? 'zig-zag-grid' : 'cards-grid'">
       <ItemCard
         v-for="item in items"
         :key="item.id"
@@ -27,6 +27,7 @@ defineProps({
   items: { type: Array, required: true },
   empty: { type: String, required: true },
   editable: { type: Boolean, default: false },
+  layout: { type: String, default: 'grid' },
 });
 
 defineEmits(['edit', 'delete', 'view-case']);

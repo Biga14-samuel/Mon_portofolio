@@ -81,3 +81,41 @@ export function deleteTag(id, token) {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
+
+export function getTestimonials(token = null) {
+  const options = {};
+  if (token) {
+    options.headers = { Authorization: `Bearer ${token}` };
+  }
+  return request('/api/testimonials', options);
+}
+
+export function createTestimonial(testimonial) {
+  return request('/api/testimonials', {
+    method: 'POST',
+    body: JSON.stringify(testimonial),
+  });
+}
+
+export function updateTestimonial(id, is_visible, token) {
+  return request(`/api/testimonials/${id}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ is_visible }),
+  });
+}
+
+export function deleteTestimonial(id, token) {
+  return request(`/api/testimonials/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export function sendContactMessage(email, subject, message) {
+  return request('/api/contact', {
+    method: 'POST',
+    body: JSON.stringify({ email, subject, message }),
+  });
+}
+

@@ -37,3 +37,15 @@ class Tag(Base):
     type: Mapped[str] = mapped_column(String(20), index=True, nullable=False)
     name: Mapped[str] = mapped_column(String(80), index=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class Testimonial(Base):
+    __tablename__ = "testimonials"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    client_name: Mapped[str] = mapped_column(String(140), nullable=False)
+    client_company: Mapped[str | None] = mapped_column(String(140), nullable=True)
+    linkedin_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    is_visible: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

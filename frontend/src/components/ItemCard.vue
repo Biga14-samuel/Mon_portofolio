@@ -1,5 +1,5 @@
 <template>
-  <article class="item-card" :class="item.type">
+  <article class="item-card bento-card" :class="item.type">
     <div v-if="imagesList.length" class="item-card__image-container">
       <Transition name="fade" mode="out-in">
         <img :key="imagesList[currentImageIndex]" :src="imagesList[currentImageIndex]" :alt="`Image de ${item.title}`" loading="lazy" />
@@ -14,40 +14,45 @@
         ></span>
       </div>
     </div>
-    <div class="item-card__meta">
-      <PillBadge :tone="item.type === 'realisation' ? 'orange' : 'aubergine'">{{ labels[item.type] }}</PillBadge>
-      <PillBadge :tone="tagTone(item.category)">{{ item.category }}</PillBadge>
-      <span>{{ item.subtitle }}</span>
-    </div>
-    <h3>{{ item.title }}</h3>
-    <p>{{ item.description }}</p>
     
-    <div class="item-card__links" v-if="item.github_url || item.demo_url">
-      <a v-if="item.github_url" :href="item.github_url" target="_blank" rel="noreferrer" class="external-link">
-        <Github :size="16" aria-hidden="true" /> Code
-      </a>
-      <a v-if="item.demo_url" :href="item.demo_url" target="_blank" rel="noreferrer" class="external-link">
-        <ExternalLink :size="16" aria-hidden="true" /> Démo
-      </a>
-    </div>
+    <div class="item-card__body">
+      <div class="item-card__meta">
+        <PillBadge :tone="item.type === 'realisation' ? 'orange' : 'aubergine'">{{ labels[item.type] }}</PillBadge>
+        <PillBadge :tone="tagTone(item.category)">{{ item.category }}</PillBadge>
+        <span>{{ item.subtitle }}</span>
+      </div>
+      <h3>{{ item.title }}</h3>
+      <p>{{ item.description }}</p>
+      
+      <div class="item-card__links" v-if="item.github_url || item.demo_url">
+        <a v-if="item.github_url" :href="item.github_url" target="_blank" rel="noreferrer" class="external-link">
+          <Github :size="16" aria-hidden="true" /> Code
+        </a>
+        <a v-if="item.demo_url" :href="item.demo_url" target="_blank" rel="noreferrer" class="external-link">
+          <ExternalLink :size="16" aria-hidden="true" /> Démo
+        </a>
+      </div>
 
-    <button class="case-link" type="button" @click="$emit('view-case', item)">
-      {{ item.type === 'realisation' ? "Voir l'étude de cas" : "Voir le détail" }}
-    </button>
-    <div v-if="editable" class="card-actions" aria-label="Actions administrateur">
-      <button class="icon-button" type="button" :aria-label="`Modifier ${item.title}`" @click="$emit('edit', item)">
-        <Pencil :size="18" aria-hidden="true" />
+      <button class="button button-pill" type="button" @click="$emit('view-case', item)">
+        {{ item.type === 'realisation' ? "Voir l'étude de cas" : "Voir le détail" }}
+        <span class="icon-circle"><ArrowUpRight :size="16" /></span>
       </button>
-      <button class="icon-button danger" type="button" :aria-label="`Supprimer ${item.title}`" @click="$emit('delete', item)">
-        <Trash2 :size="18" aria-hidden="true" />
-      </button>
+      
+      <div v-if="editable" class="card-actions" aria-label="Actions administrateur">
+        <button class="icon-button" type="button" :aria-label="`Modifier ${item.title}`" @click="$emit('edit', item)">
+          <Pencil :size="18" aria-hidden="true" />
+        </button>
+        <button class="icon-button danger" type="button" :aria-label="`Supprimer ${item.title}`" @click="$emit('delete', item)">
+          <Trash2 :size="18" aria-hidden="true" />
+        </button>
+      </div>
     </div>
   </article>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { Pencil, Trash2, Github, ExternalLink } from 'lucide-vue-next';
+import { Pencil, Trash2, Github, ExternalLink, ArrowUpRight } from 'lucide-vue-next';
 import PillBadge from './PillBadge.vue';
 import { tagTone } from '../services/tags';
 
@@ -143,7 +148,7 @@ onBeforeUnmount(() => {
 }
 
 .item-card:hover .item-card__image-container img {
-  transform: scale(1.05);
+  transform: scale(1.05) rotate(5deg);
 }
 
 .item-card__links {

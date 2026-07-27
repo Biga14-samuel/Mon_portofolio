@@ -1,4 +1,6 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
+import smtplib
+from email.message import EmailMessage
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -13,9 +15,11 @@ from .auth import (
     verify_password,
 )
 from .config import Settings, get_settings
-from .database import get_db
-from .models import ITEM_TYPES, Item, Tag
-from .schemas import ItemCreate, ItemRead, ItemType, ItemUpdate, LoginRequest, TagCreate, TagRead, TokenResponse
+from .database import get_db, engine, Base
+from .models import ITEM_TYPES, Item, Tag, Testimonial
+
+Base.metadata.create_all(bind=engine)
+from .schemas import ItemCreate, ItemRead, ItemType, ItemUpdate, LoginRequest, TagCreate, TagRead, TokenResponse, TestimonialCreate, TestimonialRead, TestimonialUpdate, ContactRequest
 
 app = FastAPI(title="Portfolio API", version="1.0.0")
 settings = get_settings()
@@ -163,3 +167,98 @@ def delete_item(
     db.delete(item)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.get("/api/testimonials", response_model=list[TestimonialRead])
+def list_testimonials(request: Request, db: Session = Depends(get_db)) -> list[Testimonial]:
+    # If admin token is provided, return all testimonials. Otherwise, only visible ones.
+    is_admin = False
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ")[1]
+        try:
+            from .auth import get_current_admin
+            # Just test if the token is valid
+            get_current_admin(token, get_settings())
+            is_admin = True
+        except Exception:
+            pass
+
+    query = select(Testimonial).order_by(Testimonial.created_at.desc())
+    if not is_admin:
+        query = query.where(Testimonial.is_visible == True)
+        
+    return list(db.scalars(query))
+
+
+@app.post("/api/testimonials", response_model=TestimonialRead, status_code=status.HTTP_201_CREATED)
+def create_testimonial(payload: TestimonialCreate, db: Session = Depends(get_db)) -> Testimonial:
+    testimonial = Testimonial(**payload.model_dump())
+    db.add(testimonial)
+    db.commit()
+    db.refresh(testimonial)
+    return testimonial
+
+
+@app.put("/api/testimonials/{testimonial_id}", response_model=TestimonialRead)
+def update_testimonial_visibility(
+    testimonial_id: int,
+    payload: TestimonialUpdate,
+    db: Session = Depends(get_db),
+    _: str = Depends(get_current_admin),
+) -> Testimonial:
+    testimonial = db.get(Testimonial, testimonial_id)
+    if testimonial is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Témoignage introuvable.")
+
+    testimonial.is_visible = payload.is_visible
+    db.commit()
+    db.refresh(testimonial)
+    return testimonial
+
+
+@app.delete("/api/testimonials/{testimonial_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_testimonial(
+    testimonial_id: int,
+    db: Session = Depends(get_db),
+    _: str = Depends(get_current_admin),
+) -> Response:
+    testimonial = db.get(Testimonial, testimonial_id)
+    if testimonial is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Témoignage introuvable.")
+
+    db.delete(testimonial)
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
+def send_contact_email(payload: ContactRequest, background_tasks: BackgroundTasks, settings: Settings = Depends(get_settings)) -> dict[str, str]:
+    if not settings.smtp_user or not settings.smtp_password:
+        raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="L'envoi d'email n'est pas encore configuré (SMTP manquant).")
+
+    def send_email():
+        try:
+            msg = EmailMessage()
+            msg.set_content(f"Nouveau message de: {payload.email}\n\n{payload.message}")
+            msg['Subject'] = payload.subject if payload.subject else 'Nouveau message depuis votre portfolio'
+            msg['From'] = settings.smtp_user
+            msg['To'] = settings.smtp_user
+
+            if settings.smtp_port == 465:
+                server = smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port)
+            else:
+                server = smtplib.SMTP(settings.smtp_server, settings.smtp_port)
+                server.starttls()
+                
+            server.login(settings.smtp_user, settings.smtp_password)
+            server.send_message(msg)
+            server.quit()
+        except Exception as e:
+            print(f"Erreur d'envoi d'email: {e}")
+
+    background_tasks.add_task(send_email)
+    return {"status": "accepted"}
+
+# Trigger reload
+
