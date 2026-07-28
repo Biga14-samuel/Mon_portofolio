@@ -41,8 +41,8 @@
     </div>
     <div class="form-row">
       <label>
-        URL Image (optionnel)
-        <input v-model.trim="form.image_url" type="url" maxlength="500" placeholder="https://..." />
+        Image de couverture (Optionnel)
+        <ImageUploader v-model="form.image_url" @upload-error="handleUploadError" />
       </label>
       <label>
         Ordre d'affichage
@@ -66,8 +66,8 @@
           <input v-model="form.content.tools" placeholder="Ex: Wazuh, Cisco, Linux (séparés par virgules)" />
         </label>
         <label>
-          Media / Illustration / Certificat (URL Image)
-          <input v-model="form.content.architecture_image" type="url" placeholder="https://..." />
+          Media / Illustration / Certificat
+          <ImageUploader v-model="form.content.architecture_image" @upload-error="handleUploadError" />
         </label>
       </div>
       <label>
@@ -99,6 +99,7 @@
 <script setup>
 import { reactive, ref, watch, computed, onMounted } from 'vue';
 import { getTags } from '../services/api';
+import ImageUploader from './ImageUploader.vue';
 
 const props = defineProps({
   item: {
@@ -110,6 +111,10 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'cancel']);
 const error = ref('');
 const allTags = ref([]);
+
+function handleUploadError(msg) {
+  error.value = msg;
+}
 
 const form = reactive({
   type: 'parcours',

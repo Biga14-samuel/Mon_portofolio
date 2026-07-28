@@ -11,3 +11,4 @@ bcrypt==3.2.2
 slowapi
 nh3
 email-validator
+python-multipart

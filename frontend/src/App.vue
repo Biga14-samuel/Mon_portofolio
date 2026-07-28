@@ -17,7 +17,7 @@
           <a href="#realisations" @click="playClick" @mouseenter="playHover">Réalisations</a>
           <a href="#contact" @click="playClick" @mouseenter="playHover">Contact</a>
           <button v-if="!authState.token" class="nav-button" type="button" @click="showLogin = true; playClick()" @mouseenter="playHover">Admin</button>
-          <button v-else class="nav-button" type="button" @click="logout; playClick()" @mouseenter="playHover">Déconnexion</button>
+          <button v-else class="nav-button" type="button" @click="logout(); playClick()" @mouseenter="playHover">Déconnexion</button>
         </nav>
       </header>
     </div>
@@ -176,7 +176,7 @@
           <button class="button secondary" type="button" @click="showTagManager = true; playClick()" @mouseenter="playHover">
             Gérer les tags
           </button>
-          <button class="button primary" type="button" @click="openCreate; playClick()" @mouseenter="playHover">
+          <button class="button primary" type="button" @click="openCreate(); playClick()" @mouseenter="playHover">
             <Plus :size="18" aria-hidden="true" />
             Ajouter un element
           </button>
@@ -225,7 +225,7 @@
 
       <Transition name="filter-swap" mode="out-in">
         <div :key="`${selectedType}-${selectedCategory}`" class="portfolio-results">
-          <p v-if="loading" class="empty-state" role="status">Chargement du portfolio...</p>
+          <p v-if="loading" class="empty-state" role="status" style="display: flex; justify-content: center; align-items: center; min-height: 50vh; font-size: 1.2rem; color: var(--ubuntu-orange);">Chargement du portfolio...</p>
           <p v-else-if="loadError" class="form-error" role="alert" style="text-align: center;">{{ loadError }}</p>
 
           <template v-else>
@@ -284,7 +284,7 @@
             </button>
           </div>
 
-          <form @submit.prevent="handleContactSubmit; playClick()" class="styled-contact-form">
+          <form @submit.prevent="handleContactSubmit(); playClick()" class="styled-contact-form">
             <div class="form-row">
               <span class="row-label">À</span>
               <span class="row-static-text">{{ contactEmail }}</span>
@@ -341,7 +341,7 @@
       </section>
     </main>
 
-    <div v-if="caseStudyItem" class="modal-backdrop" role="presentation" @click.self="closeCaseStudy; playClick()">
+    <div v-if="caseStudyItem" class="modal-backdrop" role="presentation" @click.self="closeCaseStudy(); playClick()">
       <section
         ref="caseModal"
         class="case-modal"
@@ -355,11 +355,11 @@
           <span :style="{ width: `${caseProgress}%` }"></span>
         </div>
         <div class="case-nav-header">
-          <button class="case-back-button" type="button" aria-label="Retourner en arrière" @click="closeCaseStudy; playClick()" @mouseenter="playHover">
+          <button class="case-back-button" type="button" aria-label="Retourner en arrière" @click="closeCaseStudy(); playClick()" @mouseenter="playHover">
             <ArrowLeft :size="20" aria-hidden="true" />
             <span>Retour</span>
           </button>
-          <button class="case-close" type="button" aria-label="Fermer la vue" @click="closeCaseStudy; playClick()" @mouseenter="playHover">×</button>
+          <button class="case-close" type="button" aria-label="Fermer la vue" @click="closeCaseStudy(); playClick()" @mouseenter="playHover">×</button>
         </div>
         <div class="case-hero">
           <PillBadge :tone="tagTone(caseStudyItem.category)">{{ caseStudyItem.category }}</PillBadge>
@@ -408,7 +408,7 @@
         <LockKeyhole aria-hidden="true" :size="34" />
         <h2 id="login-title">Administration du portfolio</h2>
         <p>Connexion reservee au proprietaire du portfolio.</p>
-        <form @submit.prevent="handleLogin; playClick()">
+        <form @submit.prevent="handleLogin(); playClick()">
           <label>
             Identifiant
             <input v-model.trim="credentials.username" required autocomplete="username" />
@@ -436,17 +436,17 @@
       </section>
     </div>
 
-    <div v-if="editing" class="modal-backdrop" role="presentation" @click.self="closeForm; playClick()">
+    <div v-if="editing" class="modal-backdrop" role="presentation" @click.self="closeForm(); playClick()">
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="form-title">
         <h2 id="form-title">{{ editing.id ? 'Modifier un element' : 'Ajouter un element' }}</h2>
-        <ItemForm :item="editing" @submit="saveItem" @cancel="closeForm; playClick()" />
+        <ItemForm :item="editing" @submit="saveItem" @cancel="closeForm(); playClick()" />
       </section>
     </div>
 
     <div v-if="showTestimonialForm" class="modal-backdrop" role="presentation" @click.self="showTestimonialForm = false; playClick()">
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="testimonial-form-title">
         <h2 id="testimonial-form-title">Laisser un témoignage</h2>
-        <form @submit.prevent="handleCreateTestimonial; playClick()">
+        <form @submit.prevent="handleCreateTestimonial(); playClick()">
           <label>
             Votre nom complet *
             <input v-model.trim="testimonialDraft.client_name" required minlength="2" maxlength="140" />
@@ -472,13 +472,13 @@
       </section>
     </div>
     <footer class="footer">
-      <p>© 2026 Samuel Biga. Construit avec Vue & FastAPI.</p>
+      <p>© 2026 Samuel Biga. Tous droits réservés.</p>
     </footer>
 
     <button 
       class="scroll-to-top" 
       :class="{ visible: showScrollToTop }" 
-      @click="scrollToTop; playClick()" 
+      @click="scrollToTop(); playClick()" 
       aria-label="Retour en haut"
       @mouseenter="playHover"
     >
@@ -1173,5 +1173,21 @@ async function handleContactSubmit() {
     width: 45px;
     height: 45px;
   }
+}
+.admin-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem auto;
+  text-align: center;
+}
+.admin-strip > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 </style>

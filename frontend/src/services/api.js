@@ -2,7 +2,7 @@ const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replac
 
 async function request(path, options = {}) {
   const headers = new Headers(options.headers || {});
-  if (!headers.has('Content-Type') && options.body) {
+  if (!headers.has('Content-Type') && options.body && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
 
@@ -116,6 +116,17 @@ export function sendContactMessage(email, subject, message) {
   return request('/api/contact', {
     method: 'POST',
     body: JSON.stringify({ email, subject, message }),
+  });
+}
+
+export function uploadImage(file, token) {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  return request('/api/upload', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
   });
 }
 

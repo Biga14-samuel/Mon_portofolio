@@ -73,22 +73,28 @@ a {
   position: sticky;
   top: 14px;
   z-index: 40;
-  display: flex;
-  justify-content: center;
+  display: block;
+  text-align: center;
   width: 100%;
   padding: 0 16px;
   pointer-events: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.topbar-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .topbar {
   pointer-events: auto;
+  display: inline-flex;
   width: max-content;
-  max-width: min(1100px, calc(100vw - 32px));
-  display: flex;
+  max-width: none;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(14px, 3vw, 36px);
-  padding: 6px 10px 6px 18px;
+  gap: clamp(10px, 2vw, 24px);
+  padding: 8px 16px;
   border-radius: 999px;
   background: rgba(44, 0, 30, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -119,11 +125,11 @@ a {
 nav {
   display: flex;
   align-items: center;
-  gap: clamp(4px, 1.2vw, 16px);
+  gap: clamp(4px, 1vw, 10px);
 }
 
 nav a {
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 999px;
   color: rgba(255, 255, 255, 0.82);
   font-weight: 500;
@@ -145,7 +151,7 @@ nav a:hover {
   cursor: pointer;
   font-weight: 700;
   font-size: 13px;
-  padding: 7px 18px;
+  padding: 6px 14px;
   border-radius: 999px;
   transition: transform 0.2s ease, background 0.2s ease;
   white-space: nowrap;
@@ -1626,17 +1632,23 @@ td {
   position: fixed;
   inset: 0;
   z-index: 50;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   padding: 20px;
   background: rgba(44, 0, 30, 0.42);
   backdrop-filter: blur(8px);
   animation: modalFadeIn 250ms ease-out forwards;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal {
   width: min(100%, 620px);
   padding: 28px;
+  margin: auto;
+  margin-top: 40px;
+  margin-bottom: 40px;
   animation: modalSlideUp 350ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 

@@ -1,7 +1,11 @@
 import smtplib
 from email.message import EmailMessage
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request, Response, status
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request, Response, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
+import uuid
+import shutil
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -278,6 +282,25 @@ def send_contact_email(request: Request, payload: ContactRequest, background_tas
 
     background_tasks.add_task(send_email)
     return {"status": "accepted"}
+
+# Create uploads directory if it doesn't exist
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+@app.post("/api/upload", dependencies=[Depends(get_current_admin)])
+async def upload_image(file: UploadFile = File(...)):
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Seules les images sont autorisées.")
+    
+    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    unique_filename = f"{uuid.uuid4().hex}.{ext}"
+    file_path = os.path.join("uploads", unique_filename)
+    
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    # Return the absolute or relative URL
+    return {"url": f"/uploads/{unique_filename}"}
 
 # Trigger reload now
 
