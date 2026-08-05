@@ -7,7 +7,7 @@
           <DynamicLogo />
           <span style="margin-left: 12px;">Mon portfolio</span>
         </a>
-        <button class="hamburger" @click="menuOpen = !menuOpen; playClick()" aria-label="Menu">
+        <button class="hamburger" @click.stop="menuOpen = !menuOpen; playClick()" aria-label="Menu">
           <span class="hamburger-line"></span>
           <span class="hamburger-line"></span>
           <span class="hamburger-line"></span>
@@ -478,7 +478,7 @@
       </section>
     </div>
     <footer class="footer">
-      <p>© 2026 Samuel Biga. Tous droits réservés.</p>
+      <p>© 2026 Raoul BIGA. Tous droits réservés.</p>
     </footer>
 
     <button 
@@ -1198,11 +1198,19 @@ async function handleContactSubmit() {
   }
 }
 @media (max-width: 560px) {
-  .styled-contact-form {
-    padding: 1.2rem;
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 0;
+    gap: 0.5rem;
   }
   .row-label {
-    width: 60px;
+    width: 100%;
+    font-size: 0.95rem;
+  }
+  .row-input, .row-static-text {
+    width: 100%;
+    font-size: 1rem;
   }
 }
 .admin-strip {
