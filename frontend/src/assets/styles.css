@@ -1974,12 +1974,6 @@ footer {
 }
 
 @media (max-width: 900px) {
-  .topbar,
-  nav {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .hero,
   .admin-layout,
   .about-lead,
