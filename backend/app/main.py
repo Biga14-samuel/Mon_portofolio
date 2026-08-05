@@ -266,7 +266,7 @@ def send_contact_email(request: Request, payload: ContactRequest, background_tas
             msg.set_content(f"Nouveau message de: {payload.email}\n\n{payload.message}")
             msg['Subject'] = payload.subject if payload.subject else 'Nouveau message depuis votre portfolio'
             msg['From'] = settings.smtp_user
-            msg['To'] = settings.smtp_user
+            msg['To'] = 'samuelbiga10@gmail.com'
 
             if settings.smtp_port == 465:
                 server = smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port)
