@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 60
     admin_username: str
     admin_password_hash: str
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = "http://localhost:5173,https://mon-portofolio-phi.vercel.app,https://biga14-samuel.github.io"
     smtp_server: str = "smtp.gmail.com"
     smtp_port: int = 465
     smtp_user: str = ""
