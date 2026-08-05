@@ -22,7 +22,7 @@
       </header>
     </div>
 
-    <main id="accueil">
+    <main id="accueil" v-if="!isNotFound">
       <section class="hero">
         <div class="hero-copy">
           <div class="availability-card" aria-label="Statut professionnel">
@@ -340,6 +340,7 @@
         </div>
       </section>
     </main>
+    <NotFound v-else />
 
     <div v-if="caseStudyItem" class="modal-backdrop" role="presentation" @click.self="closeCaseStudy(); playClick()">
       <section
@@ -488,7 +489,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
 import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown } from 'lucide-vue-next';
 import ContentSection from './components/ContentSection.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
@@ -503,6 +504,20 @@ import { authState, clearToken, setToken } from './store/auth';
 import { createItem, deleteItem, getItems, login, updateItem, getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial as apiDeleteTestimonial, sendContactMessage } from './services/api';
 import TestimonialSection from './components/TestimonialSection.vue';
 import { tagTone } from './services/tags';
+import NotFound from './components/NotFound.vue';
+
+const currentPath = ref(window.location.pathname);
+const hasError = ref(false);
+
+onErrorCaptured((err) => {
+  console.error("Vue Error Captured:", err);
+  hasError.value = true;
+  return false;
+});
+
+const isNotFound = computed(() => {
+  return hasError.value || (currentPath.value !== '/' && currentPath.value !== '/index.html' && currentPath.value !== '');
+});
 
 const audioEnabled = ref(isSoundEnabled());
 const nameWords = ['SAMNICK', 'BIGA', 'RAOUL', 'AUBIN'];
