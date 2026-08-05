@@ -1072,6 +1072,7 @@ async function handleContactSubmit() {
   color: var(--text);
   flex-grow: 1;
   font-size: 1rem;
+  word-break: break-all;
 }
 
 .row-feedback {
@@ -1089,6 +1090,7 @@ async function handleContactSubmit() {
   outline: none;
   font-family: inherit;
   resize: none;
+  min-width: 0;
 }
 
 .row-input::placeholder {
@@ -1193,6 +1195,14 @@ async function handleContactSubmit() {
     right: 1.5rem;
     width: 45px;
     height: 45px;
+  }
+}
+@media (max-width: 560px) {
+  .styled-contact-form {
+    padding: 1.2rem;
+  }
+  .row-label {
+    width: 60px;
   }
 }
 .admin-strip {

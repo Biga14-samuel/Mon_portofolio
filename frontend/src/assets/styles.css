@@ -1991,6 +1991,10 @@ footer {
 }
 
 @media (max-width: 900px) {
+  .topbar-wrapper {
+    overflow: visible;
+  }
+  
   .topbar {
     width: 100%;
     justify-content: space-between;
