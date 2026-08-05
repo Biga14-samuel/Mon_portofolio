@@ -7,8 +7,13 @@
           <DynamicLogo />
           <span style="margin-left: 12px;">Mon portfolio</span>
         </a>
-        <nav class="nav-links" aria-label="Navigation principale">
-          <button class="nav-button" @click="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
+        <button class="hamburger" @click="menuOpen = !menuOpen; playClick()" aria-label="Menu">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        <nav class="nav-links" :class="{ 'is-open': menuOpen }" aria-label="Navigation principale" @click="menuOpen = false">
+          <button class="nav-button" @click.stop="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
             {{ audioEnabled ? '🔊 Son ON' : '🔇 Son OFF' }}
           </button>
           <a href="#apropos" @click="playClick" @mouseenter="playHover">À propos</a>
@@ -16,8 +21,8 @@
           <a href="#competences" @click="playClick" @mouseenter="playHover">Stack & outils</a>
           <a href="#realisations" @click="playClick" @mouseenter="playHover">Réalisations</a>
           <a href="#contact" @click="playClick" @mouseenter="playHover">Contact</a>
-          <button v-if="!authState.token" class="nav-button" type="button" @click="showLogin = true; playClick()" @mouseenter="playHover">Admin</button>
-          <button v-else class="nav-button" type="button" @click="logout(); playClick()" @mouseenter="playHover">Déconnexion</button>
+          <button v-if="!authState.token" class="nav-button" type="button" @click.stop="showLogin = true; menuOpen = false; playClick()" @mouseenter="playHover">Admin</button>
+          <button v-else class="nav-button" type="button" @click.stop="logout(); menuOpen = false; playClick()" @mouseenter="playHover">Déconnexion</button>
         </nav>
       </header>
     </div>
@@ -596,6 +601,7 @@ const futureProjectCategories = ['Cloud & Virtualisation', 'Automatisation', 'Fo
 const selectedType = ref('');
 const selectedCategory = ref('');
 const showLogin = ref(false);
+const menuOpen = ref(false);
 const showTagManager = ref(false);
 const items = ref([]);
 const testimonials = ref([]);
