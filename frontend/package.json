@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@studio-freight/lenis": "^1.0.42",
+    "@vercel/analytics": "^2.0.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "lucide-vue-next": "^0.468.0",
     "vite": "^8.1.5",
