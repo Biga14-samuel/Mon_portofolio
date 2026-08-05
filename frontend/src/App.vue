@@ -289,7 +289,7 @@
             </button>
           </div>
 
-          <form @submit.prevent="handleContactSubmit(); playClick()" class="styled-contact-form">
+          <form @submit.prevent="handleContactSubmit" class="styled-contact-form">
             <div class="form-row">
               <span class="row-label">À</span>
               <span class="row-static-text">{{ contactEmail }}</span>
@@ -414,7 +414,7 @@
         <LockKeyhole aria-hidden="true" :size="34" />
         <h2 id="login-title">Administration du portfolio</h2>
         <p>Connexion reservee au proprietaire du portfolio.</p>
-        <form @submit.prevent="handleLogin(); playClick()">
+        <form @submit.prevent="handleLogin">
           <label>
             Identifiant
             <input v-model.trim="credentials.username" required autocomplete="username" />
@@ -452,7 +452,7 @@
     <div v-if="showTestimonialForm" class="modal-backdrop" role="presentation" @click.self="showTestimonialForm = false; playClick()">
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="testimonial-form-title">
         <h2 id="testimonial-form-title">Laisser un témoignage</h2>
-        <form @submit.prevent="handleCreateTestimonial(); playClick()">
+        <form @submit.prevent="handleCreateTestimonial">
           <label>
             Votre nom complet *
             <input v-model.trim="testimonialDraft.client_name" required minlength="2" maxlength="140" />
@@ -821,6 +821,8 @@ async function loadItems() {
 }
 
 async function handleLogin() {
+  playClick();
+  authState.loading = true;
   authError.value = '';
   try {
     const data = await login(credentials.username, credentials.password);
@@ -830,6 +832,8 @@ async function handleLogin() {
     await loadItems();
   } catch (error) {
     authError.value = error.message;
+  } finally {
+    authState.loading = false;
   }
 }
 
@@ -981,6 +985,7 @@ async function handleToggleTestimonialVisibility(t, is_visible) {
 }
 
 async function handleCreateTestimonial() {
+  playClick();
   testimonialError.value = '';
   try {
     await createTestimonial(testimonialDraft);
@@ -1005,6 +1010,7 @@ function fillQuestion(q) {
 }
 
 async function handleContactSubmit() {
+  playClick();
   contactStatus.value = 'sending';
   contactError.value = '';
   try {
