@@ -1,4 +1,12 @@
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+const API_URL = (() => {
+  const envUrl = import.meta.env.VITE_API_URL?.trim();
+  if (envUrl) return envUrl.replace(/\/$/, '');
+  return import.meta.env.DEV ? 'http://localhost:8000' : window.location.origin;
+})();
+
+function authHeaders(token) {
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 async function request(path, options = {}) {
   const headers = new Headers(options.headers || {});
@@ -42,7 +50,7 @@ export function login(username, password) {
 export function createItem(item, token) {
   return request('/api/items', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: authHeaders(token),
     body: JSON.stringify(item),
   });
 }
@@ -50,7 +58,7 @@ export function createItem(item, token) {
 export function updateItem(id, item, token) {
   return request(`/api/items/${id}`, {
     method: 'PUT',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: authHeaders(token),
     body: JSON.stringify(item),
   });
 }
@@ -58,7 +66,7 @@ export function updateItem(id, item, token) {
 export function deleteItem(id, token) {
   return request(`/api/items/${id}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: authHeaders(token),
   });
 }
 
@@ -70,7 +78,7 @@ export function getTags(type = '') {
 export function createTag(tag, token) {
   return request('/api/tags', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: authHeaders(token),
     body: JSON.stringify(tag),
   });
 }
@@ -78,14 +86,14 @@ export function createTag(tag, token) {
 export function deleteTag(id, token) {
   return request(`/api/tags/${id}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: authHeaders(token),
   });
 }
 
 export function getTestimonials(token = null) {
   const options = {};
   if (token) {
-    options.headers = { Authorization: `Bearer ${token}` };
+    options.headers = authHeaders(token);
   }
   return request('/api/testimonials', options);
 }
@@ -100,7 +108,7 @@ export function createTestimonial(testimonial) {
 export function updateTestimonial(id, is_visible, token) {
   return request(`/api/testimonials/${id}`, {
     method: 'PUT',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: authHeaders(token),
     body: JSON.stringify({ is_visible }),
   });
 }
@@ -108,7 +116,7 @@ export function updateTestimonial(id, is_visible, token) {
 export function deleteTestimonial(id, token) {
   return request(`/api/testimonials/${id}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: authHeaders(token),
   });
 }
 
@@ -125,7 +133,7 @@ export function uploadImage(file, token) {
   
   return request('/api/upload', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: authHeaders(token),
     body: formData,
   });
 }

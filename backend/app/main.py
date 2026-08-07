@@ -1,6 +1,6 @@
 import smtplib
 from email.message import EmailMessage
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request, Response, status, UploadFile, File
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -257,31 +257,32 @@ def delete_testimonial(
 
 @app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("3/minute")
-def send_contact_email(request: Request, payload: ContactRequest, background_tasks: BackgroundTasks, settings: Settings = Depends(get_settings)) -> dict[str, str]:
+def send_contact_email(request: Request, payload: ContactRequest, settings: Settings = Depends(get_settings)) -> dict[str, str]:
     if not settings.smtp_user or not settings.smtp_password:
         raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="L'envoi d'email n'est pas encore configuré (SMTP manquant).")
 
-    def send_email():
-        try:
-            msg = EmailMessage()
-            msg.set_content(f"Nouveau message de: {payload.email}\n\n{payload.message}")
-            msg['Subject'] = payload.subject if payload.subject else 'Nouveau message depuis votre portfolio'
-            msg['From'] = settings.smtp_user
-            msg['To'] = 'samuelbiga10@gmail.com'
+    msg = EmailMessage()
+    msg.set_content(f"Nouveau message de: {payload.email}\n\n{payload.message}")
+    msg['Subject'] = payload.subject if payload.subject else 'Nouveau message depuis votre portfolio'
+    msg['From'] = settings.smtp_user
+    msg['To'] = 'samuelbiga10@gmail.com'
 
-            if settings.smtp_port == 465:
-                server = smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port)
-            else:
-                server = smtplib.SMTP(settings.smtp_server, settings.smtp_port)
+    try:
+        if settings.smtp_port == 465:
+            with smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port, timeout=30) as server:
+                server.login(settings.smtp_user, settings.smtp_password)
+                server.send_message(msg)
+        else:
+            with smtplib.SMTP(settings.smtp_server, settings.smtp_port, timeout=30) as server:
                 server.starttls()
-                
-            server.login(settings.smtp_user, settings.smtp_password)
-            server.send_message(msg)
-            server.quit()
-        except Exception as e:
-            print(f"Erreur d'envoi d'email: {e}")
+                server.login(settings.smtp_user, settings.smtp_password)
+                server.send_message(msg)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Impossible d'envoyer l'e-mail. Vérifiez la configuration SMTP et vos informations d'identification.",
+        ) from exc
 
-    background_tasks.add_task(send_email)
     return {"status": "accepted"}
 
 # Create uploads directory if it doesn't exist
