@@ -1,5 +1,6 @@
 import smtplib
 from email.message import EmailMessage
+import requests
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status, UploadFile, File
 import logging
 import sys
@@ -282,6 +283,29 @@ def send_contact_email(request: Request, payload: ContactRequest, settings: Sett
     msg['To'] = settings.smtp_recipient
     msg['Reply-To'] = payload.email
 
+    def send_via_sendgrid():
+        if not settings.sendgrid_api_key:
+            return False, "no_sendgrid_key"
+
+        url = "https://api.sendgrid.com/v3/mail/send"
+        headers = {
+            "Authorization": f"Bearer {settings.sendgrid_api_key}",
+            "Content-Type": "application/json",
+        }
+        data = {
+            "personalizations": [{"to": [{"email": settings.smtp_recipient}], "subject": msg['Subject']}],
+            "from": {"email": settings.smtp_user},
+            "reply_to": {"email": payload.email},
+            "content": [{"type": "text/plain", "value": msg.get_content()}],
+        }
+        try:
+            resp = requests.post(url, headers=headers, json=data, timeout=15)
+            if resp.status_code in (200, 202):
+                return True, None
+            return False, f"sendgrid_status_{resp.status_code}: {resp.text}"
+        except Exception as e:
+            return False, str(e)
+
     try:
         if settings.smtp_port == 465:
             with smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port, timeout=30) as server:
@@ -294,13 +318,19 @@ def send_contact_email(request: Request, payload: ContactRequest, settings: Sett
                 server.login(settings.smtp_user, settings.smtp_password)
                 server.send_message(msg)
     except Exception as exc:
-        # Log full traceback to uvicorn logger and stderr to ensure visibility in Render logs
         logger.exception("Échec de l'envoi SMTP: %s", exc)
         try:
             tb = traceback.format_exc()
             print("[SMTP ERROR TRACEBACK]", tb, file=sys.stderr)
         except Exception:
             logger.exception("Erreur lors de l'écriture du traceback")
+
+        # If network errors (outbound blocked) or other failures, try SendGrid fallback
+        if settings.sendgrid_api_key:
+            ok, info = send_via_sendgrid()
+            if ok:
+                return {"status": "accepted_via_sendgrid"}
+            logger.error("SendGrid fallback failed: %s", info)
 
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,

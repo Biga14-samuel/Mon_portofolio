@@ -12,3 +12,4 @@ slowapi
 nh3
 email-validator
 python-multipart
+requests
