@@ -1,6 +1,6 @@
 <template>
   <div class="app-shell">
-    <Toaster richColors position="top-right" theme="dark" />
+    <Toaster richColors position="bottom-left" theme="dark" :toastOptions="{ style: { borderRadius: '12px', padding: '16px', fontSize: '15px' } }" />
     <Preloader />
     <div class="topbar-wrapper">
       <header class="topbar">
