@@ -258,14 +258,23 @@ def delete_testimonial(
 @app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("3/minute")
 def send_contact_email(request: Request, payload: ContactRequest, settings: Settings = Depends(get_settings)) -> dict[str, str]:
-    if not settings.smtp_user or not settings.smtp_password:
-        raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="L'envoi d'email n'est pas encore configuré (SMTP manquant).")
+    if not settings.smtp_user or not settings.smtp_password or not settings.smtp_recipient:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="L'envoi d'email n'est pas encore configuré (SMTP manquant).",
+        )
 
     msg = EmailMessage()
-    msg.set_content(f"Nouveau message de: {payload.email}\n\n{payload.message}")
+    msg.set_content(
+        "Nouveau message depuis votre portfolio\n\n"
+        f"Nom / email: {payload.email}\n"
+        f"Objet: {payload.subject or 'Sans objet'}\n\n"
+        f"Message:\n{payload.message}"
+    )
     msg['Subject'] = payload.subject if payload.subject else 'Nouveau message depuis votre portfolio'
     msg['From'] = settings.smtp_user
-    msg['To'] = 'samuelbiga10@gmail.com'
+    msg['To'] = settings.smtp_recipient
+    msg['Reply-To'] = payload.email
 
     try:
         if settings.smtp_port == 465:
@@ -274,7 +283,8 @@ def send_contact_email(request: Request, payload: ContactRequest, settings: Sett
                 server.send_message(msg)
         else:
             with smtplib.SMTP(settings.smtp_server, settings.smtp_port, timeout=30) as server:
-                server.starttls()
+                if server.has_extn("STARTTLS"):
+                    server.starttls()
                 server.login(settings.smtp_user, settings.smtp_password)
                 server.send_message(msg)
     except Exception as exc:

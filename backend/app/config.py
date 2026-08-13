@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,8 +15,23 @@ class Settings(BaseSettings):
     smtp_port: int = 465
     smtp_user: str = ""
     smtp_password: str = ""
+    smtp_recipient: str = "samuelbiga10@gmail.com"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    @field_validator("smtp_server", "smtp_user", "smtp_recipient", mode="before")
+    @classmethod
+    def strip_smtp_strings(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        return value.strip()
+
+    @field_validator("smtp_password", mode="before")
+    @classmethod
+    def normalize_smtp_password(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        return "".join(value.split())
 
     @property
     def cors_origin_list(self) -> list[str]:
