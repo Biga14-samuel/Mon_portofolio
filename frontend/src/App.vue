@@ -499,7 +499,7 @@ import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
 import Preloader from './components/Preloader.vue';
-import { toggleSound, isSoundEnabled, playHover, playClick } from './services/sounds';
+import { toggleSound, isSoundEnabled, playHover, playClick, playSuccess, playError } from './services/sounds';
 import Lenis from '@studio-freight/lenis';
 import ItemForm from './components/ItemForm.vue';
 import PillBadge from './components/PillBadge.vue';
@@ -513,6 +513,16 @@ import NotFound from './components/NotFound.vue';
 
 const currentPath = ref(window.location.pathname);
 const hasError = ref(false);
+
+function notifySuccess(msg) {
+  playSuccess();
+  toast.success(msg);
+}
+
+function notifyError(msg) {
+  playError();
+  toast.error(msg);
+}
 
 onErrorCaptured((err) => {
   console.error("Vue Error Captured:", err);
@@ -827,10 +837,10 @@ async function handleLogin() {
     setToken(data.access_token);
     credentials.password = '';
     showLogin.value = false;
-    toast.success('Connexion réussie');
+    notifySuccess('Connexion réussie');
     await loadItems();
   } catch (error) {
-    toast.error(error.message);
+    notifyError(error.message);
   } finally {
     authState.loading = false;
   }
@@ -846,7 +856,7 @@ function handleSessionExpired() {
   showTagManager.value = false;
   closeForm();
   showLogin.value = true;
-  toast.error('Session expirée. Veuillez vous reconnecter.');
+  notifyError('Session expirée. Veuillez vous reconnecter.');
 }
 
 function openCreate() {
@@ -937,15 +947,15 @@ async function saveItem(payload) {
       await createItem(payload, authState.token);
     }
     closeForm();
-    toast.success('Élément enregistré avec succès');
+    notifySuccess('Élément enregistré avec succès');
     await loadItems();
   } catch (error) {
     if (error.status === 401 || error.status === 403) {
       clearToken();
       showLogin.value = true;
-      toast.error('Session expirée. Veuillez vous reconnecter.');
+      notifyError('Session expirée. Veuillez vous reconnecter.');
     } else {
-      toast.error(error.message);
+      notifyError(error.message);
     }
   }
 }
@@ -954,15 +964,15 @@ async function remove(item) {
   if (!confirm(`Supprimer "${item.title}" du portfolio ?`)) return;
   try {
     await deleteItem(item.id, authState.token);
-    toast.success('Élément supprimé');
+    notifySuccess('Élément supprimé');
     await loadItems();
   } catch (error) {
     if (error.status === 401 || error.status === 403) {
       clearToken();
       showLogin.value = true;
-      toast.error('Session expirée. Veuillez vous reconnecter.');
+      notifyError('Session expirée. Veuillez vous reconnecter.');
     } else {
-      toast.error(error.message);
+      notifyError(error.message);
     }
   }
 }
@@ -970,20 +980,20 @@ async function handleDeleteTestimonial(t) {
   if (!confirm(`Supprimer le témoignage de "${t.client_name}" ?`)) return;
   try {
     await apiDeleteTestimonial(t.id, authState.token);
-    toast.success('Témoignage supprimé');
+    notifySuccess('Témoignage supprimé');
     await loadItems();
   } catch (error) {
-    toast.error(error.message);
+    notifyError(error.message);
   }
 }
 
 async function handleToggleTestimonialVisibility(t, is_visible) {
   try {
     await updateTestimonial(t.id, is_visible, authState.token);
-    toast.success('Visibilité mise à jour');
+    notifySuccess('Visibilité mise à jour');
     await loadItems();
   } catch (error) {
-    toast.error(error.message);
+    notifyError(error.message);
   }
 }
 
@@ -996,10 +1006,10 @@ async function handleCreateTestimonial() {
     testimonialDraft.client_company = '';
     testimonialDraft.linkedin_url = '';
     testimonialDraft.content = '';
-    toast.success('Merci ! Votre témoignage a bien été envoyé et sera examiné.');
+    notifySuccess('Merci ! Votre témoignage a bien été envoyé et sera examiné.');
     await loadItems();
   } catch (error) {
-    toast.error(error.message);
+    notifyError(error.message);
   }
 }
 
@@ -1020,10 +1030,10 @@ async function handleContactSubmit() {
     contactDraft.email = '';
     contactDraft.subject = '';
     contactDraft.message = '';
-    toast.success('Votre message a bien été envoyé !');
+    notifySuccess('Votre message a bien été envoyé !');
   } catch (error) {
     contactStatus.value = '';
-    toast.error(error.message || "Une erreur est survenue lors de l'envoi.");
+    notifyError(error.message || "Une erreur est survenue lors de l'envoi.");
   }
 }
 </script>
