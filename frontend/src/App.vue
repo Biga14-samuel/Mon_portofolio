@@ -1,6 +1,15 @@
 <template>
   <div class="app-shell">
-    <Toaster richColors position="bottom-left" theme="dark" :toastOptions="{ style: { borderRadius: '12px', padding: '16px', fontSize: '15px' } }" />
+    <Toaster 
+      position="bottom-left" 
+      :toastOptions="{ 
+        classNames: {
+          success: 'toast-pastel-success',
+          error: 'toast-pastel-error'
+        },
+        style: { borderRadius: '12px', padding: '16px', fontSize: '15px' } 
+      }" 
+    />
     <Preloader />
     <div class="topbar-wrapper">
       <header class="topbar">

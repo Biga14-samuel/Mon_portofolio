@@ -2126,3 +2126,22 @@ body {
 img {
   -webkit-user-drag: none;
 }
+
+/* =========================================
+   CUSTOM PASTEL TOASTS (VUE-SONNER)
+   ========================================= */
+.toast-pastel-success {
+  background-color: #d1e7dd !important;
+  background-image: none !important;
+  color: #0f5132 !important;
+  border: 1px solid #badbcc !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.toast-pastel-error {
+  background-color: #f8d7da !important;
+  background-image: none !important;
+  color: #842029 !important;
+  border: 1px solid #f5c2c7 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
