@@ -83,6 +83,10 @@
               Me contacter
               <span class="icon-circle"><ArrowRight :size="16" /></span>
             </a>
+            <a class="button button-pill tertiary" href="/CV_Samnick_Biga_Raoul_Aubin.pdf" download="CV_Samnick_Biga_Raoul_Aubin.pdf" @click="playClick" @mouseenter="playHover" style="background: rgba(233, 84, 32, 0.1); color: var(--ubuntu-orange);">
+              Télécharger mon CV
+              <span class="icon-circle" style="background: var(--ubuntu-orange); color: white;"><FileDown :size="16" /></span>
+            </a>
           </div>
           <a class="scroll-cue" href="#realisations" aria-label="Descendre vers les projets" @click="playClick" @mouseenter="playHover">
             <span></span>
@@ -530,7 +534,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
