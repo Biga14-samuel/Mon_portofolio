@@ -14,11 +14,15 @@
         @view-case="$emit('view-case', $event)"
       />
     </div>
-    <p v-else class="empty-state">{{ empty }}</p>
+    <div v-else class="empty-state-card">
+      <SearchX class="empty-icon" :size="48" />
+      <p>{{ empty || 'Aucun élément trouvé pour cette catégorie.' }}</p>
+    </div>
   </section>
 </template>
 
 <script setup>
+import { SearchX } from 'lucide-vue-next';
 import ItemCard from './ItemCard.vue';
 
 defineProps({

@@ -240,7 +240,18 @@
 
       <Transition name="filter-swap" mode="out-in">
         <div :key="`${selectedType}-${selectedCategory}`" class="portfolio-results">
-          <p v-if="loading" class="empty-state" role="status" style="display: flex; justify-content: center; align-items: center; min-height: 50vh; font-size: 1.2rem; color: var(--ubuntu-orange);">Chargement du portfolio...</p>
+          <div v-if="loading" class="skeleton-container" aria-label="Chargement du portfolio...">
+            <div class="skeleton-grid">
+              <div v-for="n in 3" :key="n" class="skeleton-card">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-content">
+                  <div class="skeleton-title"></div>
+                  <div class="skeleton-text"></div>
+                  <div class="skeleton-text short"></div>
+                </div>
+              </div>
+            </div>
+          </div>
           <p v-else-if="loadError" class="form-error" role="alert" style="text-align: center;">{{ loadError }}</p>
 
           <template v-else>
@@ -280,6 +291,7 @@
       <TestimonialSection 
         :testimonials="testimonials"
         :editable="Boolean(authState.token)"
+        :loading="loading"
         @toggle-visibility="handleToggleTestimonialVisibility"
         @delete="handleDeleteTestimonial"
         @add-testimonial="showTestimonialForm = true; playClick()"
@@ -458,31 +470,46 @@
       </section>
     </div>
 
-    <div v-if="showTestimonialForm" class="modal-backdrop" role="presentation" @click.self="showTestimonialForm = false; playClick()">
+    <div v-if="showTestimonialForm" class="modal-backdrop" role="presentation" @click.self="closeTestimonialModal(); playClick()">
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="testimonial-form-title">
-        <h2 id="testimonial-form-title">Laisser un témoignage</h2>
-        <form @submit.prevent="handleCreateTestimonial">
-          <label>
-            Votre nom complet *
-            <input v-model.trim="testimonialDraft.client_name" required minlength="2" maxlength="140" />
-          </label>
-          <label>
-            Votre entreprise ou poste (optionnel)
-            <input v-model.trim="testimonialDraft.client_company" maxlength="140" />
-          </label>
-          <label>
-            Lien de votre profil LinkedIn (optionnel)
-            <input v-model.trim="testimonialDraft.linkedin_url" type="url" maxlength="500" placeholder="https://linkedin.com/in/..." />
-          </label>
-          <label>
-            Votre message *
-            <textarea v-model.trim="testimonialDraft.content" required minlength="5" maxlength="2000" rows="5"></textarea>
-          </label>
-          <div class="form-actions">
-            <button class="button secondary" type="button" @click="showTestimonialForm = false; playClick()" @mouseenter="playHover">Annuler</button>
-            <button class="button primary" type="submit" @mouseenter="playHover">Envoyer</button>
+        <template v-if="!showTestimonialSuccess">
+          <h2 id="testimonial-form-title">Laisser un témoignage</h2>
+          <form @submit.prevent="handleCreateTestimonial">
+            <label>
+              Votre nom complet *
+              <input v-model.trim="testimonialDraft.client_name" required minlength="2" maxlength="140" />
+            </label>
+            <label>
+              Votre entreprise ou poste (optionnel)
+              <input v-model.trim="testimonialDraft.client_company" maxlength="140" />
+            </label>
+            <label>
+              Lien de votre profil LinkedIn (optionnel)
+              <input v-model.trim="testimonialDraft.linkedin_url" type="url" maxlength="500" placeholder="https://linkedin.com/in/..." />
+            </label>
+            <label>
+              Votre message *
+              <textarea v-model.trim="testimonialDraft.content" required minlength="5" maxlength="2000" rows="5"></textarea>
+            </label>
+            <div class="form-actions">
+              <button class="button secondary" type="button" @click="closeTestimonialModal(); playClick()" @mouseenter="playHover">Annuler</button>
+              <button class="button primary" type="submit" @mouseenter="playHover">
+                <span v-if="testimonialStatus === 'sending'">Envoi en cours...</span>
+                <span v-else>Envoyer</span>
+              </button>
+            </div>
+          </form>
+        </template>
+        <template v-else>
+          <div class="success-view">
+            <div class="success-icon-wrapper">
+              <CheckCircle class="success-icon" :size="64" />
+            </div>
+            <h2>Merci beaucoup, {{ testimonialDraft.client_name }} !</h2>
+            <p>Votre témoignage a bien été reçu. Il sera examiné et publié très bientôt. Cela me fait énormément plaisir !</p>
+            <button class="button primary" type="button" @click="closeTestimonialModal(); playClick()" @mouseenter="playHover">Fermer</button>
           </div>
-        </form>
+        </template>
       </section>
     </div>
     <footer class="footer">
@@ -503,7 +530,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
@@ -625,6 +652,8 @@ const showTagManager = ref(false);
 const items = ref([]);
 const testimonials = ref([]);
 const showTestimonialForm = ref(false);
+const showTestimonialSuccess = ref(false);
+const testimonialStatus = ref('');
 const testimonialDraft = reactive({ client_name: '', client_company: '', linkedin_url: '', content: '' });
 const testimonialError = ref('');
 const contactDraft = reactive({ email: '', subject: '', message: '' });
@@ -1006,19 +1035,29 @@ async function handleToggleTestimonialVisibility(t, is_visible) {
   }
 }
 
-async function handleCreateTestimonial() {
-  playClick();
-  try {
-    await createTestimonial(testimonialDraft);
-    showTestimonialForm.value = false;
+function closeTestimonialModal() {
+  showTestimonialForm.value = false;
+  setTimeout(() => {
+    showTestimonialSuccess.value = false;
     testimonialDraft.client_name = '';
     testimonialDraft.client_company = '';
     testimonialDraft.linkedin_url = '';
     testimonialDraft.content = '';
-    notifySuccess('Merci ! Votre témoignage a bien été envoyé et sera examiné.');
+  }, 300);
+}
+
+async function handleCreateTestimonial() {
+  playClick();
+  testimonialStatus.value = 'sending';
+  try {
+    await createTestimonial(testimonialDraft);
+    testimonialStatus.value = '';
+    showTestimonialSuccess.value = true;
+    notifySuccess('Témoignage envoyé avec succès !');
     await loadItems();
   } catch (error) {
-    notifyError(error.message);
+    testimonialStatus.value = '';
+    notifyError("Oups, impossible d'envoyer le témoignage. Veuillez vérifier votre connexion et réessayer.");
   }
 }
 
@@ -1042,7 +1081,7 @@ async function handleContactSubmit() {
     notifySuccess('Votre message a bien été envoyé !');
   } catch (error) {
     contactStatus.value = '';
-    notifyError(error.message || "Une erreur est survenue lors de l'envoi.");
+    notifyError("Oups, notre serveur semble faire une pause. Veuillez vérifier votre connexion et réessayer.");
   }
 }
 </script>

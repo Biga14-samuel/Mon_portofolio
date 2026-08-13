@@ -2145,3 +2145,113 @@ img {
   border: 1px solid #f5c2c7 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
+
+/* =========================================
+   EMPTY STATES
+   ========================================= */
+.empty-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: var(--surface-1);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--text-muted);
+  gap: 16px;
+  margin-top: 24px;
+}
+.empty-icon {
+  color: var(--ubuntu-orange);
+  opacity: 0.8;
+}
+
+/* =========================================
+   SKELETON LOADERS
+   ========================================= */
+.skeleton-container {
+  padding: 40px 0;
+  width: 100%;
+}
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+.skeleton-card {
+  background: var(--surface-1);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+.skeleton-img {
+  width: 100%;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeleton-title {
+  height: 24px;
+  width: 60%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton-text {
+  height: 16px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton-text.short {
+  width: 80%;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* =========================================
+   SUCCESS VIEW
+   ========================================= */
+.success-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  gap: 16px;
+}
+.success-icon-wrapper {
+  background-color: rgba(13, 83, 42, 0.2);
+  color: #81c784;
+  padding: 24px;
+  border-radius: 50%;
+  margin-bottom: 16px;
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -4,8 +4,23 @@
       <h2 id="testimonials-title">Selon leurs propres mots</h2>
     </div>
 
-    <div v-if="testimonials.length === 0 && !editable" class="empty-state">
-      <p style="text-align: center;">Aucun témoignage pour le moment. Soyez le premier à partager votre expérience !</p>
+    <div v-if="loading" class="carousel-container">
+      <div class="testimonials-carousel" aria-label="Chargement des témoignages...">
+        <div v-for="n in 3" :key="n" class="skeleton-card" style="flex: 0 0 calc(100% - 3rem); max-width: 400px; min-width: 300px;">
+          <div class="skeleton-text long"></div>
+          <div class="skeleton-text long"></div>
+          <div class="skeleton-text short"></div>
+          <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between;">
+            <div class="skeleton-title" style="width: 50%;"></div>
+            <div class="skeleton-img" style="width: 36px; height: 36px; border-radius: 50%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="testimonials.length === 0 && !editable" class="empty-state-card" style="margin: 0 2rem;">
+      <MessageSquarePlus class="empty-icon" :size="48" />
+      <p>Aucun témoignage pour le moment.<br>Soyez le premier à partager votre expérience !</p>
     </div>
 
     <div v-else class="carousel-container">
@@ -53,7 +68,7 @@
 </template>
 
 <script setup>
-import { Trash2 } from 'lucide-vue-next';
+import { Trash2, MessageSquarePlus } from 'lucide-vue-next';
 
 defineProps({
   testimonials: {
@@ -61,6 +76,10 @@ defineProps({
     required: true
   },
   editable: {
+    type: Boolean,
+    default: false
+  },
+  loading: {
     type: Boolean,
     default: false
   }
