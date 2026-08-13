@@ -1,6 +1,7 @@
 import smtplib
 from email.message import EmailMessage
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status, UploadFile, File
+import logging
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -288,6 +289,7 @@ def send_contact_email(request: Request, payload: ContactRequest, settings: Sett
                 server.login(settings.smtp_user, settings.smtp_password)
                 server.send_message(msg)
     except Exception as exc:
+        logging.exception("Échec de l'envoi SMTP")
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Impossible d'envoyer l'e-mail. Vérifiez la configuration SMTP et vos informations d'identification.",
