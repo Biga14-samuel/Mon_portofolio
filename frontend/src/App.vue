@@ -1,5 +1,6 @@
 <template>
   <div class="app-shell">
+    <Toaster richColors position="top-right" theme="dark" />
     <Preloader />
     <div class="topbar-wrapper">
       <header class="topbar">
@@ -423,7 +424,6 @@
             Mot de passe
             <input v-model="credentials.password" required type="password" autocomplete="current-password" />
           </label>
-          <p v-if="authError" class="form-error" role="alert">{{ authError }}</p>
           <div class="form-actions">
             <button class="button secondary" type="button" @click="showLogin = false; playClick()" @mouseenter="playHover">Annuler</button>
             <button class="button primary" type="submit" @mouseenter="playHover">Se connecter</button>
@@ -469,7 +469,6 @@
             Votre message *
             <textarea v-model.trim="testimonialDraft.content" required minlength="5" maxlength="2000" rows="5"></textarea>
           </label>
-          <p v-if="testimonialError" class="form-error" role="alert">{{ testimonialError }}</p>
           <div class="form-actions">
             <button class="button secondary" type="button" @click="showTestimonialForm = false; playClick()" @mouseenter="playHover">Annuler</button>
             <button class="button primary" type="submit" @mouseenter="playHover">Envoyer</button>
@@ -496,6 +495,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
 import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown } from 'lucide-vue-next';
+import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
 import Preloader from './components/Preloader.vue';
@@ -619,7 +619,6 @@ const suggestedQuestions = [
 ];
 const loading = ref(false);
 const loadError = ref('');
-const authError = ref('');
 const editing = ref(null);
 const caseStudyItem = ref(null);
 const caseModal = ref(null);
@@ -823,15 +822,15 @@ async function loadItems() {
 async function handleLogin() {
   playClick();
   authState.loading = true;
-  authError.value = '';
   try {
     const data = await login(credentials.username, credentials.password);
     setToken(data.access_token);
     credentials.password = '';
     showLogin.value = false;
+    toast.success('Connexion réussie');
     await loadItems();
   } catch (error) {
-    authError.value = error.message;
+    toast.error(error.message);
   } finally {
     authState.loading = false;
   }
@@ -846,8 +845,8 @@ function handleSessionExpired() {
   clearToken();
   showTagManager.value = false;
   closeForm();
-  authError.value = 'Session expirée. Veuillez vous reconnecter.';
   showLogin.value = true;
+  toast.error('Session expirée. Veuillez vous reconnecter.');
 }
 
 function openCreate() {
@@ -938,14 +937,15 @@ async function saveItem(payload) {
       await createItem(payload, authState.token);
     }
     closeForm();
+    toast.success('Élément enregistré avec succès');
     await loadItems();
   } catch (error) {
     if (error.status === 401 || error.status === 403) {
       clearToken();
-      authError.value = 'Session expiree. Veuillez vous reconnecter.';
       showLogin.value = true;
+      toast.error('Session expirée. Veuillez vous reconnecter.');
     } else {
-      alert(error.message);
+      toast.error(error.message);
     }
   }
 }
@@ -954,14 +954,15 @@ async function remove(item) {
   if (!confirm(`Supprimer "${item.title}" du portfolio ?`)) return;
   try {
     await deleteItem(item.id, authState.token);
+    toast.success('Élément supprimé');
     await loadItems();
   } catch (error) {
     if (error.status === 401 || error.status === 403) {
       clearToken();
-      authError.value = 'Session expiree. Veuillez vous reconnecter.';
       showLogin.value = true;
+      toast.error('Session expirée. Veuillez vous reconnecter.');
     } else {
-      alert(error.message);
+      toast.error(error.message);
     }
   }
 }
@@ -969,24 +970,25 @@ async function handleDeleteTestimonial(t) {
   if (!confirm(`Supprimer le témoignage de "${t.client_name}" ?`)) return;
   try {
     await apiDeleteTestimonial(t.id, authState.token);
+    toast.success('Témoignage supprimé');
     await loadItems();
   } catch (error) {
-    alert(error.message);
+    toast.error(error.message);
   }
 }
 
 async function handleToggleTestimonialVisibility(t, is_visible) {
   try {
     await updateTestimonial(t.id, is_visible, authState.token);
+    toast.success('Visibilité mise à jour');
     await loadItems();
   } catch (error) {
-    alert(error.message);
+    toast.error(error.message);
   }
 }
 
 async function handleCreateTestimonial() {
   playClick();
-  testimonialError.value = '';
   try {
     await createTestimonial(testimonialDraft);
     showTestimonialForm.value = false;
@@ -994,10 +996,10 @@ async function handleCreateTestimonial() {
     testimonialDraft.client_company = '';
     testimonialDraft.linkedin_url = '';
     testimonialDraft.content = '';
-    alert('Merci ! Votre témoignage a bien été envoyé et sera examiné.');
+    toast.success('Merci ! Votre témoignage a bien été envoyé et sera examiné.');
     await loadItems();
   } catch (error) {
-    testimonialError.value = error.message;
+    toast.error(error.message);
   }
 }
 
@@ -1012,19 +1014,16 @@ function fillQuestion(q) {
 async function handleContactSubmit() {
   playClick();
   contactStatus.value = 'sending';
-  contactError.value = '';
   try {
     await sendContactMessage(contactDraft.email, contactDraft.subject, contactDraft.message);
-    contactStatus.value = 'success';
+    contactStatus.value = '';
     contactDraft.email = '';
     contactDraft.subject = '';
     contactDraft.message = '';
-    setTimeout(() => {
-      if (contactStatus.value === 'success') contactStatus.value = '';
-    }, 6000);
+    toast.success('Votre message a bien été envoyé !');
   } catch (error) {
-    contactStatus.value = 'error';
-    contactError.value = error.message || "Une erreur est survenue lors de l'envoi.";
+    contactStatus.value = '';
+    toast.error(error.message || "Une erreur est survenue lors de l'envoi.");
   }
 }
 </script>
