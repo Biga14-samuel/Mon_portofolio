@@ -2,6 +2,11 @@ import smtplib
 from email.message import EmailMessage
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status, UploadFile, File
 import logging
+import sys
+import traceback
+
+# Use uvicorn logger for consistency in Render logs
+logger = logging.getLogger("uvicorn.error")
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -289,7 +294,14 @@ def send_contact_email(request: Request, payload: ContactRequest, settings: Sett
                 server.login(settings.smtp_user, settings.smtp_password)
                 server.send_message(msg)
     except Exception as exc:
-        logging.exception("Échec de l'envoi SMTP")
+        # Log full traceback to uvicorn logger and stderr to ensure visibility in Render logs
+        logger.exception("Échec de l'envoi SMTP: %s", exc)
+        try:
+            tb = traceback.format_exc()
+            print("[SMTP ERROR TRACEBACK]", tb, file=sys.stderr)
+        except Exception:
+            logger.exception("Erreur lors de l'écriture du traceback")
+
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Impossible d'envoyer l'e-mail. Vérifiez la configuration SMTP et vos informations d'identification.",
