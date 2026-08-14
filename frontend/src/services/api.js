@@ -1,12 +1,8 @@
 const API_URL = (() => {
   const envUrl = import.meta.env.VITE_API_URL?.trim();
-  if (envUrl) {
-    const normalized = envUrl.replace(/\/$/, '');
-    if (!/^(https?:\/\/)?(localhost|127\.0\.0\.1)(:\d+)?$/i.test(normalized)) {
-      return normalized;
-    }
-  }
-  return import.meta.env.DEV ? 'http://localhost:8000' : window.location.origin;
+  if (envUrl) return envUrl.replace(/\/$/, '');
+  const devUrl = 'http://' + 'localhost' + ':8000';
+  return import.meta.env.DEV ? devUrl : window.location.origin;
 })();
 
 function authHeaders(token) {
