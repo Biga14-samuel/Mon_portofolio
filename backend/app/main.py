@@ -24,6 +24,7 @@ from .auth import (
     check_rate_limit,
     clear_failed_attempts,
     create_access_token,
+    get_client_ip,
     get_current_admin,
     register_failed_attempt,
     verify_password,
@@ -39,7 +40,7 @@ app = FastAPI(title="Portfolio API", version="1.0.0")
 settings = get_settings()
 
 # Setup Rate Limiter
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=get_client_ip)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 

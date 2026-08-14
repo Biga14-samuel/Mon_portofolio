@@ -13,6 +13,22 @@ bearer_scheme = HTTPBearer(auto_error=False)
 failed_attempts: dict[str, list[float]] = {}
 
 
+def get_client_ip(request: Request) -> str:
+    forwarded_for = request.headers.get("x-forwarded-for")
+    if forwarded_for:
+        first_ip = forwarded_for.split(",", 1)[0].strip()
+        if first_ip:
+            return first_ip
+
+    real_ip = request.headers.get("x-real-ip")
+    if real_ip:
+        real_ip = real_ip.strip()
+        if real_ip:
+            return real_ip
+
+    return request.client.host if request.client else "unknown"
+
+
 def verify_password(plain_password: str, password_hash: str) -> bool:
     return pwd_context.verify(plain_password, password_hash)
 
@@ -28,7 +44,7 @@ def create_access_token(subject: str, settings: Settings) -> str:
 
 
 def check_rate_limit(request: Request) -> None:
-    key = request.client.host if request.client else "unknown"
+    key = get_client_ip(request)
     now = monotonic()
     window_start = now - 60
     attempts = [timestamp for timestamp in failed_attempts.get(key, []) if timestamp >= window_start]
@@ -41,12 +57,12 @@ def check_rate_limit(request: Request) -> None:
 
 
 def register_failed_attempt(request: Request) -> None:
-    key = request.client.host if request.client else "unknown"
+    key = get_client_ip(request)
     failed_attempts.setdefault(key, []).append(monotonic())
 
 
 def clear_failed_attempts(request: Request) -> None:
-    key = request.client.host if request.client else "unknown"
+    key = get_client_ip(request)
     failed_attempts.pop(key, None)
 
 
