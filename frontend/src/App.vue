@@ -382,7 +382,6 @@
         aria-modal="true"
         aria-labelledby="case-title"
         @scroll="updateCaseProgress"
-        @dblclick="closeCaseStudy"
       >
         <div class="case-progress" aria-hidden="true">
           <span :style="{ width: `${caseProgress}%` }"></span>
@@ -398,14 +397,19 @@
           <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
           <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
           <p>{{ stripEmojis(caseStudyItem.description) }}</p>
+          <figure v-if="caseStudyItem.image_url" class="case-hero-visual">
+            <img :src="resolveAssetUrl(caseStudyItem.image_url.split(/[\n,]+/)[0])" :alt="`Illustration de ${stripEmojis(caseStudyItem.title)}`" />
+          </figure>
         </div>
 
         <div class="case-layout">
-          <aside class="case-summary" aria-label="Résumé du projet">
-            <strong>{{ caseStudyItem.subtitle ? 'Informations / stack' : 'Informations' }}</strong>
-            <ul>
+          <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'">
+            <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
+            <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
+            <ul v-if="caseStudyStack.length">
               <li v-for="entry in caseStudyStack" :key="entry">{{ entry }}</li>
             </ul>
+            <p v-else class="case-summary-empty">Les compétences associées seront précisées prochainement.</p>
           </aside>
 
           <div class="case-timeline">
@@ -415,18 +419,18 @@
                 <h3>{{ section.title }}</h3>
                 <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
                 <div v-if="section.image" class="case-section-image-wrapper">
-                  <img :src="section.image" alt="Schéma d'architecture" />
+                  <img :src="resolveAssetUrl(section.image)" alt="Schéma d'architecture" />
                 </div>
               </div>
             </article>
           </div>
         </div>
 
-        <div class="case-placeholder">
-          <strong>Captures et démonstration</strong>
+        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-placeholder">
+          <strong>Ressources du projet</strong>
           <p v-if="!caseStudyItem.image_url && !caseStudyItem.github_url && !caseStudyItem.demo_url">Emplacement prévu pour ajouter plus tard des captures, liens GitHub, lien de démo ou vidéo du projet.</p>
           <div v-if="caseStudyItem.image_url" style="margin-top: 1.5rem; width: 100%; border-radius: var(--radius-md); overflow: hidden;">
-             <img :src="caseStudyItem.image_url" alt="Capture d'écran du projet" style="width: 100%; height: auto; display: block;" />
+             <img :src="resolveAssetUrl(caseStudyItem.image_url.split(/[\n,]+/)[0])" alt="Capture d'écran du projet" style="width: 100%; height: auto; display: block;" />
           </div>
           <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
@@ -547,7 +551,7 @@ import PillBadge from './components/PillBadge.vue';
 import StackToolsSection from './components/StackToolsSection.vue';
 import TagManager from './components/TagManager.vue';
 import { authState, clearToken, setToken } from './store/auth';
-import { createItem, deleteItem, getItems, login, updateItem, getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial as apiDeleteTestimonial, sendContactMessage } from './services/api';
+import { createItem, deleteItem, getItems, login, resolveAssetUrl, updateItem, getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial as apiDeleteTestimonial, sendContactMessage } from './services/api';
 import TestimonialSection from './components/TestimonialSection.vue';
 import { tagTone } from './services/tags';
 import NotFound from './components/NotFound.vue';
@@ -689,7 +693,7 @@ const typeFilteredItems = computed(() => (selectedType.value ? items.value.filte
 const caseStudyStack = computed(() => {
   if (!caseStudyItem.value) return [];
   const list = [];
-  if (caseStudyItem.value.subtitle) {
+  if (caseStudyItem.value.subtitle && caseStudyItem.value.type !== 'parcours') {
     list.push(...caseStudyItem.value.subtitle.split(',').map((e) => stripEmojis(e.trim())).filter(Boolean));
   }
   const tools = caseStudyItem.value.content?.tools;
@@ -706,16 +710,18 @@ const activeCaseStudy = computed(() => {
   const sections = [];
   let num = 1;
 
-  sections.push({
-    number: String(num++).padStart(2, '0'),
-    title: 'Présentation & Contexte',
-    body: caseStudyItem.value.description,
-  });
+  if (type !== 'parcours') {
+    sections.push({
+      number: String(num++).padStart(2, '0'),
+      title: 'Présentation & Contexte',
+      body: caseStudyItem.value.description,
+    });
+  }
 
   if (c.objective) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: type === 'realisation' ? 'Objectif' : type === 'parcours' ? 'Missions & Objectifs' : 'Contexte & Utilisation',
+      title: type === 'realisation' ? 'Objectif' : type === 'parcours' ? 'Objectifs de la formation' : 'Contexte & Utilisation',
       body: c.objective,
     });
   }
@@ -723,23 +729,23 @@ const activeCaseStudy = computed(() => {
   if (c.architecture) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: type === 'realisation' ? 'Architecture / méthode' : type === 'parcours' ? 'Activités clés & Déroulement' : 'Détails techniques & Niveau',
+      title: type === 'realisation' ? 'Architecture / méthode' : type === 'parcours' ? 'Programme & apprentissages' : 'Détails techniques & Niveau',
       body: c.architecture,
-      image: c.architecture_image,
+      image: resolveAssetUrl(c.architecture_image),
     });
   } else if (c.architecture_image) {
     sections.push({
       number: String(num++).padStart(2, '0'),
       title: 'Illustration / Document',
       body: '',
-      image: c.architecture_image,
+      image: resolveAssetUrl(c.architecture_image),
     });
   }
 
-  if (c.alert_flow) {
+  if (c.alert_flow && type !== 'parcours') {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: type === 'realisation' ? 'Flux d\'alerte' : type === 'parcours' ? 'Méthodologie & Organisation' : 'Cas d\'usage & Projets liés',
+      title: type === 'realisation' ? 'Flux d\'alerte' : type === 'parcours' ? 'Cadre de formation' : 'Cas d\'usage & Projets liés',
       body: c.alert_flow,
     });
   }
@@ -755,7 +761,7 @@ const activeCaseStudy = computed(() => {
   if (c.impact) {
     sections.push({
       number: String(num++).padStart(2, '0'),
-      title: type === 'realisation' ? 'Impact' : type === 'parcours' ? 'Bilan / Résultat' : 'Certifications / Attestation',
+      title: type === 'realisation' ? 'Impact' : type === 'parcours' ? 'Résultat' : 'Certifications / Attestation',
       body: c.impact,
     });
   }
@@ -764,7 +770,7 @@ const activeCaseStudy = computed(() => {
     sections.push({
       number: String(num++).padStart(2, '0'),
       title: 'Détails complémentaires',
-      body: "Vous pouvez compléter cette fiche depuis l'espace Administration pour ajouter des images, des explications détaillées ou un bilan.",
+      body: 'Les informations détaillées seront ajoutées prochainement.',
     });
   }
 
@@ -1093,6 +1099,37 @@ async function handleContactSubmit() {
 </script>
 
 <style scoped>
+.case-hero-visual {
+  width: min(100%, 720px);
+  margin: 2rem 0 0;
+  overflow: hidden;
+  border: 1px solid var(--outline);
+  border-radius: 1.25rem;
+  background: var(--surface-card);
+  box-shadow: var(--shadow);
+}
+
+.case-hero-visual img {
+  display: block;
+  width: 100%;
+  max-height: 380px;
+  object-fit: cover;
+}
+
+.case-summary-period {
+  margin: 0 0 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.case-summary-empty {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
 .case-section-image-wrapper {
   margin-top: 1.5rem;
   border-radius: var(--radius-md);
