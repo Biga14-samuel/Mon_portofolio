@@ -1,5 +1,5 @@
 <template>
-  <section class="content-section reveal-on-scroll" :id="id" :aria-labelledby="`${id}-title`">
+  <section class="content-section" :id="id" :aria-labelledby="`${id}-title`">
     <div class="section-heading">
       <h2 :id="`${id}-title`">{{ title }}</h2>
     </div>

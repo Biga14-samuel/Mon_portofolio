@@ -1,5 +1,5 @@
 <template>
-  <section class="stack-section reveal-on-scroll blueprint-bg" :id="id" :aria-labelledby="`${id}-title`">
+  <section class="stack-section blueprint-bg" :id="id" :aria-labelledby="`${id}-title`">
     <div class="stack-heading">
       <div>
         <PillBadge tone="aubergine">Stack configurable</PillBadge>
