@@ -5,8 +5,6 @@ Run with the project's venv and PYTHONPATH set to backend.
 from app.database import SessionLocal
 from app.models import Item, Tag
 
-CATEGORY = 'Certification'
-
 ORDER_RULES = [
     (1, ('brevet de technicien',)),
     (2, ('bts maintenance', 'maintenance des appareils biomédicaux')),
@@ -23,6 +21,7 @@ ORDER_RULES = [
 CERTIFICATIONS = [
     {
         'display_order': 3,
+        'category': 'Marketing',
         'title': 'Certification — Marketing Digital',
         'subtitle': '2024 | Obtenue',
         'description': "Acquisition des bases du marketing digital, de la stratégie de contenu et du développement de la présence en ligne.",
@@ -44,6 +43,7 @@ CERTIFICATIONS = [
     },
     {
         'display_order': 4,
+        'category': 'Entrepreneuriat',
         'title': 'Certification — Entrepreneuriat',
         'subtitle': '2024 | MIU (Obtenue)',
         'description': "Certification sur la création d'entreprise, la modélisation économique (Business Plan, SWOT) et la gestion de projet.",
@@ -65,6 +65,7 @@ CERTIFICATIONS = [
     },
     {
         'display_order': 6,
+        'category': 'Cybersécurité',
         'title': 'Certification — Ethical Hacking (Hacker Éthique)',
         'subtitle': '2026 | Cisco NetAcad & Credly (Obtenue)',
         'description': "Maîtrise des concepts de hacking éthique, exécution des techniques de post-exploitation, analyse de vulnérabilités et sécurité du Cloud/IoT.",
@@ -86,6 +87,7 @@ CERTIFICATIONS = [
     },
     {
         'display_order': 7,
+        'category': 'Réseaux',
         'title': "CCNA — Routage, Switching & Réseautage d'entreprise",
         'subtitle': '2026 | Cisco NetAcad (En cours)',
         'description': "Formation approfondie sur les essentiels de la commutation, le routage, la sécurité des infrastructures LAN/WLAN et l'automatisation réseau.",
@@ -107,6 +109,7 @@ CERTIFICATIONS = [
     },
     {
         'display_order': 8,
+        'category': 'Sécurité Réseau',
         'title': 'Certification — Sécurité des réseaux en entreprise & Défense du réseau',
         'subtitle': '2026 | Cisco NetAcad (En cours)',
         'description': "Apprentissage des techniques de surveillance réseau, de défense périmétrique, de sécurisation des flux et de gestion des alertes de sécurité.",
@@ -141,7 +144,7 @@ def upsert_item(session, payload):
         item = Item(type='parcours')
         session.add(item)
 
-    item.category = CATEGORY
+    item.category = payload['category']
     item.featured = False
     item.display_order = payload['display_order']
     item.title = payload['title']
@@ -167,7 +170,8 @@ def normalize_existing_orders(session):
 
 session = SessionLocal()
 try:
-    upsert_tag(session)
+    for tag_name in TAGS:
+        upsert_tag(session, tag_name)
     for payload in CERTIFICATIONS:
         upsert_item(session, payload)
     normalize_existing_orders(session)
