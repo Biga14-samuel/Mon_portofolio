@@ -392,20 +392,45 @@
             <span>Retour</span>
           </button>
         </div>
-        <div class="case-hero" :class="{ 'case-hero--has-image': Boolean(caseHeroImage) }">
+        <div class="case-hero" :class="{ 'case-hero--has-image': Boolean(caseHeroImages.length) }">
           <div class="case-hero-copy" :style="storyStyle(0)">
             <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
             <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
             <p>{{ stripEmojis(caseStudyItem.description) }}</p>
           </div>
-          <figure v-if="caseHeroImage" class="case-hero-visual" :class="{ 'is-loaded': caseHeroImageLoaded }" :style="storyStyle(1)">
+          <figure v-if="caseHeroImages.length" class="case-hero-visual case-gallery-card" :class="{ 'is-loaded': caseHeroImageLoaded, 'is-multi': caseHeroImages.length > 1 }" :style="storyStyle(1)">
+            <button v-if="caseHeroImages.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="caseHeroImageIndex = (caseHeroImageIndex - 1 + caseHeroImages.length) % caseHeroImages.length; playClick()" aria-label="Image précédente">
+              <ArrowLeft :size="18" aria-hidden="true" />
+            </button>
             <img
-              :src="caseHeroImage"
+              :key="caseHeroImageIndex"
+              :src="caseHeroImages[caseHeroImageIndex] || caseHeroImage"
               :alt="`Illustration de ${stripEmojis(caseStudyItem.title)}`"
               data-hide-on-error="1"
+              class="case-clickable-image"
+              @click="openImageViewer(caseHeroImages, caseHeroImageIndex, stripEmojis(caseStudyItem.title)); playClick()"
+              @mouseenter="playHover"
               @load="handleCaseHeroImageLoad"
               @error="handleCaseHeroImageError"
             />
+            <button v-if="caseHeroImages.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="caseHeroImageIndex = (caseHeroImageIndex + 1) % caseHeroImages.length; playClick()" aria-label="Image suivante">
+              <ArrowRight :size="18" aria-hidden="true" />
+            </button>
+            <figcaption class="case-gallery-caption">Cliquer pour agrandir</figcaption>
+            <div v-if="caseHeroImages.length > 1" class="case-gallery-thumbs">
+              <button
+                v-for="(image, imageIndex) in caseHeroImages"
+                :key="image"
+                type="button"
+                class="case-gallery-thumb"
+                :class="{ active: imageIndex === caseHeroImageIndex }"
+                @click="caseHeroImageIndex = imageIndex; playClick()"
+                @mouseenter="playHover"
+                :aria-label="`Voir l'image ${imageIndex + 1}`"
+              >
+                <img :src="image" :alt="`Miniature ${imageIndex + 1} de ${stripEmojis(caseStudyItem.title)}`" />
+              </button>
+            </div>
           </figure>
         </div>
 
@@ -425,20 +450,84 @@
               <div>
                 <h3>{{ section.title }}</h3>
                 <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
-                <div v-if="section.image" class="case-section-image-wrapper">
-                  <img :src="resolveAssetUrl(section.image)" alt="Schéma d'architecture" data-hide-on-error="1" @load="markImageLoaded" @error="handleImgError" />
+                <div v-if="section.images?.length" class="case-section-gallery">
+                  <figure class="case-section-image-wrapper case-gallery-card case-section-image-wrapper--interactive" :class="{ 'is-loaded': true, 'is-multi': section.images.length > 1 }" @click="openImageViewer(section.images, getSectionImageIndex(section), stripEmojis(section.title)); playClick()" @mouseenter="playHover">
+                    <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) - 1); playClick()" aria-label="Image précédente">
+                      <ArrowLeft :size="18" aria-hidden="true" />
+                    </button>
+                    <img :src="section.images[getSectionImageIndex(section)]" :alt="`Illustration de ${stripEmojis(section.title)}`" data-hide-on-error="1" @load="markImageLoaded" @error="handleImgError" />
+                    <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) + 1); playClick()" aria-label="Image suivante">
+                      <ArrowRight :size="18" aria-hidden="true" />
+                    </button>
+                    <span class="case-gallery-hint">Cliquer pour agrandir</span>
+                  </figure>
+                  <div v-if="section.images.length > 1" class="case-gallery-thumbs">
+                    <button
+                      v-for="(image, imageIndex) in section.images"
+                      :key="image"
+                      type="button"
+                      class="case-gallery-thumb"
+                      :class="{ active: imageIndex === getSectionImageIndex(section) }"
+                      @click="setSectionImageIndex(section, imageIndex); playClick()"
+                      @mouseenter="playHover"
+                      :aria-label="`Voir la miniature ${imageIndex + 1}`"
+                    >
+                      <img :src="image" :alt="`Miniature ${imageIndex + 1} de ${stripEmojis(section.title)}`" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </article>
           </div>
         </div>
 
-        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-resources" :style="storyStyle((caseHeroImage ? 3 : 2) + activeCaseStudy.length)">
+        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-resources" :style="storyStyle((caseHeroImages.length ? 3 : 2) + activeCaseStudy.length)">
           <strong>Ressources du projet</strong>
           <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
              <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
           </div>
+        </div>
+      </section>
+    </div>
+
+
+    <div v-if="imageViewerOpen" class="image-viewer-backdrop" role="presentation" @click.self="closeImageViewer()">
+      <section class="image-viewer" role="dialog" aria-modal="true" aria-label="Aperçu d'image">
+        <header class="image-viewer-header">
+          <div>
+            <span class="image-viewer-kicker">Aperçu plein écran</span>
+            <strong>{{ imageViewerTitle || 'Image' }}</strong>
+          </div>
+          <button type="button" class="image-viewer-close" @click="closeImageViewer(); playClick()" @mouseenter="playHover" aria-label="Fermer l'aperçu">
+            <X :size="20" aria-hidden="true" />
+          </button>
+        </header>
+        <div class="image-viewer-body">
+          <button v-if="imageViewerImages.length > 1" type="button" class="image-viewer-nav image-viewer-nav--prev" @click="previousImage(); playClick()" @mouseenter="playHover" aria-label="Image précédente">
+            <ArrowLeft :size="22" aria-hidden="true" />
+          </button>
+          <figure class="image-viewer-figure">
+            <img :src="imageViewerImages[imageViewerIndex]" :alt="imageViewerTitle || 'Aperçu de l’image'" />
+            <figcaption v-if="imageViewerImages.length > 1">{{ imageViewerIndex + 1 }} / {{ imageViewerImages.length }}</figcaption>
+          </figure>
+          <button v-if="imageViewerImages.length > 1" type="button" class="image-viewer-nav image-viewer-nav--next" @click="nextImage(); playClick()" @mouseenter="playHover" aria-label="Image suivante">
+            <ArrowRight :size="22" aria-hidden="true" />
+          </button>
+        </div>
+        <div v-if="imageViewerImages.length > 1" class="image-viewer-thumbs">
+          <button
+            v-for="(image, imageIndex) in imageViewerImages"
+            :key="image"
+            type="button"
+            class="image-viewer-thumb"
+            :class="{ active: imageIndex === imageViewerIndex }"
+            @click="imageViewerIndex = imageIndex; playClick()"
+            @mouseenter="playHover"
+            :aria-label="`Voir l'image ${imageIndex + 1}`"
+          >
+            <img :src="image" :alt="`Miniature ${imageIndex + 1}`" />
+          </button>
         </div>
       </section>
     </div>
@@ -542,7 +631,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, X } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
@@ -704,6 +793,12 @@ const caseModal = ref(null);
 const caseProgress = ref(0);
 const caseHeroImageFailed = ref(false);
 const caseHeroImageLoaded = ref(false);
+const caseHeroImageIndex = ref(0);
+const caseSectionImageIndexes = reactive({});
+const imageViewerOpen = ref(false);
+const imageViewerImages = ref([]);
+const imageViewerIndex = ref(0);
+const imageViewerTitle = ref('');
 const activeCaseStepIndex = ref(-1);
 const emailCopied = ref(false);
 const credentials = reactive({ username: '', password: '' });
@@ -738,6 +833,75 @@ function sortChronologically(list) {
   });
 }
 
+function splitImageSources(raw) {
+  if (!raw) return [];
+  const values = Array.isArray(raw) ? raw : String(raw).split(/[\n,;|]+/);
+  return values.map((value) => stripEmojis(String(value).trim())).filter(Boolean);
+}
+
+function getSectionGalleryKey(section) {
+  return `${section.number}-${section.title}`;
+}
+
+function getSectionImageIndex(section) {
+  return caseSectionImageIndexes[getSectionGalleryKey(section)] ?? 0;
+}
+
+function setSectionImageIndex(section, index) {
+  if (!section?.images?.length) return;
+  const key = getSectionGalleryKey(section);
+  const total = section.images.length;
+  const normalized = ((index % total) + total) % total;
+  caseSectionImageIndexes[key] = normalized;
+}
+
+function resetCaseImageIndexes() {
+  Object.keys(caseSectionImageIndexes).forEach((key) => {
+    delete caseSectionImageIndexes[key];
+  });
+  caseHeroImageIndex.value = 0;
+}
+
+function openImageViewer(images, startIndex = 0, title = '') {
+  const normalized = (images || []).filter(Boolean);
+  if (!normalized.length) return;
+  imageViewerImages.value = normalized;
+  imageViewerIndex.value = Math.min(Math.max(startIndex, 0), normalized.length - 1);
+  imageViewerTitle.value = title;
+  imageViewerOpen.value = true;
+}
+
+function closeImageViewer() {
+  imageViewerOpen.value = false;
+}
+
+function nextImage() {
+  if (!imageViewerImages.value.length) return;
+  imageViewerIndex.value = (imageViewerIndex.value + 1) % imageViewerImages.value.length;
+}
+
+function previousImage() {
+  if (!imageViewerImages.value.length) return;
+  imageViewerIndex.value = (imageViewerIndex.value - 1 + imageViewerImages.value.length) % imageViewerImages.value.length;
+}
+
+function handleGlobalKeydown(e) {
+  if (!imageViewerOpen.value) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeImageViewer();
+    return;
+  }
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    nextImage();
+  }
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    previousImage();
+  }
+}
+
 const caseStudyStack = computed(() => {
   if (!caseStudyItem.value) return [];
   const list = [];
@@ -751,15 +915,15 @@ const caseStudyStack = computed(() => {
   return list;
 });
 
-const caseHeroImage = computed(() => {
-  if (!caseStudyItem.value?.image_url || caseHeroImageFailed.value) return '';
+const caseHeroImages = computed(() => {
+  if (!caseStudyItem.value?.image_url || caseHeroImageFailed.value) return [];
+  return splitImageSources(caseStudyItem.value.image_url).map((image) => resolveAssetUrl(image));
+});
 
-  const [firstImage] = caseStudyItem.value.image_url
-    .split(/[\n,]+/)
-    .map((value) => value.trim())
-    .filter(Boolean);
+const caseHeroImage = computed(() => caseHeroImages.value[0] || '');
 
-  return firstImage ? resolveAssetUrl(firstImage) : '';
+watch(caseHeroImageIndex, () => {
+  caseHeroImageLoaded.value = false;
 });
 
 const activeCaseStudy = computed(() => {
@@ -867,6 +1031,8 @@ onMounted(async () => {
   });
 
   // Désactiver les raccourcis clavier de développement (F12, Ctrl+Maj+I, Ctrl+U)
+  document.addEventListener('keydown', handleGlobalKeydown);
+
   document.addEventListener('keydown', (e) => {
     if (
       e.key === 'F12' || 
@@ -907,6 +1073,7 @@ onUnmounted(() => {
   revealObserver?.disconnect();
   window.removeEventListener('scroll', updatePhotoParallax);
   window.removeEventListener('scroll', handleScroll);
+  document.removeEventListener('keydown', handleGlobalKeydown);
 });
 
 function handleScroll() {
@@ -983,6 +1150,7 @@ function openCaseStudy(item) {
   activeCaseStepIndex.value = -1;
   caseStudyItem.value = item;
   caseProgress.value = 0;
+  resetCaseImageIndexes();
   nextTick(updateCaseProgress);
 }
 
@@ -992,6 +1160,8 @@ function closeCaseStudy() {
   caseHeroImageFailed.value = false;
   caseHeroImageLoaded.value = false;
   activeCaseStepIndex.value = -1;
+  closeImageViewer();
+  resetCaseImageIndexes();
 }
 
 function handleCaseHeroImageLoad(e) {
@@ -1208,16 +1378,247 @@ async function handleContactSubmit() {
 
 <style scoped>
 
-.case-section-image-wrapper {
+.case-section-gallery {
+  display: grid;
+  gap: 0.9rem;
   margin-top: 1.5rem;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--surface-1);
 }
+
+.case-gallery-card {
+  position: relative;
+}
+
+.case-section-image-wrapper {
+  position: relative;
+  margin-top: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(119, 33, 111, 0.12);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247, 241, 246, 0.98));
+  box-shadow: 0 14px 28px rgba(44, 0, 30, 0.08);
+}
+
+.case-section-image-wrapper--interactive {
+  cursor: zoom-in;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.case-section-image-wrapper--interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(233, 84, 32, 0.25);
+  box-shadow: 0 18px 36px rgba(44, 0, 30, 0.12);
+}
+
 .case-section-image-wrapper img {
   width: 100%;
   height: auto;
+  display: block;
+}
+
+.case-section-image-wrapper .case-gallery-hint,
+.case-gallery-caption {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(37, 12, 34, 0.72);
+  color: #fff;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(10px);
+}
+
+.case-gallery-thumbs {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.case-gallery-thumb {
+  width: 72px;
+  height: 54px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 6px 14px rgba(44, 0, 30, 0.08);
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.case-gallery-thumb:hover {
+  transform: translateY(-2px);
+}
+
+.case-gallery-thumb.active {
+  border-color: var(--ubuntu-orange);
+  box-shadow: 0 10px 20px rgba(233, 84, 32, 0.16);
+}
+
+.case-gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.case-gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  color: var(--aubergine-dark);
+  box-shadow: 0 10px 24px rgba(44, 0, 30, 0.16);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.case-gallery-nav:hover {
+  background: #fff;
+}
+
+.case-gallery-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.case-gallery-nav--prev { left: 12px; }
+.case-gallery-nav--next { right: 12px; }
+
+.image-viewer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(31, 14, 27, 0.78);
+  backdrop-filter: blur(18px);
+}
+
+.image-viewer {
+  width: min(1120px, 100%);
+  max-height: min(92vh, 980px);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,239,244,0.97));
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+.image-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.image-viewer-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ubuntu-orange-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.image-viewer-header strong {
+  color: var(--aubergine-dark);
+  font-size: 1.1rem;
+}
+
+.image-viewer-close {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(119, 33, 111, 0.08);
+  color: var(--aubergine-dark);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.image-viewer-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+}
+
+.image-viewer-nav {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(119, 33, 111, 0.08);
+  color: var(--aubergine-dark);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 24px rgba(44, 0, 30, 0.12);
+}
+
+.image-viewer-figure {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.image-viewer-figure img {
+  max-width: 100%;
+  max-height: calc(92vh - 220px);
+  object-fit: contain;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.94);
+  box-shadow: 0 18px 40px rgba(44, 0, 30, 0.16);
+  cursor: zoom-out;
+}
+
+.image-viewer-figure figcaption {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.image-viewer-thumbs {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.image-viewer-thumb {
+  width: 88px;
+  height: 62px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.92);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.image-viewer-thumb.active {
+  border-color: var(--ubuntu-orange);
+}
+
+.image-viewer-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
 
