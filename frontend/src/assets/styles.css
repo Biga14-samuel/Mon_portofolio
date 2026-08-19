@@ -1997,6 +1997,66 @@ td {
   color: var(--aubergine-dark);
 }
 
+.case-hero-copy,
+.case-hero-visual,
+.case-summary,
+.case-step,
+.case-resources {
+  animation: storyRise 680ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--story-delay, 0ms);
+}
+
+.case-timeline {
+  position: relative;
+  padding-left: 18px;
+}
+
+.case-timeline::before {
+  content: '';
+  position: absolute;
+  left: 24px;
+  top: 4px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(119, 33, 111, 0.18), rgba(233, 84, 32, 0.18));
+}
+
+.case-step {
+  position: relative;
+}
+
+.case-step::before {
+  content: '';
+  position: absolute;
+  left: -30px;
+  top: 30px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f8a07d;
+  box-shadow: 0 0 0 5px rgba(248, 160, 125, 0.16);
+}
+
+.case-step:nth-child(1) {
+  animation-delay: var(--story-delay, 0ms);
+}
+
+.case-step:nth-child(2) {
+  animation-delay: var(--story-delay, 0ms);
+}
+
+@keyframes storyRise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .contact-section {
   width: min(1200px, calc(100% - 32px));
   display: grid;

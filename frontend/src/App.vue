@@ -394,12 +394,12 @@
           <button class="case-close" type="button" aria-label="Fermer la vue" @click="closeCaseStudy(); playClick()" @mouseenter="playHover">×</button>
         </div>
         <div class="case-hero" :class="{ 'case-hero--has-image': Boolean(caseHeroImage) }">
-          <div class="case-hero-copy">
+          <div class="case-hero-copy" :style="storyStyle(0)">
             <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
             <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
             <p>{{ stripEmojis(caseStudyItem.description) }}</p>
           </div>
-          <figure v-if="caseHeroImage" class="case-hero-visual" :class="{ 'is-loaded': caseHeroImageLoaded }">
+          <figure v-if="caseHeroImage" class="case-hero-visual" :class="{ 'is-loaded': caseHeroImageLoaded }" :style="storyStyle(1)">
             <img
               :src="caseHeroImage"
               :alt="`Illustration de ${stripEmojis(caseStudyItem.title)}`"
@@ -411,7 +411,7 @@
         </div>
 
         <div class="case-layout">
-          <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'">
+          <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(caseHeroImage ? 2 : 1)">
             <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
             <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
             <ul v-if="caseStudyStack.length">
@@ -421,7 +421,7 @@
           </aside>
 
           <div class="case-timeline">
-            <article v-for="section in activeCaseStudy" :key="section.title" class="case-step">
+            <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :style="storyStyle((caseHeroImage ? 3 : 2) + index)">
               <span>{{ section.number }}</span>
               <div>
                 <h3>{{ section.title }}</h3>
@@ -434,7 +434,7 @@
           </div>
         </div>
 
-        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-resources">
+        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-resources" :style="storyStyle((caseHeroImage ? 3 : 2) + activeCaseStudy.length)">
           <strong>Ressources du projet</strong>
           <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
@@ -978,6 +978,10 @@ function handleCaseHeroImageLoad(e) {
 function handleCaseHeroImageError(e) {
   caseHeroImageFailed.value = true;
   handleImgError(e);
+}
+
+function storyStyle(index) {
+  return { '--story-delay': `${Math.max(index, 0) * 110}ms` };
 }
 
 function markImageLoaded(e) {
