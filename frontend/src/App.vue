@@ -392,45 +392,24 @@
             <span>Retour</span>
           </button>
         </div>
-        <div class="case-hero" :class="{ 'case-hero--has-image': Boolean(caseHeroImages.length) }">
+        <div class="case-hero" :class="{ 'case-hero--has-image': Boolean(casePrimaryImage) }">
           <div class="case-hero-copy" :style="storyStyle(0)">
             <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
             <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
             <p>{{ stripEmojis(caseStudyItem.description) }}</p>
           </div>
-          <figure v-if="caseHeroImages.length" class="case-hero-visual case-gallery-card" :class="{ 'is-loaded': caseHeroImageLoaded, 'is-multi': caseHeroImages.length > 1 }" :style="storyStyle(1)">
-            <button v-if="caseHeroImages.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="caseHeroImageIndex = (caseHeroImageIndex - 1 + caseHeroImages.length) % caseHeroImages.length; playClick()" aria-label="Image précédente">
-              <ArrowLeft :size="18" aria-hidden="true" />
-            </button>
+          <figure v-if="casePrimaryImage" class="case-hero-visual case-main-visual" :class="{ 'is-loaded': caseHeroImageLoaded }" :style="storyStyle(1)">
             <img
-              :key="caseHeroImageIndex"
-              :src="caseHeroImages[caseHeroImageIndex] || caseHeroImage"
+              :src="casePrimaryImage"
               :alt="`Illustration de ${stripEmojis(caseStudyItem.title)}`"
               data-hide-on-error="1"
               class="case-clickable-image"
-              @click="openImageViewer(caseHeroImages, caseHeroImageIndex, stripEmojis(caseStudyItem.title)); playClick()"
+              @click="openImageViewer(caseDetailImages, 0, stripEmojis(caseStudyItem.title)); playClick()"
               @mouseenter="playHover"
               @load="handleCaseHeroImageLoad"
               @error="handleCaseHeroImageError"
             />
-            <button v-if="caseHeroImages.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="caseHeroImageIndex = (caseHeroImageIndex + 1) % caseHeroImages.length; playClick()" aria-label="Image suivante">
-              <ArrowRight :size="18" aria-hidden="true" />
-            </button>
             <figcaption class="case-gallery-caption">Cliquer pour agrandir</figcaption>
-            <div v-if="caseHeroImages.length > 1" class="case-gallery-thumbs">
-              <button
-                v-for="(image, imageIndex) in caseHeroImages"
-                :key="image"
-                type="button"
-                class="case-gallery-thumb"
-                :class="{ active: imageIndex === caseHeroImageIndex }"
-                @click="caseHeroImageIndex = imageIndex; playClick()"
-                @mouseenter="playHover"
-                :aria-label="`Voir l'image ${imageIndex + 1}`"
-              >
-                <img :src="image" :alt="`Miniature ${imageIndex + 1} de ${stripEmojis(caseStudyItem.title)}`" />
-              </button>
-            </div>
           </figure>
         </div>
 
@@ -481,7 +460,25 @@
           </div>
         </div>
 
-        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-resources" :style="storyStyle((caseHeroImages.length ? 3 : 2) + activeCaseStudy.length)">
+        <section v-if="caseGalleryImages.length" class="case-gallery-section" :style="storyStyle((casePrimaryImage ? 2 : 1) + activeCaseStudy.length)">
+          <strong>Galerie d’images</strong>
+          <p>Quelques vues supplémentaires pour explorer le contexte, les écrans ou les certificats associés.</p>
+          <div class="case-gallery-grid">
+            <button
+              v-for="(image, imageIndex) in caseGalleryImages"
+              :key="image"
+              type="button"
+              class="case-gallery-card case-gallery-tile"
+              @click="openImageViewer(caseDetailImages, imageIndex + (casePrimaryImage ? 1 : 0), stripEmojis(caseStudyItem.title)); playClick()"
+              @mouseenter="playHover"
+              :aria-label="`Ouvrir l'image ${imageIndex + 1}`"
+            >
+              <img :src="image" :alt="`Galerie ${imageIndex + 1} de ${stripEmojis(caseStudyItem.title)}`" data-hide-on-error="1" @error="handleImgError" />
+            </button>
+          </div>
+        </section>
+
+        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-resources" :style="storyStyle((casePrimaryImage ? 3 : 2) + activeCaseStudy.length + (caseGalleryImages.length ? 1 : 0))">
           <strong>Ressources du projet</strong>
           <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
@@ -915,15 +912,15 @@ const caseStudyStack = computed(() => {
   return list;
 });
 
-const caseHeroImages = computed(() => {
+const caseDetailImages = computed(() => {
   if (!caseStudyItem.value) return [];
-  const coverImages = caseStudyItem.value?.image_url ? splitImageSources(caseStudyItem.value.image_url) : [];
-  const galleryImages = splitImageSources(caseStudyItem.value?.content?.gallery_images);
-  const merged = [...coverImages, ...galleryImages].filter(Boolean);
-  return [...new Set(merged)].map((image) => resolveAssetUrl(image));
+  const coverImages = splitImageSources(caseStudyItem.value?.image_url).map((image) => resolveAssetUrl(image));
+  const contentGallery = splitImageSources(caseStudyItem.value?.content?.gallery_images).map((image) => resolveAssetUrl(image));
+  return [...new Set([...coverImages, ...contentGallery].filter(Boolean))];
 });
 
-const caseHeroImage = computed(() => caseHeroImages.value[0] || '');
+const casePrimaryImage = computed(() => caseDetailImages.value[0] || '');
+const caseGalleryImages = computed(() => caseDetailImages.value.slice(1));
 
 watch(caseHeroImageIndex, () => {
   caseHeroImageLoaded.value = false;
