@@ -24,7 +24,7 @@
         </button>
         <nav class="nav-links" :class="{ 'is-open': menuOpen }" aria-label="Navigation principale" @click="menuOpen = false">
           <button class="nav-button" @click.stop="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
-            {{ audioEnabled ? '🔊 Son ON' : '🔇 Son OFF' }}
+            {{ audioEnabled ? 'Son ON' : 'Son OFF' }}
           </button>
           <a href="#apropos" @click="playClick" @mouseenter="playHover">À propos</a>
           <a href="#parcours" @click="playClick" @mouseenter="playHover">Parcours</a>
@@ -267,6 +267,7 @@
               :editable="Boolean(authState.token)"
               @edit="openEdit"
               @delete="remove"
+              @view-case="openCaseStudy"
             />
             <StackToolsSection
               id="competences"
@@ -394,9 +395,9 @@
           <button class="case-close" type="button" aria-label="Fermer la vue" @click="closeCaseStudy(); playClick()" @mouseenter="playHover">×</button>
         </div>
         <div class="case-hero">
-          <PillBadge :tone="tagTone(caseStudyItem.category)">{{ caseStudyItem.category }}</PillBadge>
-          <h2 id="case-title">{{ caseStudyItem.title }}</h2>
-          <p>{{ caseStudyItem.description }}</p>
+          <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
+          <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
+          <p>{{ stripEmojis(caseStudyItem.description) }}</p>
         </div>
 
         <div class="case-layout">
@@ -412,7 +413,7 @@
               <span>{{ section.number }}</span>
               <div>
                 <h3>{{ section.title }}</h3>
-                <p style="white-space: pre-wrap;">{{ section.body }}</p>
+                <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
                 <div v-if="section.image" class="case-section-image-wrapper">
                   <img :src="section.image" alt="Schéma d'architecture" />
                 </div>
@@ -550,6 +551,7 @@ import { createItem, deleteItem, getItems, login, updateItem, getTestimonials, c
 import TestimonialSection from './components/TestimonialSection.vue';
 import { tagTone } from './services/tags';
 import NotFound from './components/NotFound.vue';
+import { stripEmojis } from './utils/sanitize';
 
 const currentPath = ref(window.location.pathname);
 const hasError = ref(false);
@@ -627,15 +629,15 @@ const filters = [
 ];
 
 const categoryIcons = {
-  'web': '🌐',
-  'data': '📊',
-  'cyber': '🔒',
-  'system': '⚙️',
-  'design': '🎨',
-  'mobile': '📱',
-  'cloud': '☁️',
-  'réseau': '🔌',
-  'default': '✨'
+  'web': '',
+  'data': '',
+  'cyber': '',
+  'system': '',
+  'design': '',
+  'mobile': '',
+  'cloud': '',
+  'réseau': '',
+  'default': ''
 };
 
 function getCategoryIcon(cat) {
@@ -643,7 +645,7 @@ function getCategoryIcon(cat) {
   for (const [key, icon] of Object.entries(categoryIcons)) {
     if (lowerCat.includes(key)) return icon;
   }
-  return categoryIcons.default;
+  return '';
 }
 
 const futureProjectCategories = ['Cloud & Virtualisation', 'Automatisation', 'Forensic', 'DevSecOps', 'Réseau'];
@@ -688,11 +690,11 @@ const caseStudyStack = computed(() => {
   if (!caseStudyItem.value) return [];
   const list = [];
   if (caseStudyItem.value.subtitle) {
-    list.push(...caseStudyItem.value.subtitle.split(',').map((e) => e.trim()).filter(Boolean));
+    list.push(...caseStudyItem.value.subtitle.split(',').map((e) => stripEmojis(e.trim())).filter(Boolean));
   }
   const tools = caseStudyItem.value.content?.tools;
   if (tools) {
-    list.push(...tools.split(',').map((e) => e.trim()).filter(Boolean));
+    list.push(...tools.split(',').map((e) => stripEmojis(e.trim())).filter(Boolean));
   }
   return list.length ? list : ['À compléter'];
 });
