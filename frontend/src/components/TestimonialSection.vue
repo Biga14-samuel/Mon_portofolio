@@ -57,8 +57,7 @@
           </div>
         </article>
       </div>
-      <!-- Gradient overlay for the right side -->
-      <div class="carousel-fade"></div>
+      <div class="carousel-fade" aria-hidden="true"></div>
     </div>
 
     <div class="testimonials-actions" style="margin-top: 2rem; text-align: center;">
@@ -231,7 +230,7 @@ defineEmits(['toggle-visibility', 'delete', 'add-testimonial']);
   right: 0;
   bottom: 0;
   width: 150px;
-  background: linear-gradient(to right, transparent, var(--surface));
+  background: rgba(255, 255, 255, 0.95);
   pointer-events: none;
 }
 

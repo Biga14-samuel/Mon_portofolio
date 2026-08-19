@@ -8,6 +8,7 @@
         <option value="realisation">Realisation</option>
       </select>
     </label>
+
     <label>
       Tag / catégorie
       <select v-model="form.category" required>
@@ -17,18 +18,22 @@
       </select>
       <small v-if="availableCategories.length === 0" style="color: var(--accent);">Aucun tag. Veuillez en ajouter via "Gérer les tags".</small>
     </label>
+
     <label>
       Titre
       <input v-model.trim="form.title" required maxlength="140" placeholder="Ex: Lead Developer" />
     </label>
+
     <label>
       Sous-titre / date
       <input v-model.trim="form.subtitle" required maxlength="180" placeholder="Ex: 2024 - Present" />
     </label>
+
     <label>
       Description
       <textarea v-model.trim="form.description" required minlength="10" rows="5" placeholder="Detail de l'element"></textarea>
     </label>
+
     <div class="form-row">
       <label>
         Lien GitHub (optionnel)
@@ -39,6 +44,7 @@
         <input v-model.trim="form.demo_url" type="url" maxlength="500" placeholder="https://..." />
       </label>
     </div>
+
     <div class="form-row">
       <label>
         Image de couverture (Optionnel)
@@ -49,6 +55,7 @@
         <input v-model.number="form.display_order" type="number" min="0" max="100000" />
       </label>
     </div>
+
     <label v-if="form.type === 'realisation'" class="checkbox-row">
       <input v-model="form.featured" type="checkbox" />
       <span>Mettre cette réalisation à la une</span>
@@ -56,10 +63,12 @@
 
     <fieldset class="rich-content-fieldset">
       <legend>Contenu détaillé (Vue zoom / Fiche complète)</legend>
+
       <label>
         {{ form.type === 'realisation' ? 'Objectif du projet' : form.type === 'parcours' ? 'Missions & Objectifs' : 'Contexte & Utilisation' }}
         <textarea v-model="form.content.objective" rows="3" :placeholder="form.type === 'realisation' ? 'Pourquoi ce projet ?' : 'Quelles étaient vos responsabilités / le contexte ?'"></textarea>
       </label>
+
       <div class="form-row">
         <label>
           {{ form.type === 'realisation' ? 'Outils intégrés' : form.type === 'parcours' ? 'Technos / Outils utilisés' : 'Outils associés' }}
@@ -70,18 +79,27 @@
           <ImageUploader v-model="form.content.architecture_image" @upload-error="handleUploadError" />
         </label>
       </div>
+
+      <label>
+        Galerie d'images / miniatures
+        <MultiImageUploader v-model="form.content.gallery_images" @upload-error="handleUploadError" />
+      </label>
+
       <label>
         {{ form.type === 'realisation' ? 'Architecture / Méthode' : form.type === 'parcours' ? 'Activités clés & Déroulement' : 'Détails techniques & Niveau' }}
         <textarea v-model="form.content.architecture" rows="4" placeholder="Explication détaillée..."></textarea>
       </label>
+
       <label>
-        {{ form.type === 'realisation' ? 'Flux d\'alerte' : form.type === 'parcours' ? 'Méthodologie & Rôle' : 'Cas d\'usage / Projets liés' }}
+        {{ form.type === 'realisation' ? "Flux d'alerte" : form.type === 'parcours' ? 'Méthodologie & Rôle' : "Cas d'usage / Projets liés" }}
         <textarea v-model="form.content.alert_flow" rows="3" placeholder="Informations complémentaires..."></textarea>
       </label>
+
       <label>
-        {{ form.type === 'realisation' ? 'Ce que j\'ai appris' : form.type === 'parcours' ? 'Compétences développées' : 'Points forts & Maîtrise' }}
+        {{ form.type === 'realisation' ? "Ce que j'ai appris" : form.type === 'parcours' ? 'Compétences développées' : 'Points forts & Maîtrise' }}
         <textarea v-model="form.content.lessons" rows="3" placeholder="Acquis techniques ou méthodologiques..."></textarea>
       </label>
+
       <label>
         {{ form.type === 'realisation' ? 'Impact du projet' : form.type === 'parcours' ? 'Bilan / Résultat' : 'Certifications / Attestation' }}
         <textarea v-model="form.content.impact" rows="2" placeholder="Résultat final ou validation..."></textarea>
@@ -100,6 +118,7 @@
 import { reactive, ref, watch, computed, onMounted } from 'vue';
 import { getTags } from '../services/api';
 import ImageUploader from './ImageUploader.vue';
+import MultiImageUploader from './MultiImageUploader.vue';
 
 const props = defineProps({
   item: {
@@ -114,6 +133,19 @@ const allTags = ref([]);
 
 function handleUploadError(msg) {
   error.value = msg;
+}
+
+function normalizeImageList(value) {
+  if (Array.isArray(value)) {
+    return value.map((entry) => String(entry).trim()).filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    return value
+      .split(/[\n,;|]+/)
+      .map((entry) => entry.trim())
+      .filter(Boolean);
+  }
+  return [];
 }
 
 const form = reactive({
@@ -131,11 +163,12 @@ const form = reactive({
     objective: '',
     architecture: '',
     architecture_image: '',
+    gallery_images: [],
     alert_flow: '',
     tools: '',
     lessons: '',
     impact: '',
-  }
+  },
 });
 
 onMounted(async () => {
@@ -145,12 +178,12 @@ onMounted(async () => {
       form.category = availableCategories.value[0];
     }
   } catch (e) {
-    console.error("Erreur chargement tags", e);
+    console.error('Erreur chargement tags', e);
   }
 });
 
 const availableCategories = computed(() => {
-  return allTags.value.filter(t => t.type === form.type).map(t => t.name);
+  return allTags.value.filter((t) => t.type === form.type).map((t) => t.name);
 });
 
 watch(
@@ -166,21 +199,33 @@ watch(
     form.demo_url = item?.demo_url || '';
     form.image_url = item?.image_url || '';
     form.display_order = item?.display_order || 0;
-    
+
     if (item?.content) {
-      form.content = { ...item.content };
+      form.content = {
+        objective: '',
+        architecture: '',
+        architecture_image: '',
+        gallery_images: [],
+        alert_flow: '',
+        tools: '',
+        lessons: '',
+        impact: '',
+        ...item.content,
+      };
+      form.content.gallery_images = normalizeImageList(form.content.gallery_images);
     } else {
       form.content = {
         objective: '',
         architecture: '',
         architecture_image: '',
+        gallery_images: [],
         alert_flow: '',
         tools: '',
         lessons: '',
         impact: '',
       };
     }
-    
+
     error.value = '';
   },
   { immediate: true },
@@ -196,7 +241,13 @@ function submit() {
     return;
   }
 
-  emit('submit', { ...form });
+  emit('submit', {
+    ...form,
+    content: {
+      ...form.content,
+      gallery_images: normalizeImageList(form.content.gallery_images),
+    },
+  });
 }
 
 watch(

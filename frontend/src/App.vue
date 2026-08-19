@@ -916,8 +916,11 @@ const caseStudyStack = computed(() => {
 });
 
 const caseHeroImages = computed(() => {
-  if (!caseStudyItem.value?.image_url || caseHeroImageFailed.value) return [];
-  return splitImageSources(caseStudyItem.value.image_url).map((image) => resolveAssetUrl(image));
+  if (!caseStudyItem.value) return [];
+  const coverImages = caseStudyItem.value?.image_url ? splitImageSources(caseStudyItem.value.image_url) : [];
+  const galleryImages = splitImageSources(caseStudyItem.value?.content?.gallery_images);
+  const merged = [...coverImages, ...galleryImages].filter(Boolean);
+  return [...new Set(merged)].map((image) => resolveAssetUrl(image));
 });
 
 const caseHeroImage = computed(() => caseHeroImages.value[0] || '');
@@ -1394,7 +1397,7 @@ async function handleContactSubmit() {
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid rgba(119, 33, 111, 0.12);
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247, 241, 246, 0.98));
+  background: #ffffff;
   box-shadow: 0 14px 28px rgba(44, 0, 30, 0.08);
 }
 
@@ -1512,7 +1515,7 @@ async function handleContactSubmit() {
   gap: 18px;
   padding: 18px;
   border-radius: 28px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,239,244,0.97));
+  background: #ffffff;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
 }
 
