@@ -242,7 +242,7 @@
         </button>
       </section>
 
-      <Transition name="filter-swap" mode="out-in">
+      <Transition name="filter-swap" mode="out-in" @after-enter="setupScrollReveal">
         <div :key="`${selectedType}-${selectedCategory}`" class="portfolio-results">
           <div v-if="loading" class="skeleton-container" aria-label="Chargement du portfolio...">
             <div class="skeleton-grid">
