@@ -18,11 +18,11 @@
     <div class="item-card__body">
       <div class="item-card__meta">
         <PillBadge :tone="item.type === 'realisation' ? 'orange' : 'aubergine'">{{ labels[item.type] }}</PillBadge>
-        <PillBadge :tone="tagTone(item.category)">{{ item.category }}</PillBadge>
-        <span>{{ item.subtitle }}</span>
+        <PillBadge :tone="tagTone(props.item.category)">{{ sanitizedCategory }}</PillBadge>
+        <span>{{ sanitizedSubtitle }}</span>
       </div>
-      <h3>{{ item.title }}</h3>
-      <p>{{ item.description }}</p>
+      <h3>{{ sanitizedTitle }}</h3>
+      <p>{{ sanitizedDescription }}</p>
       
       <div class="item-card__links" v-if="item.github_url || item.demo_url">
         <a v-if="item.github_url" :href="item.github_url" target="_blank" rel="noreferrer" class="external-link">
@@ -55,6 +55,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { Pencil, Trash2, Github, ExternalLink, ArrowUpRight } from 'lucide-vue-next';
 import PillBadge from './PillBadge.vue';
 import { tagTone } from '../services/tags';
+import { stripEmojis } from '../utils/sanitize';
 
 const props = defineProps({
   item: {
@@ -82,6 +83,11 @@ const imagesList = computed(() => {
   if (!props.item.image_url) return [];
   return props.item.image_url.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean);
 });
+
+const sanitizedTitle = computed(() => stripEmojis(props.item.title));
+const sanitizedSubtitle = computed(() => stripEmojis(props.item.subtitle));
+const sanitizedDescription = computed(() => stripEmojis(props.item.description));
+const sanitizedCategory = computed(() => stripEmojis(props.item.category));
 
 onMounted(() => {
   if (imagesList.value.length > 1) {
