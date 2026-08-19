@@ -1720,8 +1720,9 @@ td {
   top: 16px;
   z-index: 10;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 12px;
   padding: 0 24px;
   pointer-events: none;
 }
@@ -1760,9 +1761,10 @@ td {
 }
 
 .case-hero {
-  padding: clamp(32px, 5vw, 58px);
-  margin-top: -42px;
+  padding: clamp(28px, 5vw, 56px) clamp(32px, 5vw, 58px) clamp(32px, 5vw, 58px);
+  margin-top: 0;
   background: var(--surface-soft);
+  border-bottom: 1px solid rgba(119, 33, 111, 0.08);
 }
 
 .case-hero h2 {
@@ -1948,37 +1950,7 @@ td {
   letter-spacing: 0.02em;
 }
 
-.case-reading {
-  margin-bottom: 1rem;
-  padding: 1rem 1rem 0.95rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-}
 
-.case-reading span {
-  display: block;
-  margin-bottom: 0.45rem;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.74rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-}
-
-.case-reading strong {
-  display: block;
-  margin: 0;
-  color: #fff;
-  font-size: 1rem;
-  line-height: 1.4;
-}
-
-.case-reading.is-active {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.18);
-}
 
 .case-summary ul {
   gap: 12px;

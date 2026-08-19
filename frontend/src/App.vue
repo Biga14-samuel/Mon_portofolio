@@ -391,7 +391,6 @@
             <ArrowLeft :size="20" aria-hidden="true" />
             <span>Retour</span>
           </button>
-          <button class="case-close" type="button" aria-label="Fermer la vue" @click="closeCaseStudy(); playClick()" @mouseenter="playHover">×</button>
         </div>
         <div class="case-hero" :class="{ 'case-hero--has-image': Boolean(caseHeroImage) }">
           <div class="case-hero-copy" :style="storyStyle(0)">
@@ -412,10 +411,6 @@
 
         <div class="case-layout">
           <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(caseHeroImage ? 2 : 1)">
-            <div class="case-reading" :class="{ 'is-active': activeCaseStepIndex >= 0 }">
-              <span>Lecture guidée</span>
-              <strong>{{ activeCaseStepTitle || 'Introduction' }}</strong>
-            </div>
             <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
             <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
             <ul v-if="caseStudyStack.length">
@@ -841,10 +836,6 @@ const activeCaseStudy = computed(() => {
   return sections;
 });
 
-const activeCaseStepTitle = computed(() => {
-  if (activeCaseStepIndex.value < 0) return '';
-  return activeCaseStudy.value[activeCaseStepIndex.value]?.title || '';
-});
 
 const categoryFilters = computed(() => {
   const values = typeFilteredItems.value.map((item) => item.category).filter(Boolean);

@@ -1,24 +1,30 @@
 #!/usr/bin/env python3
-"""Upsert the five certification parcours entries in chronological order.
+"""Upsert the five certification parcours entries and normalize parcours order.
 Run with the project's venv and PYTHONPATH set to backend.
 """
 from app.database import SessionLocal
 from app.models import Item, Tag
 
-TAGS = [
-    'Marketing',
-    'Entrepreneuriat',
-    'Cybersécurité',
-    'Réseaux',
-    'Sécurité Réseau',
+CATEGORY = 'Certification'
+
+ORDER_RULES = [
+    (1, ('brevet de technicien',)),
+    (2, ('bts maintenance', 'maintenance des appareils biomédicaux')),
+    (3, ('marketing digital',)),
+    (4, ('entrepreneuriat',)),
+    (5, ('optimisation réseau', 'optimisation reseau', 'dépannage', 'depannage')),
+    (6, ('ethical hacking', 'hacker éthique', 'hacker ethique')),
+    (7, ('ccna', 'routage, switching')),
+    (8, ('sécurité des réseaux', 'securite des reseaux', 'défense du réseau', 'defense du reseau')),
+    (9, ('licence professionnelle', 'réseaux & sécurité', 'reseaux & securite')),
+    (10, ('stagiaire technique', 'administration')),
 ]
 
 CERTIFICATIONS = [
     {
-        'display_order': 11,
+        'display_order': 3,
         'title': 'Certification — Marketing Digital',
         'subtitle': '2024 | Obtenue',
-        'category': 'Marketing',
         'description': "Acquisition des bases du marketing digital, de la stratégie de contenu et du développement de la présence en ligne.",
         'content': {
             'objective': 'Comprendre les fondamentaux du marketing digital et appliquer une stratégie de visibilité cohérente.',
@@ -37,10 +43,9 @@ CERTIFICATIONS = [
         },
     },
     {
-        'display_order': 12,
+        'display_order': 4,
         'title': 'Certification — Entrepreneuriat',
         'subtitle': '2024 | MIU (Obtenue)',
-        'category': 'Entrepreneuriat',
         'description': "Certification sur la création d'entreprise, la modélisation économique (Business Plan, SWOT) et la gestion de projet.",
         'content': {
             'objective': 'Comprendre les ressorts de la création d’entreprise et de la structuration d’un projet viable.',
@@ -59,10 +64,9 @@ CERTIFICATIONS = [
         },
     },
     {
-        'display_order': 13,
+        'display_order': 6,
         'title': 'Certification — Ethical Hacking (Hacker Éthique)',
         'subtitle': '2026 | Cisco NetAcad & Credly (Obtenue)',
-        'category': 'Cybersécurité',
         'description': "Maîtrise des concepts de hacking éthique, exécution des techniques de post-exploitation, analyse de vulnérabilités et sécurité du Cloud/IoT.",
         'content': {
             'objective': 'Approfondir les techniques de sécurité offensive et la compréhension des vulnérabilités.',
@@ -81,10 +85,9 @@ CERTIFICATIONS = [
         },
     },
     {
-        'display_order': 14,
+        'display_order': 7,
         'title': "CCNA — Routage, Switching & Réseautage d'entreprise",
         'subtitle': '2026 | Cisco NetAcad (En cours)',
-        'category': 'Réseaux',
         'description': "Formation approfondie sur les essentiels de la commutation, le routage, la sécurité des infrastructures LAN/WLAN et l'automatisation réseau.",
         'content': {
             'objective': 'Renforcer les bases réseau sur le routage, la commutation et l’architecture d’entreprise.',
@@ -103,10 +106,9 @@ CERTIFICATIONS = [
         },
     },
     {
-        'display_order': 15,
+        'display_order': 8,
         'title': 'Certification — Sécurité des réseaux en entreprise & Défense du réseau',
         'subtitle': '2026 | Cisco NetAcad (En cours)',
-        'category': 'Sécurité Réseau',
         'description': "Apprentissage des techniques de surveillance réseau, de défense périmétrique, de sécurisation des flux et de gestion des alertes de sécurité.",
         'content': {
             'objective': 'Approfondir la défense réseau et la surveillance des incidents dans un contexte d’entreprise.',
@@ -127,11 +129,10 @@ CERTIFICATIONS = [
 ]
 
 
-def upsert_tag(session, tag_name):
-    tag = session.query(Tag).filter(Tag.type == 'parcours', Tag.name == tag_name).one_or_none()
+def upsert_tag(session):
+    tag = session.query(Tag).filter(Tag.type == 'parcours', Tag.name == CATEGORY).one_or_none()
     if tag is None:
-        tag = Tag(type='parcours', name=tag_name)
-        session.add(tag)
+        session.add(Tag(type='parcours', name=CATEGORY))
 
 
 def upsert_item(session, payload):
@@ -140,7 +141,7 @@ def upsert_item(session, payload):
         item = Item(type='parcours')
         session.add(item)
 
-    item.category = payload['category']
+    item.category = CATEGORY
     item.featured = False
     item.display_order = payload['display_order']
     item.title = payload['title']
@@ -152,15 +153,25 @@ def upsert_item(session, payload):
     item.content = payload['content']
 
 
+def normalize_existing_orders(session):
+    items = session.query(Item).filter(Item.type == 'parcours').all()
+    for item in items:
+        title = (item.title or '').lower()
+        subtitle = (item.subtitle or '').lower()
+        haystack = f'{title} {subtitle}'
+        for order, needles in ORDER_RULES:
+            if any(needle in haystack for needle in needles):
+                item.display_order = order
+                break
+
+
 session = SessionLocal()
 try:
-    for tag_name in TAGS:
-        upsert_tag(session, tag_name)
-
+    upsert_tag(session)
     for payload in CERTIFICATIONS:
         upsert_item(session, payload)
-
+    normalize_existing_orders(session)
     session.commit()
-    print(f"Upserted {len(CERTIFICATIONS)} certification items and {len(TAGS)} tags.")
+    print(f"Upserted {len(CERTIFICATIONS)} certification items and normalized parcours order.")
 finally:
     session.close()
