@@ -20,7 +20,7 @@
       <p>Envoi en cours...</p>
     </div>
     <div v-else-if="modelValue" class="uploader-content has-image">
-      <img :src="previewUrl" alt="Aperçu" class="preview-image" />
+      <img :src="previewUrl" alt="Aperçu" class="preview-image" @error="handleImgError" />
       <div class="uploader-overlay">
         <p>Cliquez ou glissez pour modifier</p>
       </div>
@@ -58,6 +58,20 @@ const previewUrl = computed(() => {
     ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}${props.modelValue}`
     : `http://localhost:8000${props.modelValue}`;
 });
+
+const FALLBACK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+
+function handleImgError(e) {
+  try {
+    const img = e.target;
+    if (!img.dataset.errored) {
+      img.dataset.errored = '1';
+      img.src = FALLBACK_IMAGE;
+    }
+  } catch (err) {
+    // noop
+  }
+}
 
 function triggerFileSelect() {
   if (fileInput.value && !loading.value) {

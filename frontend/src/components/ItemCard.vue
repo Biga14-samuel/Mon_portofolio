@@ -2,7 +2,13 @@
   <article class="item-card bento-card" :class="item.type">
     <div v-if="imagesList.length" class="item-card__image-container">
       <Transition name="fade" mode="out-in">
-        <img :key="imagesList[currentImageIndex]" :src="imagesList[currentImageIndex]" :alt="`Image de ${item.title}`" loading="lazy" />
+        <img
+          :key="imagesList[currentImageIndex]"
+          :src="imagesList[currentImageIndex]"
+          :alt="`Image de ${item.title}`"
+          loading="lazy"
+          @error="handleImageError"
+        />
       </Transition>
       <div v-if="imagesList.length > 1" class="slideshow-dots">
         <span
@@ -101,6 +107,20 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (timer) clearInterval(timer);
 });
+
+const FALLBACK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+
+function handleImageError(e) {
+  try {
+    const img = e.target;
+    if (!img.dataset.errored) {
+      img.dataset.errored = '1';
+      img.src = FALLBACK_IMAGE;
+    }
+  } catch (err) {
+    // noop
+  }
+}
 </script>
 
 <style scoped>

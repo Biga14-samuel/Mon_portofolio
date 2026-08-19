@@ -94,20 +94,20 @@
           </a>
         </div>
         <figure class="hero-visual profile-photo-card">
-          <img :src="profilePhoto" alt="Portrait de SAMNICK BIGA RAOUL AUBIN" />
+          <img :src="profilePhoto" alt="Portrait de SAMNICK BIGA RAOUL AUBIN" @error="handleImgError" />
         </figure>
       </section>
 
       <section class="logo-wall-section reveal-on-scroll">
         <p class="logo-wall-title">Ils m'ont fait confiance</p>
         <div class="logo-wall-grid">
-          <img src="/Logos/paness.jpg" alt="PANESS IT" title="PANESS IT" />
-          <img src="/Logos/ihtm.png" alt="IHTM" title="IHTM" />
-          <img src="/Logos/minat.png" alt="MINAT" title="MINAT" />
-          <img src="/Logos/minsep.jpg" alt="MINSEP" title="MINSEP" />
-          <img src="/Logos/hgy.png" alt="Hôpital Général de Yaoundé" title="Hôpital Général de Yaoundé" />
-          <img src="/Logos/hcy.jpg" alt="Hôpital Central de Yaoundé" title="Hôpital Central de Yaoundé" />
-          <img src="/Logos/cury.jpg" alt="CURY" title="CURY" />
+          <img src="/Logos/paness.jpg" alt="PANESS IT" title="PANESS IT" @error="handleImgError" />
+          <img src="/Logos/ihtm.png" alt="IHTM" title="IHTM" @error="handleImgError" />
+          <img src="/Logos/minat.png" alt="MINAT" title="MINAT" @error="handleImgError" />
+          <img src="/Logos/minsep.jpg" alt="MINSEP" title="MINSEP" @error="handleImgError" />
+          <img src="/Logos/hgy.png" alt="Hôpital Général de Yaoundé" title="Hôpital Général de Yaoundé" @error="handleImgError" />
+          <img src="/Logos/hcy.jpg" alt="Hôpital Central de Yaoundé" title="Hôpital Central de Yaoundé" @error="handleImgError" />
+          <img src="/Logos/cury.jpg" alt="CURY" title="CURY" @error="handleImgError" />
         </div>
       </section>
 
@@ -397,8 +397,8 @@
           <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
           <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
           <p>{{ stripEmojis(caseStudyItem.description) }}</p>
-          <figure v-if="caseStudyItem.image_url" class="case-hero-visual">
-            <img :src="resolveAssetUrl(caseStudyItem.image_url.split(/[\n,]+/)[0])" :alt="`Illustration de ${stripEmojis(caseStudyItem.title)}`" />
+          <figure v-if="caseHeroImage" class="case-hero-visual">
+            <img :src="caseHeroImage" :alt="`Illustration de ${stripEmojis(caseStudyItem.title)}`" @error="(e) => { caseHeroImageFailed = true; handleImgError(e); }" />
           </figure>
         </div>
 
@@ -419,7 +419,7 @@
                 <h3>{{ section.title }}</h3>
                 <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
                 <div v-if="section.image" class="case-section-image-wrapper">
-                  <img :src="resolveAssetUrl(section.image)" alt="Schéma d'architecture" />
+                  <img :src="resolveAssetUrl(section.image)" alt="Schéma d'architecture" @error="handleImgError" />
                 </div>
               </div>
             </article>
@@ -430,7 +430,7 @@
           <strong>Ressources du projet</strong>
           <p v-if="!caseStudyItem.image_url && !caseStudyItem.github_url && !caseStudyItem.demo_url">Emplacement prévu pour ajouter plus tard des captures, liens GitHub, lien de démo ou vidéo du projet.</p>
           <div v-if="caseStudyItem.image_url" style="margin-top: 1.5rem; width: 100%; border-radius: var(--radius-md); overflow: hidden;">
-             <img :src="resolveAssetUrl(caseStudyItem.image_url.split(/[\n,]+/)[0])" alt="Capture d'écran du projet" style="width: 100%; height: auto; display: block;" />
+             <img :src="resolveAssetUrl(caseStudyItem.image_url.split(/[\n,]+/)[0])" alt="Capture d'écran du projet" style="width: 100%; height: auto; display: block;" @error="handleImgError" />
           </div>
           <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
@@ -556,6 +556,20 @@ import TestimonialSection from './components/TestimonialSection.vue';
 import { tagTone } from './services/tags';
 import NotFound from './components/NotFound.vue';
 import { stripEmojis } from './utils/sanitize';
+
+const FALLBACK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+
+function handleImgError(e) {
+  try {
+    const img = e.target;
+    if (!img.dataset.errored) {
+      img.dataset.errored = '1';
+      img.src = FALLBACK_IMAGE;
+    }
+  } catch (err) {
+    // noop
+  }
+}
 
 const currentPath = ref(window.location.pathname);
 const hasError = ref(false);
@@ -1114,6 +1128,29 @@ async function handleContactSubmit() {
   width: 100%;
   max-height: 380px;
   object-fit: cover;
+}
+
+.case-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.case-step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.case-step > span {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--surface-2);
 }
 
 .case-summary-period {
