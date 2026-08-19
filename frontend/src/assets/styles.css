@@ -1948,6 +1948,38 @@ td {
   letter-spacing: 0.02em;
 }
 
+.case-reading {
+  margin-bottom: 1rem;
+  padding: 1rem 1rem 0.95rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.case-reading span {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.case-reading strong {
+  display: block;
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.case-reading.is-active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
 .case-summary ul {
   gap: 12px;
 }
@@ -1981,6 +2013,31 @@ td {
   margin: 0;
   color: var(--muted);
   line-height: 1.72;
+  max-width: 68ch;
+}
+
+.case-step.is-past {
+  opacity: 0.88;
+}
+
+.case-step.is-active {
+  transform: translateX(6px) translateY(-2px);
+  border-color: rgba(233, 84, 32, 0.34);
+  background: linear-gradient(180deg, #fff, #fff8f3);
+  box-shadow: 0 16px 36px rgba(44, 0, 30, 0.12);
+}
+
+.case-step.is-active > span {
+  background: var(--ubuntu-orange);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(233, 84, 32, 0.22);
+  transform: scale(1.06);
+}
+
+.case-step.is-active::before {
+  background: var(--ubuntu-orange);
+  transform: scale(1.25);
+  box-shadow: 0 0 0 7px rgba(248, 160, 125, 0.2);
 }
 
 .case-resources {
@@ -2002,8 +2059,9 @@ td {
 .case-summary,
 .case-step,
 .case-resources {
-  animation: storyRise 680ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: storyRise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: var(--story-delay, 0ms);
+  will-change: transform, opacity;
 }
 
 .case-timeline {
@@ -2024,6 +2082,12 @@ td {
 
 .case-step {
   position: relative;
+  transition:
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 360ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .case-step::before {
@@ -2036,6 +2100,10 @@ td {
   border-radius: 50%;
   background: #f8a07d;
   box-shadow: 0 0 0 5px rgba(248, 160, 125, 0.16);
+  transition:
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 360ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 360ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .case-step:nth-child(1) {
@@ -2049,11 +2117,13 @@ td {
 @keyframes storyRise {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(24px) scale(0.99);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 

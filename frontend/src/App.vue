@@ -412,6 +412,10 @@
 
         <div class="case-layout">
           <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(caseHeroImage ? 2 : 1)">
+            <div class="case-reading" :class="{ 'is-active': activeCaseStepIndex >= 0 }">
+              <span>Lecture guidée</span>
+              <strong>{{ activeCaseStepTitle || 'Introduction' }}</strong>
+            </div>
             <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
             <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
             <ul v-if="caseStudyStack.length">
@@ -421,7 +425,7 @@
           </aside>
 
           <div class="case-timeline">
-            <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :style="storyStyle((caseHeroImage ? 3 : 2) + index)">
+            <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :class="{ 'is-active': activeCaseStepIndex === index, 'is-past': activeCaseStepIndex > index }" :style="storyStyle((caseHeroImage ? 3 : 2) + index)">
               <span>{{ section.number }}</span>
               <div>
                 <h3>{{ section.title }}</h3>
@@ -705,6 +709,7 @@ const caseModal = ref(null);
 const caseProgress = ref(0);
 const caseHeroImageFailed = ref(false);
 const caseHeroImageLoaded = ref(false);
+const activeCaseStepIndex = ref(-1);
 const emailCopied = ref(false);
 const credentials = reactive({ username: '', password: '' });
 const showScrollToTop = ref(false);
@@ -713,6 +718,30 @@ let revealObserver;
 let prefersReducedMotion;
 
 const typeFilteredItems = computed(() => (selectedType.value ? items.value.filter((item) => item.type === selectedType.value) : items.value));
+
+function getChronologyRank(item) {
+  const raw = `${item?.subtitle || ''} ${item?.title || ''}`;
+  const matches = raw.match(/\b(19|20)\d{2}\b/g);
+  const year = matches?.length ? Number(matches[0]) : 9999;
+  const monthMatch = raw.toLowerCase().match(/jan|fev|fév|mar|avr|mai|jun|jui|aou|aoû|sep|oct|nov|dec|déc/);
+  const monthOrder = {
+    jan: 1, fev: 2, fév: 2, mar: 3, avr: 4, mai: 5, jun: 6, jui: 7, aou: 8, aoû: 8, sep: 9, oct: 10, nov: 11, dec: 12, déc: 12,
+  };
+  return {
+    year,
+    month: monthMatch ? monthOrder[monthMatch[0].slice(0, 3)] || 0 : 0,
+    order: Number(item?.display_order || 0),
+    title: item?.title || '',
+  };
+}
+
+function sortChronologically(list) {
+  return [...list].sort((a, b) => {
+    const ra = getChronologyRank(a);
+    const rb = getChronologyRank(b);
+    return ra.year - rb.year || ra.month - rb.month || ra.order - rb.order || ra.title.localeCompare(rb.title);
+  });
+}
 
 const caseStudyStack = computed(() => {
   if (!caseStudyItem.value) return [];
@@ -812,6 +841,11 @@ const activeCaseStudy = computed(() => {
   return sections;
 });
 
+const activeCaseStepTitle = computed(() => {
+  if (activeCaseStepIndex.value < 0) return '';
+  return activeCaseStudy.value[activeCaseStepIndex.value]?.title || '';
+});
+
 const categoryFilters = computed(() => {
   const values = typeFilteredItems.value.map((item) => item.category).filter(Boolean);
   return [...new Set(values)].sort((a, b) => a.localeCompare(b));
@@ -822,7 +856,7 @@ const visibleItems = computed(() =>
 );
 
 const grouped = computed(() => ({
-  parcours: visibleItems.value.filter((item) => item.type === 'parcours'),
+  parcours: sortChronologically(visibleItems.value.filter((item) => item.type === 'parcours')),
   competence: visibleItems.value.filter((item) => item.type === 'competence'),
   realisation: visibleItems.value.filter((item) => item.type === 'realisation'),
 }));
@@ -955,6 +989,7 @@ function openEdit(item) {
 function openCaseStudy(item) {
   caseHeroImageFailed.value = false;
   caseHeroImageLoaded.value = false;
+  activeCaseStepIndex.value = -1;
   caseStudyItem.value = item;
   caseProgress.value = 0;
   nextTick(updateCaseProgress);
@@ -965,6 +1000,7 @@ function closeCaseStudy() {
   caseProgress.value = 0;
   caseHeroImageFailed.value = false;
   caseHeroImageLoaded.value = false;
+  activeCaseStepIndex.value = -1;
 }
 
 function handleCaseHeroImageLoad(e) {
@@ -981,7 +1017,7 @@ function handleCaseHeroImageError(e) {
 }
 
 function storyStyle(index) {
-  return { '--story-delay': `${Math.max(index, 0) * 110}ms` };
+  return { '--story-delay': `${120 + Math.max(index, 0) * 140}ms` };
 }
 
 function markImageLoaded(e) {
@@ -1034,6 +1070,24 @@ function updateCaseProgress() {
 
   const maxScroll = modal.scrollHeight - modal.clientHeight;
   caseProgress.value = maxScroll > 0 ? Math.min(100, Math.round((modal.scrollTop / maxScroll) * 100)) : 100;
+
+  const steps = modal.querySelectorAll('.case-step');
+  if (!steps.length) {
+    activeCaseStepIndex.value = -1;
+    return;
+  }
+
+  const marker = modal.getBoundingClientRect().top + modal.clientHeight * 0.42;
+  let currentIndex = -1;
+
+  steps.forEach((step, index) => {
+    const rect = step.getBoundingClientRect();
+    if (rect.top <= marker) {
+      currentIndex = index;
+    }
+  });
+
+  activeCaseStepIndex.value = currentIndex;
 }
 
 async function copyEmail() {
