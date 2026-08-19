@@ -56,6 +56,7 @@ import { Pencil, Trash2, Github, ExternalLink, ArrowUpRight } from 'lucide-vue-n
 import PillBadge from './PillBadge.vue';
 import { tagTone } from '../services/tags';
 import { stripEmojis } from '../utils/sanitize';
+import { resolveAssetUrl } from '../services/api';
 
 const props = defineProps({
   item: {
@@ -81,7 +82,7 @@ let timer = null;
 
 const imagesList = computed(() => {
   if (!props.item.image_url) return [];
-  return props.item.image_url.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean);
+  return props.item.image_url.split(/[\n,]+/).map(resolveAssetUrl).filter(Boolean);
 });
 
 const sanitizedTitle = computed(() => stripEmojis(props.item.title));

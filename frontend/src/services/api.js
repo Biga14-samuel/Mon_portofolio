@@ -5,6 +5,12 @@ const API_URL = (() => {
   return import.meta.env.DEV ? devUrl : window.location.origin;
 })();
 
+export function resolveAssetUrl(path) {
+  const value = path?.trim();
+  if (!value || /^(?:https?:|data:|blob:)/i.test(value)) return value || '';
+  return `${API_URL}${value.startsWith('/') ? value : `/${value}`}`;
+}
+
 function authHeaders(token) {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
