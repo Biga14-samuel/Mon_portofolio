@@ -393,12 +393,20 @@
           </button>
           <button class="case-close" type="button" aria-label="Fermer la vue" @click="closeCaseStudy(); playClick()" @mouseenter="playHover">×</button>
         </div>
-        <div class="case-hero">
-          <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
-          <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
-          <p>{{ stripEmojis(caseStudyItem.description) }}</p>
-          <figure v-if="caseHeroImage" class="case-hero-visual">
-            <img :src="caseHeroImage" :alt="`Illustration de ${stripEmojis(caseStudyItem.title)}`" @error="(e) => { caseHeroImageFailed = true; handleImgError(e); }" />
+        <div class="case-hero" :class="{ 'case-hero--has-image': Boolean(caseHeroImage) }">
+          <div class="case-hero-copy">
+            <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
+            <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
+            <p>{{ stripEmojis(caseStudyItem.description) }}</p>
+          </div>
+          <figure v-if="caseHeroImage" class="case-hero-visual" :class="{ 'is-loaded': caseHeroImageLoaded }">
+            <img
+              :src="caseHeroImage"
+              :alt="`Illustration de ${stripEmojis(caseStudyItem.title)}`"
+              data-hide-on-error="1"
+              @load="handleCaseHeroImageLoad"
+              @error="handleCaseHeroImageError"
+            />
           </figure>
         </div>
 
@@ -419,20 +427,16 @@
                 <h3>{{ section.title }}</h3>
                 <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
                 <div v-if="section.image" class="case-section-image-wrapper">
-                  <img :src="resolveAssetUrl(section.image)" alt="Schéma d'architecture" @error="handleImgError" />
+                  <img :src="resolveAssetUrl(section.image)" alt="Schéma d'architecture" data-hide-on-error="1" @load="markImageLoaded" @error="handleImgError" />
                 </div>
               </div>
             </article>
           </div>
         </div>
 
-        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-placeholder">
+        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-resources">
           <strong>Ressources du projet</strong>
-          <p v-if="!caseStudyItem.image_url && !caseStudyItem.github_url && !caseStudyItem.demo_url">Emplacement prévu pour ajouter plus tard des captures, liens GitHub, lien de démo ou vidéo du projet.</p>
-          <div v-if="caseStudyItem.image_url" style="margin-top: 1.5rem; width: 100%; border-radius: var(--radius-md); overflow: hidden;">
-             <img :src="resolveAssetUrl(caseStudyItem.image_url.split(/[\n,]+/)[0])" alt="Capture d'écran du projet" style="width: 100%; height: auto; display: block;" @error="handleImgError" />
-          </div>
-          <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
+          <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
              <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
           </div>
@@ -562,6 +566,10 @@ const FALLBACK_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQ
 function handleImgError(e) {
   try {
     const img = e.target;
+    if (img?.dataset?.hideOnError === '1') {
+      img.style.display = 'none';
+      return;
+    }
     if (!img.dataset.errored) {
       img.dataset.errored = '1';
       img.src = FALLBACK_IMAGE;
@@ -695,6 +703,8 @@ const editing = ref(null);
 const caseStudyItem = ref(null);
 const caseModal = ref(null);
 const caseProgress = ref(0);
+const caseHeroImageFailed = ref(false);
+const caseHeroImageLoaded = ref(false);
 const emailCopied = ref(false);
 const credentials = reactive({ username: '', password: '' });
 const showScrollToTop = ref(false);
@@ -714,7 +724,18 @@ const caseStudyStack = computed(() => {
   if (tools) {
     list.push(...tools.split(',').map((e) => stripEmojis(e.trim())).filter(Boolean));
   }
-  return list.length ? list : ['À compléter'];
+  return list;
+});
+
+const caseHeroImage = computed(() => {
+  if (!caseStudyItem.value?.image_url || caseHeroImageFailed.value) return '';
+
+  const [firstImage] = caseStudyItem.value.image_url
+    .split(/[\n,]+/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  return firstImage ? resolveAssetUrl(firstImage) : '';
 });
 
 const activeCaseStudy = computed(() => {
@@ -932,6 +953,8 @@ function openEdit(item) {
 }
 
 function openCaseStudy(item) {
+  caseHeroImageFailed.value = false;
+  caseHeroImageLoaded.value = false;
   caseStudyItem.value = item;
   caseProgress.value = 0;
   nextTick(updateCaseProgress);
@@ -940,6 +963,28 @@ function openCaseStudy(item) {
 function closeCaseStudy() {
   caseStudyItem.value = null;
   caseProgress.value = 0;
+  caseHeroImageFailed.value = false;
+  caseHeroImageLoaded.value = false;
+}
+
+function handleCaseHeroImageLoad(e) {
+  const figure = e?.target?.closest?.('.case-hero-visual');
+  if (figure) {
+    figure.classList.add('is-loaded');
+  }
+  caseHeroImageLoaded.value = true;
+}
+
+function handleCaseHeroImageError(e) {
+  caseHeroImageFailed.value = true;
+  handleImgError(e);
+}
+
+function markImageLoaded(e) {
+  const figure = e?.target?.closest?.('.case-section-image-wrapper');
+  if (figure) {
+    figure.classList.add('is-loaded');
+  }
 }
 
 function setupScrollReveal() {
@@ -1113,60 +1158,7 @@ async function handleContactSubmit() {
 </script>
 
 <style scoped>
-.case-hero-visual {
-  width: min(100%, 720px);
-  margin: 2rem 0 0;
-  overflow: hidden;
-  border: 1px solid var(--outline);
-  border-radius: 1.25rem;
-  background: var(--surface-card);
-  box-shadow: var(--shadow);
-}
 
-.case-hero-visual img {
-  display: block;
-  width: 100%;
-  max-height: 380px;
-  object-fit: cover;
-}
-
-.case-timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.case-step {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.case-step > span {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: var(--surface-2);
-}
-
-.case-summary-period {
-  margin: 0 0 1rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.92rem;
-  font-weight: 600;
-  line-height: 1.45;
-}
-
-.case-summary-empty {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
 .case-section-image-wrapper {
   margin-top: 1.5rem;
   border-radius: var(--radius-md);

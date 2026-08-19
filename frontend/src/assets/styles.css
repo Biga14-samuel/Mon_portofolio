@@ -1884,6 +1884,119 @@ td {
   color: var(--aubergine-dark);
 }
 
+.case-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: clamp(24px, 4vw, 40px);
+  align-items: center;
+  padding: clamp(32px, 5vw, 58px);
+  margin-top: 0;
+  background: linear-gradient(180deg, rgba(119, 33, 111, 0.05), rgba(255, 255, 255, 0.92));
+  border-bottom: 1px solid rgba(119, 33, 111, 0.08);
+}
+
+.case-hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.case-hero h2 {
+  margin: 8px 0 0;
+}
+
+.case-hero p {
+  max-width: 760px;
+}
+
+.case-hero-visual {
+  width: min(100%, 420px);
+  margin: 0;
+  justify-self: end;
+  overflow: hidden;
+  border: 1px solid rgba(119, 33, 111, 0.12);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(44, 0, 30, 0.12);
+}
+
+.case-hero-visual img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.case-hero-visual.is-loaded img {
+  opacity: 1;
+}
+
+.case-layout {
+  align-items: start;
+  padding-top: clamp(24px, 4vw, 36px);
+}
+
+.case-summary {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, #77216f, #5d1b57);
+  box-shadow: 0 18px 40px rgba(44, 0, 30, 0.18);
+}
+
+.case-summary strong {
+  letter-spacing: 0.02em;
+}
+
+.case-summary ul {
+  gap: 12px;
+}
+
+.case-summary li {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.case-timeline {
+  gap: 18px;
+}
+
+.case-step {
+  padding: 24px;
+  border: 1px solid rgba(119, 33, 111, 0.14);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(44, 0, 30, 0.06);
+}
+
+.case-step > span {
+  background: rgba(233, 84, 32, 0.13);
+  color: #a92e07;
+}
+
+.case-step h3 {
+  margin: 0 0 10px;
+}
+
+.case-step p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.72;
+}
+
+.case-resources {
+  margin: 0 clamp(24px, 5vw, 58px) clamp(32px, 5vw, 58px);
+  padding: 24px;
+  border: 1px solid rgba(233, 84, 32, 0.2);
+  border-radius: 20px;
+  background: rgba(233, 84, 32, 0.05);
+}
+
+.case-resources strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--aubergine-dark);
+}
+
 .contact-section {
   width: min(1200px, calc(100% - 32px));
   display: grid;
@@ -2046,6 +2159,15 @@ footer {
 
   .case-summary {
     position: static;
+  }
+
+  .case-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .case-hero-visual {
+    width: 100%;
+    justify-self: stretch;
   }
 
   .hero {
