@@ -163,6 +163,16 @@ nav a:hover {
   color: var(--aubergine-dark);
 }
 
+.nav-button--sound {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.nav-button--sound:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
 .hamburger {
   display: none;
   flex-direction: column;

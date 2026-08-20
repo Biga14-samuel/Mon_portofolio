@@ -24,7 +24,7 @@
           <span class="hamburger-line"></span>
         </button>
         <nav class="nav-links" :class="{ 'is-open': menuOpen }" aria-label="Navigation principale" @click="menuOpen = false">
-          <button class="nav-button" @click.stop="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
+          <button class="nav-button nav-button--sound" @click.stop="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
             {{ audioEnabled ? 'Son ON' : 'Son OFF' }}
           </button>
           <a href="#apropos" @click="playClick" @mouseenter="playHover">À propos</a>
