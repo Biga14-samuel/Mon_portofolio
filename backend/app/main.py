@@ -96,7 +96,7 @@ def list_items(type: ItemType | None = None, db: Session = Depends(get_db)) -> l
     return list(db.scalars(query))
 
 @app.get("/api/veille")
-def get_veille(limit: int = 6) -> dict[str, object]:
+def get_veille(limit: int = 8) -> dict[str, object]:
     limit = max(1, min(limit, 12))
     now = datetime.now(timezone.utc).timestamp()
     cached = getattr(app.state, "veille_cache", None)

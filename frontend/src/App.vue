@@ -948,7 +948,7 @@ function handlePointerMove(e) {
 
 async function loadVeille() {
   try {
-    const data = await getVeille(6);
+    const data = await getVeille(8);
     veilleItems.value = data.items || [];
     veilleSourceUrl.value = data.sourceUrl || veilleSourceUrl.value;
     if (data.updatedAt) {

@@ -105,7 +105,7 @@ export function getTestimonials(token = null) {
   return request('/api/testimonials', options);
 }
 
-export function getVeille(limit = 6) {
+export function getVeille(limit = 8) {
   return request(`/api/veille?limit=${encodeURIComponent(limit)}`);
 }
 
