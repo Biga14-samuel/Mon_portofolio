@@ -648,22 +648,20 @@
         </template>
       </section>
     </div>
-    <footer class="footer footer--premium">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <strong>Mon portfolio</strong>
-          <p>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</p>
-        </div>
-        <div class="footer-meta">
-          <div class="footer-clock">{{ clockLabel }}</div>
-          <div class="footer-socials">
-            <a href="https://www.linkedin.com/in/aubinbiga" target="_blank" rel="noreferrer">LinkedIn</a>
-            <a href="https://github.com/Biga14-samuel" target="_blank" rel="noreferrer">GitHub</a>
-            <a href="mailto:samuelbiga10@gmail.com">Email</a>
-          </div>
+    <footer class="footer footer-compact">
+      <div class="footer-brand">
+        <strong>Mon portfolio</strong>
+        <p>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</p>
+      </div>
+      <div class="footer-right">
+        <span class="footer-clock">{{ clockLabel }}</span>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/in/aubinbiga" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a href="https://github.com/Biga14-samuel" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="mailto:samuelbiga10@gmail.com">Email</a>
         </div>
       </div>
-      <div class="footer-copy">© 2026 Raoul BIGA. Tous droits réservés.</div>
+      <p class="footer-copy">© 2026 Raoul BIGA. Tous droits réservés.</p>
     </footer>
 
     <button 
