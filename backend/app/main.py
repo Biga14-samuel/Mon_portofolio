@@ -101,7 +101,9 @@ def get_veille(limit: int = 8) -> dict[str, object]:
     now = datetime.now(timezone.utc).timestamp()
     cached = getattr(app.state, "veille_cache", None)
     if cached and now < cached.get("expires_at", 0):
-        return cached["payload"]
+        cached_payload = dict(cached["payload"])
+        cached_payload["items"] = cached_payload.get("items", [])[:limit]
+        return cached_payload
 
     url = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
     try:
@@ -125,7 +127,7 @@ def get_veille(limit: int = 8) -> dict[str, object]:
                 "requiredAction": vuln.get("requiredAction", ""),
                 "dueDate": vuln.get("dueDate", ""),
             }
-            for vuln in vulnerabilities[:limit]
+            for vuln in vulnerabilities[:12]
         ]
         payload = {
             "catalogVersion": data.get("catalogVersion", ""),
@@ -137,12 +139,15 @@ def get_veille(limit: int = 8) -> dict[str, object]:
             "stale": False,
         }
         app.state.veille_cache = {"payload": payload, "expires_at": now + 120}
-        return payload
+        response_payload = dict(payload)
+        response_payload["items"] = items[:limit]
+        return response_payload
     except Exception as exc:
         logger.exception("Échec de récupération de la veille CISA: %s", exc)
         cached = getattr(app.state, "veille_cache", None)
         if cached:
             stale_payload = dict(cached["payload"])
+            stale_payload["items"] = stale_payload.get("items", [])[:limit]
             stale_payload["stale"] = True
             return stale_payload
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Impossible de récupérer la veille automatique pour le moment.") from exc

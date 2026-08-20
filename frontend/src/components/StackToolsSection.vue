@@ -8,7 +8,7 @@
           <span class="animated-word">& outils</span>
         </h2>
       </div>
-      <p>
+      <p v-if="editable">
         Les domaines ci-dessous sont alimentés par les compétences ajoutées en mode administration.
       </p>
     </div>

@@ -297,7 +297,7 @@
                 <PillBadge tone="aubergine">Blog</PillBadge>
                 <h2 id="blog-title">Blog</h2>
               </div>
-              <p class="blog-intro">Articles, notes et retours d’expérience publiés depuis l’administration. Les PDF peuvent être attachés à chaque article.</p>
+              <p v-if="authState.token" class="blog-intro">Articles, notes et retours d’expérience publiés depuis l’administration. Les PDF peuvent être attachés à chaque article.</p>
               <div v-if="grouped.blog.length" class="blog-grid blog-grid--managed">
                 <ItemCard
                   v-for="item in grouped.blog"
