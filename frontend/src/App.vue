@@ -352,7 +352,7 @@
           </article>
         </div>
       </section>
-      <section class="contact-section reveal-on-scroll" id="contact" aria-labelledby="contact-title">
+      <section class="contact-section contact-section--artistic reveal-on-scroll" id="contact" aria-labelledby="contact-title">
         <div class="contact-copy">
           <PillBadge tone="orange">Contact</PillBadge>
           <h2 id="contact-title">Posez-moi vos questions.</h2>
@@ -393,6 +393,7 @@
           </form>
         </div>
 
+        <aside class="contact-aside" aria-label="Coordonnées et questions rapides">
         <div class="contact-panel" aria-label="Coordonnées">
           <a href="mailto:samuelbiga10@gmail.com" @click="playClick" @mouseenter="playHover">
             <span>Email</span>
@@ -414,6 +415,8 @@
             <span>Localisation</span>
             <strong>Yaoundé, Cameroun</strong>
           </div>
+        </div>
+
           <div class="contact-suggestions" aria-label="Questions rapides">
             <span class="contact-suggestions__title">Questions rapides</span>
             <div class="suggestions-chips">
@@ -422,7 +425,8 @@
               </button>
             </div>
           </div>
-        </div>
+
+        </aside>
       </section>
     </main>
     <NotFound v-else />

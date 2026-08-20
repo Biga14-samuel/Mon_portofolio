@@ -2798,3 +2798,77 @@ img {
   }
 }
 
+
+/* Contact : composition éditoriale, indépendante des autres sections. */
+.contact-section--artistic {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.78fr);
+  gap: clamp(24px, 4vw, 54px);
+  padding: clamp(28px, 4vw, 52px);
+  background:
+    radial-gradient(circle at 92% 9%, rgba(248, 160, 125, 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.23) 0 1px, transparent 2px),
+    radial-gradient(circle at 6% 94%, rgba(233, 84, 32, 0.42), transparent 25%),
+    linear-gradient(125deg, #4b104a 0%, #77216f 48%, #38113f 100%);
+}
+
+.contact-section--artistic::before,
+.contact-section--artistic::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.contact-section--artistic::before {
+  width: 440px;
+  aspect-ratio: 1;
+  right: -170px;
+  bottom: -240px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 34px rgba(255, 255, 255, 0.055), 0 0 0 70px rgba(255, 255, 255, 0.035), 0 0 0 108px rgba(255, 255, 255, 0.02);
+  animation: contactOrbit 16s linear infinite;
+}
+
+.contact-section--artistic::after {
+  inset: 0;
+  opacity: 0.22;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.13) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.13) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(90deg, transparent, #000 48%, transparent);
+}
+
+.contact-section--artistic .contact-copy,
+.contact-section--artistic .contact-aside { position: relative; z-index: 1; }
+.contact-section--artistic .contact-copy > p { max-width: 57ch; }
+.contact-section--artistic .styled-contact-form { margin-top: 26px; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.96); box-shadow: 0 26px 60px rgba(22, 0, 20, 0.28); }
+.contact-section--artistic .send-button { box-shadow: 0 10px 24px rgba(233, 84, 32, 0.32); }
+.contact-section--artistic .contact-aside { min-height: 100%; display: flex; flex-direction: column; gap: 14px; }
+.contact-section--artistic .contact-panel { display: grid; gap: 10px; align-self: auto; }
+.contact-section--artistic .contact-panel a,
+.contact-section--artistic .contact-panel > div { min-height: 64px; border-color: rgba(255, 255, 255, 0.19); background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
+.contact-section--artistic .contact-suggestions { position: relative; display: block; min-height: 0; margin-top: auto; padding: 19px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.26); border-radius: 20px; background: linear-gradient(135deg, rgba(0, 0, 0, 0.23), rgba(255, 255, 255, 0.12)); box-shadow: 0 18px 36px rgba(33, 0, 28, 0.19); }
+.contact-section--artistic .contact-suggestions::before { content: '✦'; position: absolute; top: -19px; right: 12px; color: rgba(248, 160, 125, 0.8); font-size: 64px; line-height: 1; transform: rotate(16deg); }
+.contact-section--artistic .contact-suggestions__title { position: relative; color: #fff; font-size: 13px; letter-spacing: 0.1em; }
+.contact-section--artistic .suggestions-chips { position: relative; margin-top: 12px; gap: 8px; }
+.contact-section--artistic .chip-button { border-color: rgba(255, 255, 255, 0.26); background: rgba(255, 255, 255, 0.12); color: #fff; text-align: left; }
+.contact-section--artistic .chip-button:hover { transform: translateY(-2px); background: var(--ubuntu-orange); border-color: var(--ubuntu-orange); box-shadow: 0 10px 20px rgba(233, 84, 32, 0.26); }
+
+@keyframes contactOrbit { to { transform: rotate(360deg); } }
+
+@media (max-width: 900px) {
+  .contact-section--artistic { grid-template-columns: 1fr; }
+  .contact-section--artistic .contact-aside { min-height: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-section--artistic::before { animation: none; }
+}
+.contact-section--artistic .contact-suggestions {
+  display: block;
+  min-height: 0;
+  margin-top: auto;
+}
