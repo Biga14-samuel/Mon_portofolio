@@ -2144,7 +2144,7 @@ td {
   overflow: hidden;
   grid-template-columns: minmax(0, 0.9fr) minmax(340px, 1.1fr);
   min-height: 440px;
-  background: radial-gradient(circle at 76% 16%, rgba(233, 84, 32, 0.34), transparent 31%), linear-gradient(135deg, #2b1230, #17111d 62%);
+  background: #2b1230;
   border: 0;
 }
 
@@ -2198,7 +2198,7 @@ td {
 .project-shot:hover span { opacity: 1; transform: translateY(0); }
 
 .case-modal--project .case-layout { grid-template-columns: 220px minmax(0, 1fr); padding-top: 34px; background: #17111d; }
-.case-modal--project .case-summary { background: linear-gradient(145deg, #77216f, #43143f); }
+.case-modal--project .case-summary { background: #77216f; }
 .case-modal--project .case-timeline { gap: 12px; padding-left: 0; }
 .case-modal--project .case-timeline::before, .case-modal--project .case-step::before { display: none; }
 .case-modal--project .case-step { grid-template-columns: 42px 1fr; gap: 14px; padding: 19px; border-color: rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.055); box-shadow: none; }
@@ -2807,11 +2807,7 @@ img {
   grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.78fr);
   gap: clamp(24px, 4vw, 54px);
   padding: clamp(28px, 4vw, 52px);
-  background:
-    radial-gradient(circle at 92% 9%, rgba(248, 160, 125, 0.55) 0 2px, transparent 3px),
-    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.23) 0 1px, transparent 2px),
-    radial-gradient(circle at 6% 94%, rgba(233, 84, 32, 0.42), transparent 25%),
-    linear-gradient(125deg, #4b104a 0%, #77216f 48%, #38113f 100%);
+  background: #77216f;
 }
 
 .contact-section--artistic::before,
@@ -2836,9 +2832,7 @@ img {
 .contact-section--artistic::after {
   inset: 0;
   opacity: 0.22;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.13) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.13) 1px, transparent 1px);
   background-size: 34px 34px;
-  mask-image: linear-gradient(90deg, transparent, #000 48%, transparent);
 }
 
 .contact-section--artistic .contact-copy,
@@ -2850,7 +2844,7 @@ img {
 .contact-section--artistic .contact-panel { display: grid; gap: 10px; align-self: auto; }
 .contact-section--artistic .contact-panel a,
 .contact-section--artistic .contact-panel > div { min-height: 64px; border-color: rgba(255, 255, 255, 0.19); background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
-.contact-section--artistic .contact-suggestions { position: relative; display: block; min-height: 0; margin-top: auto; padding: 19px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.26); border-radius: 20px; background: linear-gradient(135deg, rgba(0, 0, 0, 0.23), rgba(255, 255, 255, 0.12)); box-shadow: 0 18px 36px rgba(33, 0, 28, 0.19); }
+.contact-section--artistic .contact-suggestions { position: relative; display: block; min-height: 0; margin-top: auto; padding: 19px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.26); border-radius: 20px; background: rgba(0, 0, 0, 0.18); box-shadow: 0 18px 36px rgba(33, 0, 28, 0.19); }
 .contact-section--artistic .contact-suggestions::before { content: '✦'; position: absolute; top: -19px; right: 12px; color: rgba(248, 160, 125, 0.8); font-size: 64px; line-height: 1; transform: rotate(16deg); }
 .contact-section--artistic .contact-suggestions__title { position: relative; color: #fff; font-size: 13px; letter-spacing: 0.1em; }
 .contact-section--artistic .suggestions-chips { position: relative; margin-top: 12px; gap: 8px; }
