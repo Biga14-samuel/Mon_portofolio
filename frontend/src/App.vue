@@ -189,31 +189,6 @@
         </div>
       </section>
 
-      <section class="watch-section reveal-on-scroll" id="veille" aria-labelledby="veille-title">
-        <div class="section-heading">
-          <PillBadge tone="blue">Veille automatique</PillBadge>
-          <h2 id="veille-title">Surveillance des vulnérabilités critiques en temps réel</h2>
-        </div>
-        <div class="veille-status-bar">
-          <span>Surveillance active</span>
-          <span>Dernière mise à jour : {{ veilleUpdatedAtLabel || '—' }}</span>
-          <span>{{ veilleItems.length }} vulnérabilités affichées</span>
-        </div>
-        <div class="veille-grid">
-          <article v-for="item in veilleItems" :key="item.cveID" class="veille-card">
-            <div class="veille-card__top">
-              <strong>{{ item.cveID }}</strong>
-              <span>{{ item.dateAdded }}</span>
-            </div>
-            <h3>{{ item.vendorProject }} {{ item.product }}</h3>
-            <p>{{ item.shortDescription }}</p>
-            <div class="veille-actions">
-              <a :href="veilleSourceUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Source officielle</a>
-            </div>
-          </article>
-        </div>
-      </section>
-
       <section v-if="authState.token" class="admin-strip reveal-on-scroll" aria-label="Administration du portfolio">
         <div>
           <PillBadge tone="aubergine">Mode administration</PillBadge>
@@ -317,16 +292,29 @@
               @delete="remove"
               @view-case="openCaseStudy"
             />
-            <ContentSection
-              id="blog"
-              title="Blog"
-              :items="grouped.blog"
-              empty="Aucun article publié pour le moment."
-              :editable="Boolean(authState.token)"
-              @edit="openEdit"
-              @delete="remove"
-              @view-case="openCaseStudy"
-            />
+            <section class="blog-section reveal-on-scroll" id="blog" aria-labelledby="blog-title">
+              <div class="section-heading">
+                <PillBadge tone="aubergine">Blog</PillBadge>
+                <h2 id="blog-title">Blog</h2>
+              </div>
+              <p class="blog-intro">Articles, notes et retours d’expérience publiés depuis l’administration. Les PDF peuvent être attachés à chaque article.</p>
+              <div v-if="grouped.blog.length" class="blog-grid blog-grid--managed">
+                <ItemCard
+                  v-for="item in grouped.blog"
+                  :key="item.id"
+                  :item="item"
+                  :editable="Boolean(authState.token)"
+                  @edit="openEdit"
+                  @delete="remove"
+                  @view-case="openCaseStudy"
+                />
+              </div>
+              <div v-else class="empty-state-card blog-empty-state">
+                <SearchX class="empty-icon" :size="48" />
+                <p>Aucun article publié pour le moment.</p>
+                <button v-if="authState.token" class="button primary" type="button" @click="openCreate(); playClick()" @mouseenter="playHover">Ajouter un article</button>
+              </div>
+            </section>
           </template>
         </div>
       </Transition>
@@ -340,6 +328,30 @@
         @add-testimonial="showTestimonialForm = true; playClick()"
       />
 
+      <section class="watch-section reveal-on-scroll" id="veille" aria-labelledby="veille-title">
+        <div class="section-heading">
+          <PillBadge tone="blue">Veille automatique</PillBadge>
+          <h2 id="veille-title">Surveillance des vulnérabilités critiques en temps réel</h2>
+        </div>
+        <div class="veille-status-bar">
+          <span>Surveillance active</span>
+          <span>Dernière mise à jour : {{ veilleUpdatedAtLabel || '—' }}</span>
+          <span>{{ veilleItems.length }} vulnérabilités affichées</span>
+        </div>
+        <div class="veille-grid">
+          <article v-for="item in veilleItems" :key="item.cveID" class="veille-card">
+            <div class="veille-card__top">
+              <strong>{{ item.cveID }}</strong>
+              <span>{{ item.dateAdded }}</span>
+            </div>
+            <h3>{{ item.vendorProject }} {{ item.product }}</h3>
+            <p>{{ item.shortDescription }}</p>
+            <div class="veille-actions">
+              <a :href="veilleSourceUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Source officielle</a>
+            </div>
+          </article>
+        </div>
+      </section>
       <section class="contact-section reveal-on-scroll" id="contact" aria-labelledby="contact-title">
         <div class="contact-copy">
           <PillBadge tone="orange">Contact</PillBadge>
@@ -678,9 +690,10 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, X } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, X, SearchX } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
+import ItemCard from './components/ItemCard.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
 import Preloader from './components/Preloader.vue';
 import { toggleSound, isSoundEnabled, playHover, playClick, playSuccess, playError } from './services/sounds';
@@ -1912,3 +1925,4 @@ async function handleContactSubmit() {
   gap: 0.5rem;
 }
 </style>
+
