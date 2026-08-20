@@ -360,11 +360,6 @@
             Vous avez une question ou une proposition ? Envoyez-moi un message directement, ou utilisez l'une des suggestions ci-dessous !
           </p>
           
-          <div class="suggestions-chips">
-            <button v-for="q in suggestedQuestions" :key="q" type="button" class="chip-button" @click="fillQuestion(q); playClick()" @mouseenter="playHover">
-              {{ q }}
-            </button>
-          </div>
 
           <form @submit.prevent="handleContactSubmit" class="styled-contact-form">
             <div class="form-row">
@@ -419,6 +414,14 @@
             <span>Localisation</span>
             <strong>Yaoundé, Cameroun</strong>
           </div>
+          <div class="contact-suggestions" aria-label="Questions rapides">
+            <span class="contact-suggestions__title">Questions rapides</span>
+            <div class="suggestions-chips">
+              <button v-for="q in suggestedQuestions" :key="q" type="button" class="chip-button" @click="fillQuestion(q); playClick()" @mouseenter="playHover">
+                {{ q }}
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -427,7 +430,7 @@
     <div v-if="caseStudyItem" class="modal-backdrop" role="presentation" @click.self="closeCaseStudy(); playClick()">
       <section
         ref="caseModal"
-        class="case-modal"
+        :class="['case-modal', { 'case-modal--project': caseStudyItem.type === 'realisation' }]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="case-title"
@@ -447,6 +450,11 @@
             <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
             <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
             <p>{{ stripEmojis(caseStudyItem.description) }}</p>
+            <div v-if="caseStudyItem.type === 'realisation' && (caseStudyItem.demo_url || caseStudyItem.github_url || casePdfUrl)" class="project-quick-actions">
+              <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="project-action project-action--primary" @click="playClick" @mouseenter="playHover"><ExternalLink :size="18" aria-hidden="true" /><span>Voir la démo</span></a>
+              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><Github :size="18" aria-hidden="true" /><span>Code source</span></a>
+              <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><FileText :size="18" aria-hidden="true" /><span>Documentation PDF</span></a>
+            </div>
           </div>
           <figure v-if="casePrimaryImage" class="case-hero-visual case-main-visual" :class="{ 'is-loaded': caseHeroImageLoaded }" :style="storyStyle(1)">
             <img
@@ -463,6 +471,14 @@
           </figure>
         </div>
 
+        <section v-if="caseStudyItem.type === 'realisation' && caseGalleryImages.length" class="project-showcase-gallery" :style="storyStyle(casePrimaryImage ? 2 : 1)">
+          <div class="project-showcase-gallery__heading"><span>Visuels du projet</span><strong>{{ caseGalleryImages.length }} capture{{ caseGalleryImages.length > 1 ? 's' : '' }}</strong></div>
+          <div class="project-showcase-gallery__grid">
+            <button v-for="(image, imageIndex) in caseGalleryImages" :key="image" type="button" class="project-shot" @click="openImageViewer(caseDetailImages, imageIndex + (casePrimaryImage ? 1 : 0), stripEmojis(caseStudyItem.title)); playClick()" @mouseenter="playHover" :aria-label="`Agrandir la capture ${imageIndex + 1}`">
+              <img :src="image" :alt="`Capture ${imageIndex + 1} de ${stripEmojis(caseStudyItem.title)}`" data-hide-on-error="1" @error="handleImgError" /><span>Ouvrir</span>
+            </button>
+          </div>
+        </section>
         <div class="case-layout">
           <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(caseHeroImage ? 2 : 1)">
             <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
@@ -510,7 +526,7 @@
           </div>
         </div>
 
-        <section v-if="caseGalleryImages.length" class="case-gallery-section" :style="storyStyle((casePrimaryImage ? 2 : 1) + activeCaseStudy.length)">
+        <section v-if="caseStudyItem.type !== 'realisation' && caseGalleryImages.length" class="case-gallery-section" :style="storyStyle((casePrimaryImage ? 2 : 1) + activeCaseStudy.length)">
           <strong>Galerie d’images</strong>
           <p>Quelques vues supplémentaires pour explorer le contexte, les écrans ou les certificats associés.</p>
           <div class="case-gallery-grid">
@@ -528,10 +544,11 @@
           </div>
         </section>
 
-        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url" class="case-resources" :style="storyStyle((casePrimaryImage ? 3 : 2) + activeCaseStudy.length + (caseGalleryImages.length ? 1 : 0))">
+        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle((casePrimaryImage ? 3 : 2) + activeCaseStudy.length + (caseGalleryImages.length ? 1 : 0))">
           <strong>Ressources du projet</strong>
           <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
+             <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Documentation PDF</a>
              <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
           </div>
         </div>
@@ -690,7 +707,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, X, SearchX } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, X, SearchX } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import ItemCard from './components/ItemCard.vue';
@@ -794,6 +811,13 @@ function handleCharMouseLeave(idx) {
 
 const profilePhoto = `${import.meta.env.BASE_URL}profile-photo.jpg`;
 const contactEmail = 'samuelbiga10@gmail.com';
+const suggestedQuestions = [
+  'Êtes-vous disponible pour une opportunité ?',
+  'Quels sont vos tarifs pour une mission ?',
+  'Pouvez-vous configurer un firewall Fortinet ?',
+  'Quel est votre niveau en Python et automatisation ?',
+  'Intervenez-vous sur les réseaux et systèmes Linux/Windows ?',
+];
 
 const filters = [
   { label: 'Tous', value: '' },
@@ -844,12 +868,6 @@ const clockLabel = ref('');
 const veilleItems = ref([]);
 const veilleSourceUrl = ref('https://www.cisa.gov/known-exploited-vulnerabilities-catalog');
 const veilleUpdatedAtLabel = ref('');
-const suggestedQuestions = [
-  "Quels sont vos tarifs ?",
-  "Êtes-vous disponible pour un emploi ?",
-  "Pouvez-vous configurer un firewall Fortinet ?",
-  "Quel est votre niveau en Python ?"
-];
 const loading = ref(false);
 const loadError = ref('');
 const editing = ref(null);
@@ -1022,6 +1040,7 @@ const caseDetailImages = computed(() => {
 
 const casePrimaryImage = computed(() => caseDetailImages.value[0] || '');
 const caseGalleryImages = computed(() => caseDetailImages.value.slice(1));
+const casePdfUrl = computed(() => resolveAssetUrl(caseStudyItem.value?.content?.pdf_url || ''));
 
 watch(caseHeroImageIndex, () => {
   caseHeroImageLoaded.value = false;
@@ -1828,9 +1847,9 @@ async function handleContactSubmit() {
 }
 
 .chip-button {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  color: #fff;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -1839,7 +1858,8 @@ async function handleContactSubmit() {
 }
 
 .chip-button:hover {
-  background: var(--accent);
+  background: var(--ubuntu-orange);
+  border-color: var(--ubuntu-orange);
   color: white;
 }
 

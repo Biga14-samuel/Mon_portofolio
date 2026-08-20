@@ -86,8 +86,8 @@
         <MultiImageUploader v-model="form.content.gallery_images" @upload-error="handleUploadError" />
       </label>
 
-      <label v-if="form.type === 'blog'">
-        PDF de l'article
+      <label v-if="form.type === 'blog' || form.type === 'realisation'">
+        {{ form.type === 'realisation' ? 'Documentation PDF du projet' : "PDF de l'article" }}
         <FileUploader v-model="form.content.pdf_url" accept="application/pdf" label="PDF de l'article" @upload-error="handleUploadError" />
       </label>
 
