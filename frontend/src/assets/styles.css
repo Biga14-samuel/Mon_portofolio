@@ -915,6 +915,25 @@ main {
   box-shadow: var(--shadow);
 }
 
+.stack-section.blueprint-bg {
+  background-color: var(--ubuntu-orange);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+  background-size: 28px 28px;
+  border-color: rgba(169, 46, 7, 0.28);
+  box-shadow: 0 24px 52px rgba(169, 46, 7, 0.18);
+}
+
+.portfolio-load-error {
+  width: min(760px, 100%);
+  margin: 0 auto 28px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  text-align: center;
+}
+
 .stack-heading {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.75fr);

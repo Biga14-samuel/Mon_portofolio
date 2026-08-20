@@ -259,9 +259,9 @@
               </div>
             </div>
           </div>
-          <p v-else-if="loadError" class="form-error" role="alert" style="text-align: center;">{{ loadError }}</p>
+          <div v-else class="portfolio-content">
+            <p v-if="loadError" class="form-error portfolio-load-error" role="alert">{{ loadError }}</p>
 
-          <template v-else>
             <ContentSection
               id="parcours"
               title="Mon parcours"
@@ -315,7 +315,7 @@
                 <button v-if="authState.token" class="button primary" type="button" @click="openCreate(); playClick()" @mouseenter="playHover">Ajouter un article</button>
               </div>
             </section>
-          </template>
+          </div>
         </div>
       </Transition>
 
