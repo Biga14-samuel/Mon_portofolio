@@ -6,6 +6,7 @@
         <option value="parcours">Parcours</option>
         <option value="competence">Competence</option>
         <option value="realisation">Realisation</option>
+        <option value="blog">Blog</option>
       </select>
     </label>
 
@@ -85,6 +86,11 @@
         <MultiImageUploader v-model="form.content.gallery_images" @upload-error="handleUploadError" />
       </label>
 
+      <label v-if="form.type === 'blog'">
+        PDF de l'article
+        <FileUploader v-model="form.content.pdf_url" accept="application/pdf" label="PDF de l'article" @upload-error="handleUploadError" />
+      </label>
+
       <label>
         {{ form.type === 'realisation' ? 'Architecture / Méthode' : form.type === 'parcours' ? 'Activités clés & Déroulement' : 'Détails techniques & Niveau' }}
         <textarea v-model="form.content.architecture" rows="4" placeholder="Explication détaillée..."></textarea>
@@ -119,6 +125,7 @@ import { reactive, ref, watch, computed, onMounted } from 'vue';
 import { getTags } from '../services/api';
 import ImageUploader from './ImageUploader.vue';
 import MultiImageUploader from './MultiImageUploader.vue';
+import FileUploader from './FileUploader.vue';
 
 const props = defineProps({
   item: {
@@ -206,6 +213,7 @@ watch(
         architecture: '',
         architecture_image: '',
         gallery_images: [],
+        pdf_url: '',
         alert_flow: '',
         tools: '',
         lessons: '',
@@ -219,6 +227,7 @@ watch(
         architecture: '',
         architecture_image: '',
         gallery_images: [],
+        pdf_url: '',
         alert_flow: '',
         tools: '',
         lessons: '',

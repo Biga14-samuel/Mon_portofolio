@@ -1,5 +1,6 @@
 import smtplib
 from email.message import EmailMessage
+from datetime import datetime, timezone
 import requests
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status, UploadFile, File
 import logging
@@ -35,6 +36,11 @@ from .database import get_db, engine, Base
 from .models import ITEM_TYPES, Item, Tag, Testimonial
 
 Base.metadata.create_all(bind=engine)
+try:
+    with engine.begin() as conn:
+        conn.exec_driver_sql("ALTER TYPE item_type ADD VALUE IF NOT EXISTS 'blog'")
+except Exception:
+    pass
 from .schemas import ItemCreate, ItemRead, ItemType, ItemUpdate, LoginRequest, TagCreate, TagRead, TokenResponse, TestimonialCreate, TestimonialRead, TestimonialUpdate, ContactRequest
 
 app = FastAPI(title="Portfolio API", version="1.0.0")
@@ -88,6 +94,58 @@ def list_items(type: ItemType | None = None, db: Session = Depends(get_db)) -> l
     if type is not None:
         query = query.where(Item.type == type)
     return list(db.scalars(query))
+
+@app.get("/api/veille")
+def get_veille(limit: int = 6) -> dict[str, object]:
+    limit = max(1, min(limit, 12))
+    now = datetime.now(timezone.utc).timestamp()
+    cached = getattr(app.state, "veille_cache", None)
+    if cached and now < cached.get("expires_at", 0):
+        return cached["payload"]
+
+    url = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
+    try:
+        response = requests.get(url, timeout=20, headers={"Accept": "application/json"})
+        response.raise_for_status()
+        data = response.json()
+        vulnerabilities = data.get("vulnerabilities", []) if isinstance(data, dict) else []
+        vulnerabilities = sorted(
+            [v for v in vulnerabilities if isinstance(v, dict)],
+            key=lambda v: (v.get("dateAdded") or "", v.get("cveID") or ""),
+            reverse=True,
+        )
+        items = [
+            {
+                "cveID": vuln.get("cveID", ""),
+                "vendorProject": vuln.get("vendorProject", ""),
+                "product": vuln.get("product", ""),
+                "vulnerabilityName": vuln.get("vulnerabilityName", ""),
+                "dateAdded": vuln.get("dateAdded", ""),
+                "shortDescription": vuln.get("shortDescription", ""),
+                "requiredAction": vuln.get("requiredAction", ""),
+                "dueDate": vuln.get("dueDate", ""),
+            }
+            for vuln in vulnerabilities[:limit]
+        ]
+        payload = {
+            "catalogVersion": data.get("catalogVersion", ""),
+            "dateReleased": data.get("dateReleased", ""),
+            "count": data.get("count", len(vulnerabilities)),
+            "sourceUrl": url,
+            "items": items,
+            "updatedAt": now,
+            "stale": False,
+        }
+        app.state.veille_cache = {"payload": payload, "expires_at": now + 120}
+        return payload
+    except Exception as exc:
+        logger.exception("Échec de récupération de la veille CISA: %s", exc)
+        cached = getattr(app.state, "veille_cache", None)
+        if cached:
+            stale_payload = dict(cached["payload"])
+            stale_payload["stale"] = True
+            return stale_payload
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Impossible de récupérer la veille automatique pour le moment.") from exc
 
 
 @app.get("/api/tags", response_model=list[TagRead])
@@ -347,17 +405,24 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.post("/api/upload", dependencies=[Depends(get_current_admin)])
 async def upload_image(file: UploadFile = File(...)):
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Seules les images sont autorisées.")
-    
-    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    allowed_mime_prefixes = ("image/",)
+    allowed_exact_mimes = {"application/pdf"}
+    filename = file.filename or "upload"
+    content_type = (file.content_type or "").lower()
+    if not content_type.startswith(allowed_mime_prefixes) and content_type not in allowed_exact_mimes:
+        raise HTTPException(status_code=400, detail="Seules les images et les fichiers PDF sont autorisés.")
+
+    ext = filename.split(".")[-1].lower() if "." in filename else "bin"
+    if content_type == "application/pdf" or ext == "pdf":
+        ext = "pdf"
+    elif not content_type.startswith("image/"):
+        ext = "bin"
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
     file_path = os.path.join("uploads", unique_filename)
-    
+
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-        
-    # Return the absolute or relative URL
+
     return {"url": f"/uploads/{unique_filename}"}
 
 # Trigger reload now

@@ -4,7 +4,7 @@ import nh3
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, EmailStr
 
-ItemType = Literal["parcours", "competence", "realisation"]
+ItemType = Literal["parcours", "competence", "realisation", "blog"]
 
 
 class LoginRequest(BaseModel):

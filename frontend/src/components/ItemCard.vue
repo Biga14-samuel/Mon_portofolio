@@ -30,12 +30,15 @@
       <h3>{{ sanitizedTitle }}</h3>
       <p>{{ sanitizedDescription }}</p>
       
-      <div class="item-card__links" v-if="item.github_url || item.demo_url">
+      <div class="item-card__links" v-if="item.github_url || item.demo_url || pdfUrl">
         <a v-if="item.github_url" :href="item.github_url" target="_blank" rel="noreferrer" class="external-link">
           <Github :size="16" aria-hidden="true" /> Code
         </a>
         <a v-if="item.demo_url" :href="item.demo_url" target="_blank" rel="noreferrer" class="external-link">
           <ExternalLink :size="16" aria-hidden="true" /> Démo
+        </a>
+        <a v-if="pdfUrl" :href="pdfUrl" target="_blank" rel="noreferrer" class="external-link">
+          <FileText :size="16" aria-hidden="true" /> PDF
         </a>
       </div>
 
@@ -58,7 +61,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { Pencil, Trash2, Github, ExternalLink, ArrowUpRight } from 'lucide-vue-next';
+import { Pencil, Trash2, Github, ExternalLink, ArrowUpRight, FileText } from 'lucide-vue-next';
 import PillBadge from './PillBadge.vue';
 import { tagTone } from '../services/tags';
 import { stripEmojis } from '../utils/sanitize';
@@ -81,6 +84,7 @@ const labels = {
   parcours: 'Parcours',
   competence: 'Competence',
   realisation: 'Realisation',
+  blog: 'Blog',
 };
 
 const currentImageIndex = ref(0);
@@ -95,6 +99,7 @@ const sanitizedTitle = computed(() => stripEmojis(props.item.title));
 const sanitizedSubtitle = computed(() => stripEmojis(props.item.subtitle));
 const sanitizedDescription = computed(() => stripEmojis(props.item.description));
 const sanitizedCategory = computed(() => stripEmojis(props.item.category));
+const pdfUrl = computed(() => resolveAssetUrl(props.item.content?.pdf_url || ''));
 
 onMounted(() => {
   if (imagesList.value.length > 1) {

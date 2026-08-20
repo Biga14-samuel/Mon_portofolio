@@ -105,6 +105,10 @@ export function getTestimonials(token = null) {
   return request('/api/testimonials', options);
 }
 
+export function getVeille(limit = 6) {
+  return request(`/api/veille?limit=${encodeURIComponent(limit)}`);
+}
+
 export function createTestimonial(testimonial) {
   return request('/api/testimonials', {
     method: 'POST',
@@ -135,13 +139,17 @@ export function sendContactMessage(email, subject, message) {
 }
 
 export function uploadImage(file, token) {
+  return uploadFile(file, token);
+}
+
+
+export function uploadFile(file, token) {
   const formData = new FormData();
   formData.append('file', file);
-  
+
   return request('/api/upload', {
     method: 'POST',
     headers: authHeaders(token),
     body: formData,
   });
 }
-

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
 
-ITEM_TYPES = ("parcours", "competence", "realisation")
+ITEM_TYPES = ("parcours", "competence", "realisation", "blog")
 
 
 class Item(Base):

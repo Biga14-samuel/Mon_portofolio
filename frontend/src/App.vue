@@ -11,6 +11,7 @@
       }" 
     />
     <Preloader />
+    <div class="cursor-orb" :style="cursorStyle" aria-hidden="true"></div>
     <div class="topbar-wrapper">
       <header class="topbar">
         <a href="#accueil" class="brand" @click="playClick" @mouseenter="playHover">
@@ -30,6 +31,8 @@
           <a href="#parcours" @click="playClick" @mouseenter="playHover">Parcours</a>
           <a href="#competences" @click="playClick" @mouseenter="playHover">Stack & outils</a>
           <a href="#realisations" @click="playClick" @mouseenter="playHover">Réalisations</a>
+          <a class="nav-button nav-link-button" href="#blog" @click="playClick" @mouseenter="playHover">Blog</a>
+          <a class="nav-button nav-link-button" href="#veille" @click="playClick" @mouseenter="playHover">Veille</a>
           <a href="#contact" @click="playClick" @mouseenter="playHover">Contact</a>
           <button v-if="!authState.token" class="nav-button" type="button" @click.stop="showLogin = true; menuOpen = false; playClick()" @mouseenter="playHover">Admin</button>
           <button v-else class="nav-button" type="button" @click.stop="logout(); menuOpen = false; playClick()" @mouseenter="playHover">Déconnexion</button>
@@ -186,6 +189,31 @@
         </div>
       </section>
 
+      <section class="watch-section reveal-on-scroll" id="veille" aria-labelledby="veille-title">
+        <div class="section-heading">
+          <PillBadge tone="blue">Veille automatique</PillBadge>
+          <h2 id="veille-title">Surveillance des vulnérabilités critiques en temps réel</h2>
+        </div>
+        <div class="veille-status-bar">
+          <span>Surveillance active</span>
+          <span>Dernière mise à jour : {{ veilleUpdatedAtLabel || '—' }}</span>
+          <span>{{ veilleItems.length }} vulnérabilités affichées</span>
+        </div>
+        <div class="veille-grid">
+          <article v-for="item in veilleItems" :key="item.cveID" class="veille-card">
+            <div class="veille-card__top">
+              <strong>{{ item.cveID }}</strong>
+              <span>{{ item.dateAdded }}</span>
+            </div>
+            <h3>{{ item.vendorProject }} {{ item.product }}</h3>
+            <p>{{ item.shortDescription }}</p>
+            <div class="veille-actions">
+              <a :href="veilleSourceUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Source officielle</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <section v-if="authState.token" class="admin-strip reveal-on-scroll" aria-label="Administration du portfolio">
         <div>
           <PillBadge tone="aubergine">Mode administration</PillBadge>
@@ -285,6 +313,16 @@
               empty="Aucune realisation publiee pour le moment."
               :editable="Boolean(authState.token)"
               layout="zig-zag"
+              @edit="openEdit"
+              @delete="remove"
+              @view-case="openCaseStudy"
+            />
+            <ContentSection
+              id="blog"
+              title="Blog"
+              :items="grouped.blog"
+              empty="Aucun article publié pour le moment."
+              :editable="Boolean(authState.token)"
               @edit="openEdit"
               @delete="remove"
               @view-case="openCaseStudy"
@@ -610,8 +648,31 @@
         </template>
       </section>
     </div>
-    <footer class="footer">
-      <p>© 2026 Raoul BIGA. Tous droits réservés.</p>
+    <footer class="footer footer--premium">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <strong>Mon portfolio</strong>
+          <p>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</p>
+        </div>
+        <nav class="footer-nav" aria-label="Navigation de pied de page">
+          <a href="#accueil">Accueil</a>
+          <a href="#apropos">À propos</a>
+          <a href="#parcours">Parcours</a>
+          <a href="#realisations">Réalisations</a>
+          <a href="#blog">Blog</a>
+          <a href="#veille">Veille</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <div class="footer-meta">
+          <div class="footer-clock">{{ clockLabel }}</div>
+          <div class="footer-socials">
+            <a href="https://www.linkedin.com/in/aubinbiga" target="_blank" rel="noreferrer">LinkedIn</a>
+            <a href="https://github.com/Biga14-samuel" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="mailto:samuelbiga10@gmail.com">Email</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copy">© 2026 Raoul BIGA. Tous droits réservés.</div>
     </footer>
 
     <button 
@@ -640,7 +701,7 @@ import PillBadge from './components/PillBadge.vue';
 import StackToolsSection from './components/StackToolsSection.vue';
 import TagManager from './components/TagManager.vue';
 import { authState, clearToken, setToken } from './store/auth';
-import { createItem, deleteItem, getItems, login, resolveAssetUrl, updateItem, getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial as apiDeleteTestimonial, sendContactMessage } from './services/api';
+import { createItem, deleteItem, getItems, login, resolveAssetUrl, updateItem, getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial as apiDeleteTestimonial, sendContactMessage, getVeille } from './services/api';
 import TestimonialSection from './components/TestimonialSection.vue';
 import { tagTone } from './services/tags';
 import NotFound from './components/NotFound.vue';
@@ -737,6 +798,7 @@ const filters = [
   { label: 'Réalisations', value: 'realisation' },
   { label: 'Parcours', value: 'parcours' },
   { label: 'Stack & Outils', value: 'competence' },
+  { label: 'Blog', value: 'blog' },
 ];
 
 const categoryIcons = {
@@ -776,6 +838,10 @@ const testimonialError = ref('');
 const contactDraft = reactive({ email: '', subject: '', message: '' });
 const contactStatus = ref('');
 const contactError = ref('');
+const clockLabel = ref('');
+const veilleItems = ref([]);
+const veilleSourceUrl = ref('https://www.cisa.gov/known-exploited-vulnerabilities-catalog');
+const veilleUpdatedAtLabel = ref('');
 const suggestedQuestions = [
   "Quels sont vos tarifs ?",
   "Êtes-vous disponible pour un emploi ?",
@@ -800,9 +866,13 @@ const activeCaseStepIndex = ref(-1);
 const emailCopied = ref(false);
 const credentials = reactive({ username: '', password: '' });
 const showScrollToTop = ref(false);
+const cursorPosition = reactive({ x: -100, y: -100 });
+const cursorStyle = computed(() => ({ transform: `translate3d(${cursorPosition.x - 18}px, ${cursorPosition.y - 18}px, 0)` }));
 
 let revealObserver;
 let prefersReducedMotion;
+let clockTimer;
+let veilleTimer;
 
 const typeFilteredItems = computed(() => (selectedType.value ? items.value.filter((item) => item.type === selectedType.value) : items.value));
 
@@ -834,6 +904,35 @@ function splitImageSources(raw) {
   if (!raw) return [];
   const values = Array.isArray(raw) ? raw : String(raw).split(/[\n,;|]+/);
   return values.map((value) => stripEmojis(String(value).trim())).filter(Boolean);
+}
+
+function updateClock() {
+  const now = new Date();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const yyyy = now.getFullYear();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  const sec = String(now.getSeconds()).padStart(2, '0');
+  clockLabel.value = `${mm}/${dd}/${yyyy} ${hh}:${min}:${sec}`;
+}
+
+function handlePointerMove(e) {
+  cursorPosition.x = e.clientX;
+  cursorPosition.y = e.clientY;
+}
+
+async function loadVeille() {
+  try {
+    const data = await getVeille(6);
+    veilleItems.value = data.items || [];
+    veilleSourceUrl.value = data.sourceUrl || veilleSourceUrl.value;
+    if (data.updatedAt) {
+      veilleUpdatedAtLabel.value = new Date(data.updatedAt * 1000).toLocaleString('fr-FR');
+    }
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function getSectionGalleryKey(section) {
@@ -1014,6 +1113,7 @@ const grouped = computed(() => ({
   parcours: sortChronologically(visibleItems.value.filter((item) => item.type === 'parcours')),
   competence: visibleItems.value.filter((item) => item.type === 'competence'),
   realisation: visibleItems.value.filter((item) => item.type === 'realisation'),
+  blog: visibleItems.value.filter((item) => item.type === 'blog'),
 }));
 
 const featuredProject = computed(() => items.value.find((item) => item.type === 'realisation' && item.featured));
@@ -1064,15 +1164,23 @@ onMounted(async () => {
   setupScrollReveal();
   setupPhotoParallax();
   loadItems();
+  updateClock();
+  loadVeille();
+  clockTimer = window.setInterval(updateClock, 1000);
+  veilleTimer = window.setInterval(loadVeille, 60000);
   window.addEventListener('scroll', handleScroll, { passive: true });
+  window.addEventListener('pointermove', handlePointerMove, { passive: true });
 });
 
 onUnmounted(() => {
   if (rafId) cancelAnimationFrame(rafId);
   if (lenis) lenis.destroy();
+  if (clockTimer) window.clearInterval(clockTimer);
+  if (veilleTimer) window.clearInterval(veilleTimer);
   revealObserver?.disconnect();
   window.removeEventListener('scroll', updatePhotoParallax);
   window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('pointermove', handlePointerMove);
   document.removeEventListener('keydown', handleGlobalKeydown);
 });
 
