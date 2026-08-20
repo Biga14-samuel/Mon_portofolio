@@ -640,6 +640,7 @@ main {
   height: 480px;
   border-radius: 24px;
   margin-bottom: 0;
+  background: rgba(44, 0, 30, 0.08);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
 }
 
@@ -662,7 +663,9 @@ main {
   font-size: 2.5rem;
   margin: 1.5rem 0 1rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
 }
 
 .zig-zag-grid .item-card p {
@@ -2866,3 +2869,9 @@ img {
   min-height: 0;
   margin-top: auto;
 }
+/* Lisibilité des cartes Réalisations : sans effet sur les fiches de détail. */
+#realisations .item-card__meta { gap: 14px; line-height: 1.35; }
+#realisations .item-card__meta .pill-badge { letter-spacing: 1.4px; line-height: 1.35; }
+#realisations .item-card__meta > span { line-height: 1.5; }
+#realisations .item-card h3 { letter-spacing: 0; line-height: 1.18; text-wrap: balance; }
+#realisations .item-card p { line-height: 1.72; }
