@@ -57,7 +57,7 @@
           </div>
         </article>
       </div>
-      <div class="carousel-fade" aria-hidden="true"></div>
+      
     </div>
 
     <div class="testimonials-actions" style="margin-top: 2rem; text-align: center;">
