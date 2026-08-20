@@ -31,8 +31,8 @@
           <a href="#parcours" @click="playClick" @mouseenter="playHover">Parcours</a>
           <a href="#competences" @click="playClick" @mouseenter="playHover">Stack & outils</a>
           <a href="#realisations" @click="playClick" @mouseenter="playHover">Réalisations</a>
-          <a class="nav-button nav-link-button" href="#blog" @click="playClick" @mouseenter="playHover">Blog</a>
-          <a class="nav-button nav-link-button" href="#veille" @click="playClick" @mouseenter="playHover">Veille</a>
+          <a href="#blog" @click="playClick" @mouseenter="playHover">Blog</a>
+          <a href="#veille" @click="playClick" @mouseenter="playHover">Veille</a>
           <a href="#contact" @click="playClick" @mouseenter="playHover">Contact</a>
           <button v-if="!authState.token" class="nav-button" type="button" @click.stop="showLogin = true; menuOpen = false; playClick()" @mouseenter="playHover">Admin</button>
           <button v-else class="nav-button" type="button" @click.stop="logout(); menuOpen = false; playClick()" @mouseenter="playHover">Déconnexion</button>
@@ -654,15 +654,6 @@
           <strong>Mon portfolio</strong>
           <p>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</p>
         </div>
-        <nav class="footer-nav" aria-label="Navigation de pied de page">
-          <a href="#accueil">Accueil</a>
-          <a href="#apropos">À propos</a>
-          <a href="#parcours">Parcours</a>
-          <a href="#realisations">Réalisations</a>
-          <a href="#blog">Blog</a>
-          <a href="#veille">Veille</a>
-          <a href="#contact">Contact</a>
-        </nav>
         <div class="footer-meta">
           <div class="footer-clock">{{ clockLabel }}</div>
           <div class="footer-socials">
