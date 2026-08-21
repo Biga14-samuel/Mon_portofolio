@@ -282,7 +282,7 @@
               @view-case="openCaseStudy"
             />
             <RealisationsSection
-              :items="grouped.realisation"
+              :items="allRealisations"
               :editable="Boolean(authState.token)"
               @edit="openEdit"
               @delete="remove"
@@ -294,10 +294,10 @@
                 <PillBadge tone="aubergine">Blog</PillBadge>
                 <h2 id="blog-title">Blog</h2>
               </div>
-              <p v-if="authState.token" class="blog-intro">Articles, notes et retours d’expérience publiés depuis l’administration. Les PDF peuvent être attachés à chaque article.</p>
-              <div v-if="grouped.blog.length" class="blog-grid blog-grid--managed">
+              <p v-if="authState.token" class="blog-intro">Articles, notes et retours d'expérience publiés depuis l'administration. Les PDF peuvent être attachés à chaque article.</p>
+              <div v-if="allBlogItems.length" class="blog-grid blog-grid--managed">
                 <ItemCard
-                  v-for="item in grouped.blog"
+                  v-for="item in allBlogItems"
                   :key="item.id"
                   :item="item"
                   :editable="Boolean(authState.token)"
@@ -308,7 +308,7 @@
               </div>
               <div v-else class="empty-state-card blog-empty-state">
                 <SearchX class="empty-icon" :size="48" />
-                <p>Aucun article publié pour le moment.</p>
+                <p>Aucun article publié pour le moment. Les articles seront disponibles ici dès qu'ils seront ajoutés.</p>
                 <button v-if="authState.token" class="button primary" type="button" @click="openCreate(); playClick()" @mouseenter="playHover">Ajouter un article</button>
               </div>
             </section>
@@ -1048,10 +1048,13 @@ const casePrimaryImage = computed(() => caseDetailImages.value[0] || '');
 const caseGalleryImages = computed(() => caseDetailImages.value.slice(1));
 const casePdfUrl = computed(() => resolveAssetUrl(caseStudyItem.value?.content?.pdf_url || ''));
 
-// Identifies the SOC project: featured item whose category contains "soc"
-const isSocProject = computed(() =>
-  Boolean(caseStudyItem.value?.featured && caseStudyItem.value?.category?.toLowerCase().includes('soc'))
-);
+// Identifies the SOC project: featured item whose category OR title contains "soc"
+const isSocProject = computed(() => {
+  const item = caseStudyItem.value;
+  if (!item?.featured) return false;
+  const haystack = `${item.category || ''} ${item.title || ''} ${item.description || ''}`.toLowerCase();
+  return haystack.includes('soc');
+});
 
 // Build timeline steps for the SOC project from the activeCaseStudy sections
 const socTimelineSteps = computed(() => {
@@ -1182,6 +1185,21 @@ const grouped = computed(() => ({
   realisation: visibleItems.value.filter((item) => item.type === 'realisation'),
   blog: visibleItems.value.filter((item) => item.type === 'blog'),
 }));
+
+// Always show realisations and blog regardless of the active type filter
+const allRealisations = computed(() => {
+  const filtered = selectedCategory.value
+    ? items.value.filter((item) => item.type === 'realisation' && item.category === selectedCategory.value)
+    : items.value.filter((item) => item.type === 'realisation');
+  return filtered;
+});
+
+const allBlogItems = computed(() => {
+  const filtered = selectedCategory.value
+    ? items.value.filter((item) => item.type === 'blog' && item.category === selectedCategory.value)
+    : items.value.filter((item) => item.type === 'blog');
+  return filtered;
+});
 
 const featuredProject = computed(() => items.value.find((item) => item.type === 'realisation' && item.featured));
 
