@@ -281,16 +281,13 @@
               @delete="remove"
               @view-case="openCaseStudy"
             />
-            <ContentSection
-              id="realisations"
-              title="Mes realisations"
+            <RealisationsSection
               :items="grouped.realisation"
-              empty="Aucune realisation publiee pour le moment."
               :editable="Boolean(authState.token)"
-              layout="zig-zag"
               @edit="openEdit"
               @delete="remove"
               @view-case="openCaseStudy"
+              @add="openCreate(); playClick()"
             />
             <section class="blog-section reveal-on-scroll" id="blog" aria-labelledby="blog-title">
               <div class="section-heading">
@@ -475,130 +472,131 @@
           </figure>
         </div>
 
-        <section v-if="caseStudyItem.type === 'realisation' && caseGalleryImages.length" class="project-showcase-gallery" :style="storyStyle(casePrimaryImage ? 2 : 1)">
-          <div class="project-showcase-gallery__heading"><span>Visuels du projet</span><strong>{{ caseGalleryImages.length }} capture{{ caseGalleryImages.length > 1 ? 's' : '' }}</strong></div>
-          <div class="project-showcase-gallery__grid">
-            <button v-for="(image, imageIndex) in caseGalleryImages" :key="image" type="button" class="project-shot" @click="openImageViewer(caseDetailImages, imageIndex + (casePrimaryImage ? 1 : 0), stripEmojis(caseStudyItem.title)); playClick()" @mouseenter="playHover" :aria-label="`Agrandir la capture ${imageIndex + 1}`">
-              <img :src="image" :alt="`Capture ${imageIndex + 1} de ${stripEmojis(caseStudyItem.title)}`" data-hide-on-error="1" @error="handleImgError" /><span>Ouvrir</span>
-            </button>
+        <!-- ===== REALISATION: Vue immersive (SOC timeline ou galerie moodboard) ===== -->
+        <template v-if="caseStudyItem.type === 'realisation'">
+          <!-- SOC Project → Timeline verticale -->
+          <div v-if="isSocProject" class="case-immersive-block" :style="storyStyle(casePrimaryImage ? 2 : 1)">
+            <ProjectTimeline
+              :steps="socTimelineSteps"
+              @open-lightbox="(imgs, idx, title) => { openImageViewer(imgs, idx, title); playClick(); }"
+            />
           </div>
-        </section>
-        <div class="case-layout">
-          <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(caseHeroImage ? 2 : 1)">
-            <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
-            <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
-            <ul v-if="caseStudyStack.length">
-              <li v-for="entry in caseStudyStack" :key="entry">{{ entry }}</li>
-            </ul>
-            <p v-else class="case-summary-empty">Les compétences associées seront précisées prochainement.</p>
-          </aside>
 
-          <div class="case-timeline">
-            <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :class="{ 'is-active': activeCaseStepIndex === index, 'is-past': activeCaseStepIndex > index }" :style="storyStyle((caseHeroImage ? 3 : 2) + index)">
-              <span>{{ section.number }}</span>
-              <div>
-                <h3>{{ section.title }}</h3>
-                <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
-                <div v-if="section.images?.length" class="case-section-gallery">
-                  <figure class="case-section-image-wrapper case-gallery-card case-section-image-wrapper--interactive" :class="{ 'is-loaded': true, 'is-multi': section.images.length > 1 }" @click="openImageViewer(section.images, getSectionImageIndex(section), stripEmojis(section.title)); playClick()" @mouseenter="playHover">
-                    <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) - 1); playClick()" aria-label="Image précédente">
-                      <ArrowLeft :size="18" aria-hidden="true" />
-                    </button>
-                    <img :src="section.images[getSectionImageIndex(section)]" :alt="`Illustration de ${stripEmojis(section.title)}`" data-hide-on-error="1" @load="markImageLoaded" @error="handleImgError" />
-                    <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) + 1); playClick()" aria-label="Image suivante">
-                      <ArrowRight :size="18" aria-hidden="true" />
-                    </button>
-                    <span class="case-gallery-hint">Cliquer pour agrandir</span>
-                  </figure>
-                  <div v-if="section.images.length > 1" class="case-gallery-thumbs">
-                    <button
-                      v-for="(image, imageIndex) in section.images"
-                      :key="image"
-                      type="button"
-                      class="case-gallery-thumb"
-                      :class="{ active: imageIndex === getSectionImageIndex(section) }"
-                      @click="setSectionImageIndex(section, imageIndex); playClick()"
-                      @mouseenter="playHover"
-                      :aria-label="`Voir la miniature ${imageIndex + 1}`"
-                    >
-                      <img :src="image" :alt="`Miniature ${imageIndex + 1} de ${stripEmojis(section.title)}`" />
-                    </button>
+          <!-- Autres projets → Galerie moodboard + case study classique -->
+          <template v-else>
+            <div v-if="caseDetailImages.length" class="case-immersive-block" :style="storyStyle(casePrimaryImage ? 2 : 1)">
+              <ProjectGallery
+                :images="caseDetailImages"
+                :project-title="stripEmojis(caseStudyItem.title)"
+                :tools="caseStudyStack"
+                @open-lightbox="(idx) => { openImageViewer(caseDetailImages, idx, stripEmojis(caseStudyItem.title)); playClick(); }"
+              />
+            </div>
+
+            <!-- Case study sections -->
+            <div class="case-layout">
+              <aside class="case-summary" aria-label="Informations du projet" :style="storyStyle(casePrimaryImage ? 3 : 2)">
+                <strong>Informations clés</strong>
+                <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
+                <ul v-if="caseStudyStack.length">
+                  <li v-for="entry in caseStudyStack" :key="entry">{{ entry }}</li>
+                </ul>
+                <p v-else class="case-summary-empty">Les compétences associées seront précisées prochainement.</p>
+              </aside>
+              <div class="case-timeline">
+                <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :class="{ 'is-active': activeCaseStepIndex === index, 'is-past': activeCaseStepIndex > index }" :style="storyStyle((casePrimaryImage ? 4 : 3) + index)">
+                  <span>{{ section.number }}</span>
+                  <div>
+                    <h3>{{ section.title }}</h3>
+                    <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
+                    <div v-if="section.images?.length" class="case-section-gallery">
+                      <figure class="case-section-image-wrapper case-gallery-card case-section-image-wrapper--interactive" :class="{ 'is-loaded': true, 'is-multi': section.images.length > 1 }" @click="openImageViewer(section.images, getSectionImageIndex(section), stripEmojis(section.title)); playClick()" @mouseenter="playHover">
+                        <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) - 1); playClick()" aria-label="Image précédente"><ArrowLeft :size="18" aria-hidden="true" /></button>
+                        <img :src="section.images[getSectionImageIndex(section)]" :alt="`Illustration de ${stripEmojis(section.title)}`" data-hide-on-error="1" @load="markImageLoaded" @error="handleImgError" />
+                        <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) + 1); playClick()" aria-label="Image suivante"><ArrowRight :size="18" aria-hidden="true" /></button>
+                        <span class="case-gallery-hint">Cliquer pour agrandir</span>
+                      </figure>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </template>
+
+          <!-- Resources (always shown for realisations) -->
+          <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle(10)">
+            <strong>Ressources du projet</strong>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+               <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
+               <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Documentation PDF</a>
+               <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
+            </div>
+          </div>
+        </template>
+
+        <!-- ===== NON-REALISATION: Vue classique (parcours, competence, blog) ===== -->
+        <template v-else>
+          <div class="case-layout">
+            <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(caseHeroImage ? 2 : 1)">
+              <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
+              <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
+              <ul v-if="caseStudyStack.length">
+                <li v-for="entry in caseStudyStack" :key="entry">{{ entry }}</li>
+              </ul>
+              <p v-else class="case-summary-empty">Les compétences associées seront précisées prochainement.</p>
+            </aside>
+            <div class="case-timeline">
+              <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :class="{ 'is-active': activeCaseStepIndex === index, 'is-past': activeCaseStepIndex > index }" :style="storyStyle((caseHeroImage ? 3 : 2) + index)">
+                <span>{{ section.number }}</span>
+                <div>
+                  <h3>{{ section.title }}</h3>
+                  <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
+                  <div v-if="section.images?.length" class="case-section-gallery">
+                    <figure class="case-section-image-wrapper case-gallery-card case-section-image-wrapper--interactive" :class="{ 'is-loaded': true, 'is-multi': section.images.length > 1 }" @click="openImageViewer(section.images, getSectionImageIndex(section), stripEmojis(section.title)); playClick()" @mouseenter="playHover">
+                      <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) - 1); playClick()" aria-label="Image précédente"><ArrowLeft :size="18" aria-hidden="true" /></button>
+                      <img :src="section.images[getSectionImageIndex(section)]" :alt="`Illustration de ${stripEmojis(section.title)}`" data-hide-on-error="1" @load="markImageLoaded" @error="handleImgError" />
+                      <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) + 1); playClick()" aria-label="Image suivante"><ArrowRight :size="18" aria-hidden="true" /></button>
+                      <span class="case-gallery-hint">Cliquer pour agrandir</span>
+                    </figure>
+                    <div v-if="section.images.length > 1" class="case-gallery-thumbs">
+                      <button v-for="(image, imageIndex) in section.images" :key="image" type="button" class="case-gallery-thumb" :class="{ active: imageIndex === getSectionImageIndex(section) }" @click="setSectionImageIndex(section, imageIndex); playClick()" @mouseenter="playHover" :aria-label="`Voir la miniature ${imageIndex + 1}`">
+                        <img :src="image" :alt="`Miniature ${imageIndex + 1} de ${stripEmojis(section.title)}`" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </article>
+              </article>
+            </div>
           </div>
-        </div>
 
-        <section v-if="caseStudyItem.type !== 'realisation' && caseGalleryImages.length" class="case-gallery-section" :style="storyStyle((casePrimaryImage ? 2 : 1) + activeCaseStudy.length)">
-          <strong>Galerie d’images</strong>
-          <p>Quelques vues supplémentaires pour explorer le contexte, les écrans ou les certificats associés.</p>
-          <div class="case-gallery-grid">
-            <button
-              v-for="(image, imageIndex) in caseGalleryImages"
-              :key="image"
-              type="button"
-              class="case-gallery-card case-gallery-tile"
-              @click="openImageViewer(caseDetailImages, imageIndex + (casePrimaryImage ? 1 : 0), stripEmojis(caseStudyItem.title)); playClick()"
-              @mouseenter="playHover"
-              :aria-label="`Ouvrir l'image ${imageIndex + 1}`"
-            >
-              <img :src="image" :alt="`Galerie ${imageIndex + 1} de ${stripEmojis(caseStudyItem.title)}`" data-hide-on-error="1" @error="handleImgError" />
-            </button>
-          </div>
-        </section>
+          <section v-if="caseGalleryImages.length" class="case-gallery-section" :style="storyStyle((casePrimaryImage ? 2 : 1) + activeCaseStudy.length)">
+            <strong>Galerie d'images</strong>
+            <p>Quelques vues supplémentaires pour explorer le contexte, les écrans ou les certificats associés.</p>
+            <div class="case-gallery-grid">
+              <button v-for="(image, imageIndex) in caseGalleryImages" :key="image" type="button" class="case-gallery-card case-gallery-tile" @click="openImageViewer(caseDetailImages, imageIndex + (casePrimaryImage ? 1 : 0), stripEmojis(caseStudyItem.title)); playClick()" @mouseenter="playHover" :aria-label="`Ouvrir l'image ${imageIndex + 1}`">
+                <img :src="image" :alt="`Galerie ${imageIndex + 1} de ${stripEmojis(caseStudyItem.title)}`" data-hide-on-error="1" @error="handleImgError" />
+              </button>
+            </div>
+          </section>
 
-        <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle((casePrimaryImage ? 3 : 2) + activeCaseStudy.length + (caseGalleryImages.length ? 1 : 0))">
-          <strong>Ressources du projet</strong>
-          <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-             <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
-             <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Documentation PDF</a>
-             <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
+          <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle((casePrimaryImage ? 3 : 2) + activeCaseStudy.length + (caseGalleryImages.length ? 1 : 0))">
+            <strong>Ressources du projet</strong>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+               <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
+               <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Documentation PDF</a>
+               <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
+            </div>
           </div>
-        </div>
+        </template>
       </section>
     </div>
 
-
-    <div v-if="imageViewerOpen" class="image-viewer-backdrop" role="presentation" @click.self="closeImageViewer()">
-      <section class="image-viewer" role="dialog" aria-modal="true" aria-label="Aperçu d'image">
-        <header class="image-viewer-header">
-          <div>
-            <span class="image-viewer-kicker">Aperçu plein écran</span>
-            <strong>{{ imageViewerTitle || 'Image' }}</strong>
-          </div>
-          <button type="button" class="image-viewer-close" @click="closeImageViewer(); playClick()" @mouseenter="playHover" aria-label="Fermer l'aperçu">
-            <X :size="20" aria-hidden="true" />
-          </button>
-        </header>
-        <div class="image-viewer-body">
-          <button v-if="imageViewerImages.length > 1" type="button" class="image-viewer-nav image-viewer-nav--prev" @click="previousImage(); playClick()" @mouseenter="playHover" aria-label="Image précédente">
-            <ArrowLeft :size="22" aria-hidden="true" />
-          </button>
-          <figure class="image-viewer-figure">
-            <img :src="imageViewerImages[imageViewerIndex]" :alt="imageViewerTitle || 'Aperçu de l’image'" />
-            <figcaption v-if="imageViewerImages.length > 1">{{ imageViewerIndex + 1 }} / {{ imageViewerImages.length }}</figcaption>
-          </figure>
-          <button v-if="imageViewerImages.length > 1" type="button" class="image-viewer-nav image-viewer-nav--next" @click="nextImage(); playClick()" @mouseenter="playHover" aria-label="Image suivante">
-            <ArrowRight :size="22" aria-hidden="true" />
-          </button>
-        </div>
-        <div v-if="imageViewerImages.length > 1" class="image-viewer-thumbs">
-          <button
-            v-for="(image, imageIndex) in imageViewerImages"
-            :key="image"
-            type="button"
-            class="image-viewer-thumb"
-            :class="{ active: imageIndex === imageViewerIndex }"
-            @click="imageViewerIndex = imageIndex; playClick()"
-            @mouseenter="playHover"
-            :aria-label="`Voir l'image ${imageIndex + 1}`"
-          >
-            <img :src="image" :alt="`Miniature ${imageIndex + 1}`" />
-          </button>
-        </div>
-      </section>
-    </div>
+    <ImageLightbox
+      v-model="imageViewerOpen"
+      :images="imageViewerImages"
+      :start-index="imageViewerIndex"
+      :title="imageViewerTitle"
+    />
 
     <div v-if="showLogin" class="modal-backdrop" role="presentation" @click.self="showLogin = false; playClick()">
       <section class="modal login-card" role="dialog" aria-modal="true" aria-labelledby="login-title">
@@ -715,6 +713,10 @@ import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCirc
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import ItemCard from './components/ItemCard.vue';
+import RealisationsSection from './components/RealisationsSection.vue';
+import ProjectGallery from './components/ProjectGallery.vue';
+import ProjectTimeline from './components/ProjectTimeline.vue';
+import ImageLightbox from './components/ImageLightbox.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
 import Preloader from './components/Preloader.vue';
 import { toggleSound, isSoundEnabled, playHover, playClick, playSuccess, playError } from './services/sounds';
@@ -1045,6 +1047,46 @@ const caseDetailImages = computed(() => {
 const casePrimaryImage = computed(() => caseDetailImages.value[0] || '');
 const caseGalleryImages = computed(() => caseDetailImages.value.slice(1));
 const casePdfUrl = computed(() => resolveAssetUrl(caseStudyItem.value?.content?.pdf_url || ''));
+
+// Identifies the SOC project: featured item whose category contains "soc"
+const isSocProject = computed(() =>
+  Boolean(caseStudyItem.value?.featured && caseStudyItem.value?.category?.toLowerCase().includes('soc'))
+);
+
+// Build timeline steps for the SOC project from the activeCaseStudy sections
+const socTimelineSteps = computed(() => {
+  if (!isSocProject.value) return [];
+  return activeCaseStudy.value.map((section) => {
+    // Infer criticality from keywords in title/body
+    const raw = `${section.title} ${section.body}`.toLowerCase();
+    let criticality = 'info';
+    if (raw.includes('malware') || raw.includes('attaque') || raw.includes('alert') || raw.includes('critical')) criticality = 'critical';
+    else if (raw.includes('yara') || raw.includes('fim') || raw.includes('detect') || raw.includes('warn')) criticality = 'warning';
+
+    // Infer tool from title
+    const toolMap = [
+      ['fim', 'FIM / Wazuh'], ['yara', 'YARA'], ['deepseek', 'DeepSeek AI'],
+      ['shuffle', 'Shuffle SOAR'], ['iris', 'IRIS'], ['telegram', 'Telegram'],
+      ['wazuh', 'Wazuh'], ['siem', 'SIEM'], ['soc', 'SOC'],
+    ];
+    let tool = '';
+    for (const [kw, label] of toolMap) {
+      if (section.title.toLowerCase().includes(kw) || section.body.toLowerCase().includes(kw)) {
+        tool = label;
+        break;
+      }
+    }
+
+    return {
+      number: section.number,
+      title: section.title,
+      body: section.body || '',
+      criticality,
+      tool,
+      images: section.images || [],
+    };
+  });
+});
 
 watch(caseHeroImageIndex, () => {
   caseHeroImageLoaded.value = false;

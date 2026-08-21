@@ -54,7 +54,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
-    allow_origin_regex=r"https://mon-portofolio-.*\.vercel\.app",
+    allow_origin_regex=r"^https://mon-portofolio(?:-[a-zA-Z0-9-]+)?\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
@@ -78,7 +78,8 @@ def health() -> dict[str, str]:
 @app.post("/api/login", response_model=TokenResponse)
 def login(request: Request, payload: LoginRequest, settings: Settings = Depends(get_settings)) -> TokenResponse:
     check_rate_limit(request)
-    valid_username = payload.username == settings.admin_username
+    import secrets
+    valid_username = secrets.compare_digest(payload.username, settings.admin_username)
     valid_password = verify_password(payload.password, settings.admin_password_hash)
     if not valid_username or not valid_password:
         register_failed_attempt(request)
@@ -410,18 +411,22 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.post("/api/upload", dependencies=[Depends(get_current_admin)])
 async def upload_image(file: UploadFile = File(...)):
-    allowed_mime_prefixes = ("image/",)
-    allowed_exact_mimes = {"application/pdf"}
-    filename = file.filename or "upload"
+    ALLOWED_EXTENSIONS = {
+        "image/jpeg": "jpg",
+        "image/jpg": "jpg",
+        "image/png": "png",
+        "image/gif": "gif",
+        "image/webp": "webp",
+        "application/pdf": "pdf"
+    }
+    
     content_type = (file.content_type or "").lower()
-    if not content_type.startswith(allowed_mime_prefixes) and content_type not in allowed_exact_mimes:
-        raise HTTPException(status_code=400, detail="Seules les images et les fichiers PDF sont autorisés.")
+    if content_type not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Type de fichier non autorisé. Seules les images (JPEG, PNG, GIF, WEBP) et les PDF sont acceptés.")
 
-    ext = filename.split(".")[-1].lower() if "." in filename else "bin"
-    if content_type == "application/pdf" or ext == "pdf":
-        ext = "pdf"
-    elif not content_type.startswith("image/"):
-        ext = "bin"
+    # Force the extension based on the content type, ignore the original filename's extension completely
+    ext = ALLOWED_EXTENSIONS[content_type]
+    
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
     file_path = os.path.join("uploads", unique_filename)
 

@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timedelta, timezone
 from time import monotonic
 
@@ -14,11 +15,12 @@ failed_attempts: dict[str, list[float]] = {}
 
 
 def get_client_ip(request: Request) -> str:
+    # Always take the right-most IP to prevent spoofing by the client
     forwarded_for = request.headers.get("x-forwarded-for")
     if forwarded_for:
-        first_ip = forwarded_for.split(",", 1)[0].strip()
-        if first_ip:
-            return first_ip
+        ips = [ip.strip() for ip in forwarded_for.split(",")]
+        if ips and ips[-1]:
+            return ips[-1]
 
     real_ip = request.headers.get("x-real-ip")
     if real_ip:
@@ -79,7 +81,7 @@ def get_current_admin(
     except JWTError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalide ou expire.") from exc
 
-    if username != settings.admin_username:
+    if not username or not secrets.compare_digest(username, settings.admin_username):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acces refuse.")
 
     return username
