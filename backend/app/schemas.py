@@ -27,7 +27,7 @@ class ItemBase(BaseModel):
     description: str = Field(min_length=10, max_length=5000)
     github_url: str | None = Field(default=None, max_length=500)
     demo_url: str | None = Field(default=None, max_length=500)
-    image_url: str | None = Field(default=None, max_length=500)
+    image_url: str | None = Field(default=None, max_length=2000)  # peut contenir plusieurs URLs séparées par \n
     content: dict | None = Field(default=None)
 
     @field_validator("github_url", "demo_url", "image_url", mode="before")

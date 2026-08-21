@@ -287,7 +287,7 @@
               @edit="openEdit"
               @delete="remove"
               @view-case="openCaseStudy"
-              @add="openCreate(); playClick()"
+              @add="openCreate('realisation'); playClick()"
             />
             <section class="blog-section reveal-on-scroll" id="blog" aria-labelledby="blog-title">
               <div class="section-heading">
@@ -537,7 +537,7 @@
         <!-- ===== NON-REALISATION: Vue classique (parcours, competence, blog) ===== -->
         <template v-else>
           <div class="case-layout">
-            <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(caseHeroImage ? 2 : 1)">
+            <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(casePrimaryImage ? 2 : 1)">
               <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
               <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
               <ul v-if="caseStudyStack.length">
@@ -546,7 +546,7 @@
               <p v-else class="case-summary-empty">Les compétences associées seront précisées prochainement.</p>
             </aside>
             <div class="case-timeline">
-              <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :class="{ 'is-active': activeCaseStepIndex === index, 'is-past': activeCaseStepIndex > index }" :style="storyStyle((caseHeroImage ? 3 : 2) + index)">
+              <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :class="{ 'is-active': activeCaseStepIndex === index, 'is-past': activeCaseStepIndex > index }" :style="storyStyle((casePrimaryImage ? 3 : 2) + index)">
                 <span>{{ section.number }}</span>
                 <div>
                   <h3>{{ section.title }}</h3>
@@ -569,7 +569,7 @@
             </div>
           </div>
 
-          <section v-if="caseGalleryImages.length" class="case-gallery-section" :style="storyStyle((casePrimaryImage ? 2 : 1) + activeCaseStudy.length)">
+          <section v-if="caseGalleryImages.length" class="case-gallery-section" :style="storyStyle((casePrimaryImage ? 3 : 2) + activeCaseStudy.length)">
             <strong>Galerie d'images</strong>
             <p>Quelques vues supplémentaires pour explorer le contexte, les écrans ou les certificats associés.</p>
             <div class="case-gallery-grid">
@@ -579,7 +579,7 @@
             </div>
           </section>
 
-          <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle((casePrimaryImage ? 3 : 2) + activeCaseStudy.length + (caseGalleryImages.length ? 1 : 0))">
+          <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle((casePrimaryImage ? 4 : 3) + activeCaseStudy.length + (caseGalleryImages.length ? 1 : 0))">
             <strong>Ressources du projet</strong>
             <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
                <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
@@ -1048,12 +1048,13 @@ const casePrimaryImage = computed(() => caseDetailImages.value[0] || '');
 const caseGalleryImages = computed(() => caseDetailImages.value.slice(1));
 const casePdfUrl = computed(() => resolveAssetUrl(caseStudyItem.value?.content?.pdf_url || ''));
 
-// Identifies the SOC project: featured item whose category OR title contains "soc"
+// Identifies SOC projects: item whose category, title, description or tools contains "soc", "wazuh" or "siem"
 const isSocProject = computed(() => {
   const item = caseStudyItem.value;
-  if (!item?.featured) return false;
-  const haystack = `${item.category || ''} ${item.title || ''} ${item.description || ''}`.toLowerCase();
-  return haystack.includes('soc');
+  if (!item || item.type !== 'realisation') return false;
+  const tools = item.content?.tools || '';
+  const haystack = `${item.category || ''} ${item.title || ''} ${item.description || ''} ${tools}`.toLowerCase();
+  return haystack.includes('soc') || haystack.includes('wazuh') || haystack.includes('siem');
 });
 
 // Build timeline steps for the SOC project from the activeCaseStudy sections
@@ -1118,19 +1119,23 @@ const activeCaseStudy = computed(() => {
     });
   }
 
+  const archImages = c.architecture_image ? [resolveAssetUrl(c.architecture_image)].filter(Boolean) : [];
+
   if (c.architecture) {
     sections.push({
       number: String(num++).padStart(2, '0'),
       title: type === 'realisation' ? 'Architecture / méthode' : type === 'parcours' ? 'Programme & apprentissages' : 'Détails techniques & Niveau',
       body: c.architecture,
-      image: resolveAssetUrl(c.architecture_image),
+      image: archImages[0] || '',
+      images: archImages,
     });
-  } else if (c.architecture_image) {
+  } else if (archImages.length) {
     sections.push({
       number: String(num++).padStart(2, '0'),
       title: 'Illustration / Document',
       body: '',
-      image: resolveAssetUrl(c.architecture_image),
+      image: archImages[0] || '',
+      images: archImages,
     });
   }
 
@@ -1329,8 +1334,8 @@ function handleSessionExpired() {
   notifyError('Session expirée. Veuillez vous reconnecter.');
 }
 
-function openCreate() {
-  editing.value = { type: 'parcours', category: 'Cursus', featured: false, title: '', subtitle: '', description: '' };
+function openCreate(type = 'parcours') {
+  editing.value = { type, category: '', featured: false, title: '', subtitle: '', description: '' };
 }
 
 function openEdit(item) {

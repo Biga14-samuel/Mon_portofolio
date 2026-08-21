@@ -131,7 +131,8 @@ let timer = null;
 
 const imagesList = computed(() => {
   if (!props.item.image_url) return [];
-  return props.item.image_url.split(/[\n,]+/).map(resolveAssetUrl).filter(Boolean);
+  // Même séparateur que App.vue splitImageSources pour garantir la cohérence entre la card et la modal
+  return props.item.image_url.split(/[\n,;|]+/).map(s => resolveAssetUrl(s.trim())).filter(Boolean);
 });
 
 const sanitizedTitle       = computed(() => stripEmojis(props.item.title));
@@ -140,9 +141,13 @@ const sanitizedDescription = computed(() => stripEmojis(props.item.description))
 const sanitizedCategory    = computed(() => stripEmojis(props.item.category));
 const pdfUrl               = computed(() => resolveAssetUrl(props.item.content?.pdf_url || ''));
 
-const isSocProject = computed(() =>
-  props.item.featured && props.item.category?.toLowerCase().includes('soc')
-);
+const isSocProject = computed(() => {
+  const item = props.item;
+  if (!item || item.type !== 'realisation') return false;
+  const tools = item.content?.tools || '';
+  const haystack = `${item.category || ''} ${item.title || ''} ${item.description || ''} ${tools}`.toLowerCase();
+  return haystack.includes('soc') || haystack.includes('wazuh') || haystack.includes('siem');
+});
 
 // Tech badges: subtitle (comma-split) + content.tools
 const techBadges = computed(() => {

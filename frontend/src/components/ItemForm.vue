@@ -22,17 +22,17 @@
 
     <label>
       Titre
-      <input v-model.trim="form.title" required maxlength="140" placeholder="Ex: Lead Developer" />
+      <input v-model.trim="form.title" required maxlength="140" :placeholder="form.type === 'realisation' ? 'Ex: Conception & Déploiement d\'un SOC Open-Source' : form.type === 'blog' ? 'Ex: Guide d\'analyse des alertes Wazuh' : 'Ex: Administrateur Réseau & Sécurité'" />
     </label>
 
     <label>
-      Sous-titre / date
-      <input v-model.trim="form.subtitle" required maxlength="180" placeholder="Ex: 2024 - Present" />
+      {{ form.type === 'realisation' ? 'Période / Sous-titre' : form.type === 'parcours' ? 'Période & Organisme / Lieu' : 'Sous-titre / Niveau' }}
+      <input v-model.trim="form.subtitle" required maxlength="180" :placeholder="form.type === 'realisation' ? 'Ex: Juin 2025 | Projet personnel' : form.type === 'parcours' ? 'Ex: 2024 - Présent | IHTM' : 'Ex: Intermédiaire / Avancé'" />
     </label>
 
     <label>
-      Description
-      <textarea v-model.trim="form.description" required minlength="10" rows="5" placeholder="Detail de l'element"></textarea>
+      {{ form.type === 'realisation' ? 'Résumé / Présentation du projet' : 'Description' }}
+      <textarea v-model.trim="form.description" required minlength="10" rows="5" :placeholder="form.type === 'realisation' ? 'Décrivez brièvement le projet, son contexte et ses objectifs principaux...' : 'Détail de l\'élément'"></textarea>
     </label>
 
     <div class="form-row">
@@ -171,6 +171,7 @@ const form = reactive({
     architecture: '',
     architecture_image: '',
     gallery_images: [],
+    pdf_url: '',       // présent dès l'initialisation pour éviter les undefined au premier rendu
     alert_flow: '',
     tools: '',
     lessons: '',
