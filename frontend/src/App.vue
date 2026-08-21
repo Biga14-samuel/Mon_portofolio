@@ -264,16 +264,18 @@
             <p v-if="loadError" class="form-error portfolio-load-error" role="alert">{{ loadError }}</p>
 
             <ContentSection
+              v-if="!selectedType || selectedType === 'parcours'"
               id="parcours"
               title="Mon parcours"
               :items="grouped.parcours"
-              empty="Aucun parcours publie pour le moment."
+              empty="Aucun parcours publié pour le moment."
               :editable="Boolean(authState.token)"
               @edit="openEdit"
               @delete="remove"
               @view-case="openCaseStudy"
             />
             <StackToolsSection
+              v-if="!selectedType || selectedType === 'competence'"
               id="competences"
               :items="grouped.competence"
               empty="Aucune compétence publiée pour le moment."
@@ -283,22 +285,28 @@
               @view-case="openCaseStudy"
             />
             <RealisationsSection
-              :items="allRealisations"
+              v-if="!selectedType || selectedType === 'realisation'"
+              :items="grouped.realisation"
               :editable="Boolean(authState.token)"
               @edit="openEdit"
               @delete="remove"
               @view-case="openCaseStudy"
               @add="openCreate('realisation'); playClick()"
             />
-            <section class="blog-section reveal-on-scroll" id="blog" aria-labelledby="blog-title">
+            <section
+              v-if="!selectedType || selectedType === 'blog'"
+              class="blog-section reveal-on-scroll"
+              id="blog"
+              aria-labelledby="blog-title"
+            >
               <div class="section-heading">
                 <PillBadge tone="aubergine">Blog</PillBadge>
                 <h2 id="blog-title">Blog</h2>
               </div>
               <p v-if="authState.token" class="blog-intro">Articles, notes et retours d'expérience publiés depuis l'administration. Les PDF peuvent être attachés à chaque article.</p>
-              <div v-if="allBlogItems.length" class="blog-grid blog-grid--managed">
+              <div v-if="grouped.blog.length" class="blog-grid blog-grid--managed">
                 <ItemCard
-                  v-for="item in allBlogItems"
+                  v-for="item in grouped.blog"
                   :key="item.id"
                   :item="item"
                   :editable="Boolean(authState.token)"
@@ -310,7 +318,7 @@
               <div v-else class="empty-state-card blog-empty-state">
                 <SearchX class="empty-icon" :size="48" />
                 <p>Aucun article publié pour le moment. Les articles seront disponibles ici dès qu'ils seront ajoutés.</p>
-                <button v-if="authState.token" class="button primary" type="button" @click="openCreate(); playClick()" @mouseenter="playHover">Ajouter un article</button>
+                <button v-if="authState.token" class="button primary" type="button" @click="openCreate('blog'); playClick()" @mouseenter="playHover">Ajouter un article</button>
               </div>
             </section>
           </div>
@@ -432,7 +440,7 @@
     <div v-if="caseStudyItem" class="modal-backdrop" role="presentation" @click.self="closeCaseStudy(); playClick()">
       <section
         ref="caseModal"
-        :class="['case-modal', { 'case-modal--project': caseStudyItem.type === 'realisation' }]"
+        :class="['case-modal', { 'case-modal--project': normalizeType(caseStudyItem.type) === 'realisation' }]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="case-title"
@@ -452,7 +460,7 @@
             <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
             <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
             <p>{{ stripEmojis(caseStudyItem.description) }}</p>
-            <div v-if="caseStudyItem.type === 'realisation' && (caseStudyItem.demo_url || caseStudyItem.github_url || casePdfUrl)" class="project-quick-actions">
+            <div v-if="normalizeType(caseStudyItem.type) === 'realisation' && (caseStudyItem.demo_url || caseStudyItem.github_url || casePdfUrl)" class="project-quick-actions">
               <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="project-action project-action--primary" @click="playClick" @mouseenter="playHover"><ExternalLink :size="18" aria-hidden="true" /><span>Voir la démo</span></a>
               <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><Github :size="18" aria-hidden="true" /><span>Code source</span></a>
               <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><FileText :size="18" aria-hidden="true" /><span>Documentation PDF</span></a>
@@ -474,7 +482,7 @@
         </div>
 
         <!-- ===== REALISATION: Vue immersive (SOC timeline ou galerie moodboard) ===== -->
-        <template v-if="caseStudyItem.type === 'realisation'">
+        <template v-if="normalizeType(caseStudyItem.type) === 'realisation'">
           <!-- SOC Project → Timeline verticale -->
           <div v-if="isSocProject" class="case-immersive-block" :style="storyStyle(casePrimaryImage ? 2 : 1)">
             <ProjectTimeline
@@ -901,7 +909,20 @@ let prefersReducedMotion;
 let clockTimer;
 let veilleTimer;
 
-const typeFilteredItems = computed(() => (selectedType.value ? items.value.filter((item) => item.type === selectedType.value) : items.value));
+function normalizeType(type) {
+  if (!type) return '';
+  return String(type)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+const typeFilteredItems = computed(() =>
+  selectedType.value
+    ? items.value.filter((item) => normalizeType(item.type) === normalizeType(selectedType.value))
+    : items.value
+);
 
 function getChronologyRank(item) {
   const raw = `${item?.subtitle || ''} ${item?.title || ''}`;
@@ -1186,28 +1207,13 @@ const visibleItems = computed(() =>
 );
 
 const grouped = computed(() => ({
-  parcours: sortChronologically(visibleItems.value.filter((item) => item.type === 'parcours')),
-  competence: visibleItems.value.filter((item) => item.type === 'competence'),
-  realisation: visibleItems.value.filter((item) => item.type === 'realisation'),
-  blog: visibleItems.value.filter((item) => item.type === 'blog'),
+  parcours: sortChronologically(visibleItems.value.filter((item) => normalizeType(item.type) === 'parcours')),
+  competence: visibleItems.value.filter((item) => normalizeType(item.type) === 'competence'),
+  realisation: visibleItems.value.filter((item) => normalizeType(item.type) === 'realisation'),
+  blog: visibleItems.value.filter((item) => normalizeType(item.type) === 'blog'),
 }));
 
-// Always show realisations and blog regardless of the active type filter
-const allRealisations = computed(() => {
-  const filtered = selectedCategory.value
-    ? items.value.filter((item) => item.type === 'realisation' && item.category === selectedCategory.value)
-    : items.value.filter((item) => item.type === 'realisation');
-  return filtered;
-});
-
-const allBlogItems = computed(() => {
-  const filtered = selectedCategory.value
-    ? items.value.filter((item) => item.type === 'blog' && item.category === selectedCategory.value)
-    : items.value.filter((item) => item.type === 'blog');
-  return filtered;
-});
-
-const featuredProject = computed(() => items.value.find((item) => item.type === 'realisation' && item.featured));
+const featuredProject = computed(() => items.value.find((item) => normalizeType(item.type) === 'realisation' && item.featured));
 
 onMounted(async () => {
   // --- PROTECTION DU CONTENU ---
@@ -1293,7 +1299,11 @@ async function loadItems() {
   loading.value = true;
   loadError.value = '';
   try {
-    items.value = await getItems();
+    const rawItems = await getItems();
+    items.value = (rawItems || []).map((item) => ({
+      ...item,
+      type: normalizeType(item.type),
+    }));
     testimonials.value = await getTestimonials(authState.token);
     await nextTick();
     setupScrollReveal();
