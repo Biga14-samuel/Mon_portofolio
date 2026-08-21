@@ -32,6 +32,7 @@
           <a href="#competences" @click="playClick" @mouseenter="playHover">Stack & outils</a>
           <a href="#realisations" @click="playClick" @mouseenter="playHover">Réalisations</a>
           <a href="#blog" @click="playClick" @mouseenter="playHover">Blog</a>
+          <a href="#temoignages" @click="playClick" @mouseenter="playHover">Témoignages</a>
           <a href="#veille" @click="playClick" @mouseenter="playHover">Veille</a>
           <a href="#contact" @click="playClick" @mouseenter="playHover">Contact</a>
           <button v-if="!authState.token" class="nav-button" type="button" @click.stop="showLogin = true; menuOpen = false; playClick()" @mouseenter="playHover">Admin</button>
