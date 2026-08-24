@@ -28,11 +28,6 @@
         </div>
       </div>
 
-      <!-- Badge featured -->
-      <div v-if="item.featured" class="project-card__featured-ribbon" aria-label="Projet à la une">
-        <span>★ Projet vedette</span>
-      </div>
-
       <!-- Criticality glow pour SOC -->
       <div v-if="isSocProject" class="project-card__soc-pulse" aria-hidden="true"></div>
 
@@ -89,7 +84,7 @@
           type="button"
           @click="$emit('view-case', item)"
         >
-          <span>{{ isSocProject ? 'Voir la timeline SOC' : "Étude de cas" }}</span>
+          <span>Voir le projet</span>
           <span class="project-card__cta-icon">
             <ArrowUpRight :size="14" />
           </span>

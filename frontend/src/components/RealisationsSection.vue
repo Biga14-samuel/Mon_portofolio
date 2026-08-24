@@ -2,7 +2,6 @@
   <section class="realisations-section reveal-on-scroll" id="realisations" aria-labelledby="realisations-title">
     <!-- Heading -->
     <div class="realisations-section__heading">
-      <span class="realisations-section__kicker">Portfolio</span>
       <h2 id="realisations-title" class="realisations-section__title">Mes réalisations</h2>
       <p class="realisations-section__subtitle">
         Projets techniques réalisés en réseau, sécurité, systèmes et SOC.
@@ -109,6 +108,7 @@ function cardSizeFor(idx) {
 .realisations-masonry {
   columns: 3 320px;
   column-gap: 1.5rem;
+  padding: 0 2rem;
 }
 
 .realisations-masonry__item {
