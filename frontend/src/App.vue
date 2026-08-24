@@ -358,7 +358,6 @@
       </section>
       <section class="contact-section contact-section--artistic reveal-on-scroll" id="contact" aria-labelledby="contact-title">
         <div class="contact-copy">
-          <PillBadge tone="orange">Contact</PillBadge>
           <h2 id="contact-title">Posez-moi vos questions.</h2>
           <p>
             Vous avez une question ou une proposition ? Envoyez-moi un message directement, ou utilisez l'une des suggestions ci-dessous !
