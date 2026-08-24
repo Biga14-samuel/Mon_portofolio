@@ -2,7 +2,6 @@
   <section class="stack-section blueprint-bg" :id="id" :aria-labelledby="`${id}-title`">
     <div class="stack-heading">
       <div>
-        <PillBadge tone="aubergine">Stack configurable</PillBadge>
         <h2 :id="`${id}-title`">
           <span>Stack</span>
           <span class="animated-word">& outils</span>
