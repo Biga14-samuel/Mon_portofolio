@@ -1,5 +1,5 @@
 <template>
-  <section class="realisations-section" id="realisations" aria-labelledby="realisations-title">
+  <section class="realisations-section reveal-on-scroll" id="realisations" aria-labelledby="realisations-title">
     <!-- Heading -->
     <div class="realisations-section__heading">
       <span class="realisations-section__kicker">Portfolio</span>
