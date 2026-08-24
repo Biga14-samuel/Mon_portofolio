@@ -68,7 +68,10 @@
               <span v-if="wIdx < nameWords.length - 1" class="wave-space">&nbsp;</span>
             </span>
           </h1>
-          <h2>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</h2>
+          <h2 class="terminal-typewriter" aria-label="Administrateur réseau & sécurité, IT Consultant, SOC Analyst Junior">
+            <span class="terminal-typewriter__text">{{ currentTypedText }}</span>
+            <span class="terminal-typewriter__cursor" aria-hidden="true">_</span>
+          </h2>
           <p>
             Je conçois, sécurise et documente des environnements réseau avec une attention particulière pour la
             supervision, la détection et la réponse aux incidents.
@@ -876,6 +879,41 @@ const testimonialError = ref('');
 const contactDraft = reactive({ email: '', subject: '', message: '' });
 const contactStatus = ref('');
 const contactError = ref('');
+const typedRoles = [
+  'Administrateur réseau & sécurité',
+  'IT Consultant',
+  'SOC Analyst Junior',
+];
+const currentRoleIndex = ref(0);
+const currentTypedText = ref('');
+const isDeleting = ref(false);
+let typewriterTimeout = null;
+
+function runTypewriter() {
+  const currentRole = typedRoles[currentRoleIndex.value];
+  if (!isDeleting.value) {
+    currentTypedText.value = currentRole.slice(0, currentTypedText.value.length + 1);
+    if (currentTypedText.value === currentRole) {
+      typewriterTimeout = setTimeout(() => {
+        isDeleting.value = true;
+        runTypewriter();
+      }, 2200);
+      return;
+    }
+    const typingSpeed = 65 + Math.random() * 30;
+    typewriterTimeout = setTimeout(runTypewriter, typingSpeed);
+  } else {
+    currentTypedText.value = currentRole.slice(0, currentTypedText.value.length - 1);
+    if (currentTypedText.value === '') {
+      isDeleting.value = false;
+      currentRoleIndex.value = (currentRoleIndex.value + 1) % typedRoles.length;
+      typewriterTimeout = setTimeout(runTypewriter, 500);
+      return;
+    }
+    typewriterTimeout = setTimeout(runTypewriter, 35);
+  }
+}
+
 const clockLabel = ref('');
 const veilleItems = ref([]);
 const veilleSourceUrl = ref('https://www.cisa.gov/known-exploited-vulnerabilities-catalog');
@@ -1255,6 +1293,7 @@ onMounted(async () => {
   rafId = requestAnimationFrame(raf);
 
   prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  runTypewriter();
   setupScrollReveal();
   setupPhotoParallax();
   loadItems();
@@ -1267,6 +1306,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  if (typewriterTimeout) clearTimeout(typewriterTimeout);
   if (rafId) cancelAnimationFrame(rafId);
   if (lenis) lenis.destroy();
   if (clockTimer) window.clearInterval(clockTimer);
