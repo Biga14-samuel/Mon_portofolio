@@ -1401,6 +1401,13 @@ function setupScrollReveal() {
   revealObserver?.disconnect();
   const revealTargets = document.querySelectorAll('.reveal-on-scroll');
 
+  // Toujours afficher les éléments qui n'auraient pas été révélés après 1.5s (filet de sécurité)
+  window.setTimeout(() => {
+    document.querySelectorAll('.reveal-on-scroll:not(.is-visible)').forEach((el) => {
+      el.classList.add('is-visible');
+    });
+  }, 1500);
+
   if (prefersReducedMotion || !('IntersectionObserver' in window)) {
     revealTargets.forEach((target) => target.classList.add('is-visible'));
     return;
@@ -1415,7 +1422,7 @@ function setupScrollReveal() {
         }
       });
     },
-    { threshold: 0.16, rootMargin: '0px 0px -80px 0px' },
+    { threshold: 0.02, rootMargin: '0px 0px 60px 0px' },
   );
 
   revealTargets.forEach((target) => revealObserver.observe(target));
