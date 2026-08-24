@@ -1,5 +1,6 @@
 <template>
   <div class="app-shell">
+    <AntigravityBackground />
     <Toaster 
       position="bottom-left" 
       :toastOptions="{ 
@@ -725,6 +726,7 @@ import ProjectTimeline from './components/ProjectTimeline.vue';
 import ImageLightbox from './components/ImageLightbox.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
 import Preloader from './components/Preloader.vue';
+import AntigravityBackground from './components/AntigravityBackground.vue';
 import { toggleSound, isSoundEnabled, playHover, playClick, playSuccess, playError } from './services/sounds';
 import Lenis from '@studio-freight/lenis';
 import ItemForm from './components/ItemForm.vue';
