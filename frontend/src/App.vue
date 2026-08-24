@@ -481,10 +481,10 @@
 
         <!-- ===== REALISATION: Vue immersive (SOC timeline ou galerie moodboard) ===== -->
         <template v-if="normalizeType(caseStudyItem.type) === 'realisation'">
-          <!-- SOC Project → Timeline verticale -->
+          <!-- SOC Project → Timeline verticale & Visualisation Interactive -->
           <div v-if="isSocProject" class="case-immersive-block" :style="storyStyle(casePrimaryImage ? 2 : 1)">
             <ProjectTimeline
-              :steps="socTimelineSteps"
+              :pdf-url="casePdfUrl"
               @open-lightbox="(imgs, idx, title) => { openImageViewer(imgs, idx, title); playClick(); }"
             />
           </div>
@@ -1250,7 +1250,29 @@ const grouped = computed(() => ({
   blog: visibleItems.value.filter((item) => normalizeType(item.type) === 'blog'),
 }));
 
-const featuredProject = computed(() => items.value.find((item) => normalizeType(item.type) === 'realisation' && item.featured));
+const defaultSocProject = {
+  id: 'soc-paness-featured',
+  type: 'realisation',
+  category: 'Cybersécurité & SOC',
+  featured: true,
+  title: 'Conception et mise en place d\'un SOC Open-Source (Cas de PANESS)',
+  subtitle: 'Wazuh v4.14.5, Suricata, DeepSeek AI, MISP, DFIR-IRIS, Shuffle SOAR, Telegram',
+  description: 'Conception, déploiement et validation d\'un Centre d\'Opérations de Sécurité (SOC) complet pour l\'entreprise PANESS IT dans un laboratoire virtualisé (5 VMs). Détection d\'intrusions réseau/terminaux, enrichissement IA, corrélation Threat Intelligence et réponse automatisée aux incidents.',
+  content: {
+    tools: 'Wazuh v4.14.5, Suricata NIDS, YARA, DeepSeek AI, VirusTotal, MISP, DFIR-IRIS, Shuffle SOAR, Telegram Bot, VirtualBox, Linux/Windows',
+    objective: 'Démontrer qu\'une infrastructure SOC/SIEM/EDR complète, performante et économiquement accessible peut être construite exclusivement à partir de technologies open-source.',
+    architecture: 'Réseau NAT VirtualBox 192.168.100.0/24 interconnectant 5 machines virtuelles : wazuh-server (Amazon Linux 2023), soc-services (Docker MISP/IRIS/Shuffle), agent-linux (Debian 12), agent-windows (Win 10), kali-attacker (Kali Linux).',
+    alert_flow: 'Détection multi-couches (Auditd, Sysmon, Suricata, FIM) -> Corrélation Wazuh -> Enrichissement Threat Intel (MISP) & IA (DeepSeek) -> Orchestration SOAR (Shuffle) -> Ticket incident (DFIR-IRIS) -> Notification instantanée (Bot Telegram).',
+    lessons: 'Maîtrise du cycle complet de réponse aux incidents, création de playbooks et scripts d\'automatisation Python/Bash, intégration d\'APIs de sécurité et validation par 4 scénarios d\'attaques réelles.',
+    impact: 'Infrastructure opérationnelle pour PANESS IT avec 0€ de coût de licences logicielles, détection et neutralisation des menaces en moins de 3 secondes.',
+    pdf_url: '/CV_Samnick_Biga_Raoul_Aubin.pdf',
+  }
+};
+
+const featuredProject = computed(() => {
+  const found = items.value.find((item) => normalizeType(item.type) === 'realisation' && item.featured);
+  return found || defaultSocProject;
+});
 
 onMounted(async () => {
   // --- PROTECTION DU CONTENU ---
