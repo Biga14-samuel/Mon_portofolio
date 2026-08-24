@@ -300,7 +300,6 @@
               aria-labelledby="blog-title"
             >
               <div class="section-heading">
-                <PillBadge tone="aubergine">Blog</PillBadge>
                 <h2 id="blog-title">Blog</h2>
               </div>
               <p v-if="authState.token" class="blog-intro">Articles, notes et retours d'expérience publiés depuis l'administration. Les PDF peuvent être attachés à chaque article.</p>

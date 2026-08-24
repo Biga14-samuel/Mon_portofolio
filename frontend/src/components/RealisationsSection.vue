@@ -1,11 +1,9 @@
 <template>
   <section class="realisations-section reveal-on-scroll" id="realisations" aria-labelledby="realisations-title">
     <!-- Heading -->
-    <div class="realisations-section__heading">
-      <h2 id="realisations-title" class="realisations-section__title">Mes réalisations</h2>
-      <p class="realisations-section__subtitle">
-        Projets techniques réalisés en réseau, sécurité, systèmes et SOC.
-      </p>
+    <div class="section-heading">
+      <PillBadge tone="orange">Réalisations</PillBadge>
+      <h2 id="realisations-title">Mes réalisations</h2>
     </div>
 
     <!-- Masonry grid -->
@@ -44,6 +42,7 @@
 <script setup>
 import { SearchX } from 'lucide-vue-next';
 import ProjectCard from './ProjectCard.vue';
+import PillBadge from './PillBadge.vue';
 
 const props = defineProps({
   items:    { type: Array,   required: true },
