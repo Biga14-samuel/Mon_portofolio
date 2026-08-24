@@ -358,9 +358,9 @@
       </section>
       <section class="contact-section contact-section--artistic reveal-on-scroll" id="contact" aria-labelledby="contact-title">
         <div class="contact-copy">
-          <h2 id="contact-title">Posez-moi vos questions.</h2>
+          <h2 id="contact-title">Contact</h2>
           <p>
-            Vous avez une question ou une proposition ? Envoyez-moi un message directement, ou utilisez l'une des suggestions ci-dessous !
+            Posez-moi vos questions ou faites-moi part de vos projets. Envoyez-moi un message directement ci-dessous !
           </p>
           
 
