@@ -118,13 +118,13 @@
       <section class="about-section reveal-on-scroll" id="apropos" aria-labelledby="about-title" style="position: relative; overflow: hidden;">
         <div class="giant-watermark">ÉVOLUER</div>
         <div class="section-heading" style="position: relative; z-index: 1;">
-          <PillBadge tone="aubergine">À propos</PillBadge>
+          <h2 id="about-title">À propos</h2>
         </div>
         <div class="about-lead">
-          <h2 id="about-title">
+          <h3>
             Construire des infrastructures fiables, lisibles et prêtes à détecter les incidents avant qu'ils ne
             deviennent critiques.
-          </h2>
+          </h3>
           <p>
             Jeune diplômé en Licence Professionnelle Réseaux et Sécurité Informatique à l'IHTM, je suis passionné par la conception d'architectures sécurisées et l'administration des systèmes. Ma récente expérience chez PANESS IT m'a permis de consolider mes acquis en déployant de A à Z un environnement complet de supervision et de réponse aux incidents.
           </p>
@@ -335,8 +335,7 @@
 
       <section class="watch-section reveal-on-scroll" id="veille" aria-labelledby="veille-title">
         <div class="section-heading">
-          <PillBadge tone="blue">Veille automatique</PillBadge>
-          <h2 id="veille-title">Surveillance des vulnérabilités critiques en temps réel</h2>
+          <h2 id="veille-title">Veille automatique</h2>
         </div>
         <div class="veille-status-bar">
           <span>Surveillance active</span>

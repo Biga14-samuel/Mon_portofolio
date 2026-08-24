@@ -94,11 +94,7 @@ defineEmits(['toggle-visibility', 'delete', 'add-testimonial']);
   overflow: hidden;
 }
 
-.section-heading {
-  max-width: 1200px;
-  margin: 0 auto 2rem auto;
-  padding: 0 1.5rem;
-}
+
 
 .carousel-container {
   position: relative;
