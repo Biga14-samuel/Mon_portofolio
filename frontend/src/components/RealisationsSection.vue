@@ -1,5 +1,5 @@
 <template>
-  <section class="realisations-section reveal-on-scroll" id="realisations" aria-labelledby="realisations-title">
+  <section class="realisations-section" id="realisations" aria-labelledby="realisations-title">
     <!-- Heading -->
     <div class="realisations-section__heading">
       <span class="realisations-section__kicker">Portfolio</span>
@@ -17,7 +17,7 @@
         :item="item"
         :editable="editable"
         :card-size="cardSizeFor(idx)"
-        class="realisations-masonry__item reveal-on-scroll"
+        class="realisations-masonry__item"
         @edit="$emit('edit', $event)"
         @delete="$emit('delete', $event)"
         @view-case="$emit('view-case', $event)"

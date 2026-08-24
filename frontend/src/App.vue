@@ -28,9 +28,9 @@
             {{ audioEnabled ? 'Son ON' : 'Son OFF' }}
           </button>
           <a href="#apropos" @click="playClick" @mouseenter="playHover">À propos</a>
+          <a href="#realisations" @click="playClick" @mouseenter="playHover">Réalisations</a>
           <a href="#parcours" @click="playClick" @mouseenter="playHover">Parcours</a>
           <a href="#competences" @click="playClick" @mouseenter="playHover">Stack & outils</a>
-          <a href="#realisations" @click="playClick" @mouseenter="playHover">Réalisations</a>
           <a href="#blog" @click="playClick" @mouseenter="playHover">Blog</a>
           <a href="#temoignages" @click="playClick" @mouseenter="playHover">Témoignages</a>
           <a href="#veille" @click="playClick" @mouseenter="playHover">Veille</a>
@@ -263,6 +263,15 @@
           <div v-else class="portfolio-content">
             <p v-if="loadError" class="form-error portfolio-load-error" role="alert">{{ loadError }}</p>
 
+            <RealisationsSection
+              v-if="!selectedType || selectedType === 'realisation'"
+              :items="grouped.realisation"
+              :editable="Boolean(authState.token)"
+              @edit="openEdit"
+              @delete="remove"
+              @view-case="openCaseStudy"
+              @add="openCreate('realisation'); playClick()"
+            />
             <ContentSection
               v-if="!selectedType || selectedType === 'parcours'"
               id="parcours"
@@ -284,18 +293,9 @@
               @delete="remove"
               @view-case="openCaseStudy"
             />
-            <RealisationsSection
-              v-if="!selectedType || selectedType === 'realisation'"
-              :items="grouped.realisation"
-              :editable="Boolean(authState.token)"
-              @edit="openEdit"
-              @delete="remove"
-              @view-case="openCaseStudy"
-              @add="openCreate('realisation'); playClick()"
-            />
             <section
               v-if="!selectedType || selectedType === 'blog'"
-              class="blog-section reveal-on-scroll"
+              class="blog-section"
               id="blog"
               aria-labelledby="blog-title"
             >
