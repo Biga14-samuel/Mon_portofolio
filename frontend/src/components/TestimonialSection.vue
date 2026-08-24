@@ -1,6 +1,6 @@
 <template>
   <section id="temoignages" class="testimonials-section reveal-on-scroll" aria-labelledby="testimonials-title">
-    <div class="section-heading" style="text-align: left; padding-left: 2rem;">
+    <div class="section-heading">
       <h2 id="testimonials-title">Selon leurs propres mots</h2>
     </div>
 
