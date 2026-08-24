@@ -540,7 +540,7 @@ main {
 
 .about-section {
   width: min(1200px, calc(100% - 32px));
-  margin: 0 auto 72px;
+  margin: 80px auto 100px;
   padding: clamp(32px, 5vw, 56px);
   border-radius: 20px;
   background: var(--surface-soft);
