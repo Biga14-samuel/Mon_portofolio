@@ -1100,26 +1100,9 @@ main {
   letter-spacing: -0.03em;
 }
 
-.portfolio-results,
-.portfolio-content,
-.content-section,
-.realisations-section,
-.blog-section,
-.testimonials-section,
-.watch-section {
+.content-section {
   width: min(1200px, calc(100% - 32px));
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.content-section,
-.realisations-section,
-.blog-section {
-  margin-bottom: 160px;
-}
-
-.watch-section {
-  margin-bottom: 120px;
+  margin: 0 auto 160px;
 }
 
 .cards-grid,

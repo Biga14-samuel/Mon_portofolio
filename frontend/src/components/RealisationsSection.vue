@@ -1,12 +1,12 @@
 <template>
-  <section class="realisations-section reveal-on-scroll" id="realisations" aria-labelledby="realisations-title">
+  <section class="content-section" id="realisations" aria-labelledby="realisations-title">
     <!-- Heading -->
     <div class="section-heading">
       <h2 id="realisations-title">Mes réalisations</h2>
     </div>
 
     <!-- Grid -->
-    <div v-if="items.length" class="realisations-grid" aria-label="Grille des projets">
+    <div v-if="items.length" class="cards-grid" aria-label="Grille des projets">
       <ProjectCard
         v-for="(item, idx) in items"
         :key="item.id"
@@ -56,29 +56,7 @@ function cardSizeFor(idx) {
 </script>
 
 <style scoped>
-.realisations-section {
-  margin-bottom: 160px;
-}
-
-.realisations-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-}
-
 .realisations-grid__item {
   width: 100%;
-}
-
-@media (max-width: 900px) {
-  .realisations-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .realisations-grid {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

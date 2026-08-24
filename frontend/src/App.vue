@@ -295,7 +295,7 @@
             />
             <section
               v-if="!selectedType || selectedType === 'blog'"
-              class="blog-section reveal-on-scroll"
+              class="content-section blog-section reveal-on-scroll"
               id="blog"
               aria-labelledby="blog-title"
             >
@@ -333,7 +333,7 @@
         @add-testimonial="showTestimonialForm = true; playClick()"
       />
 
-      <section class="watch-section reveal-on-scroll" id="veille" aria-labelledby="veille-title">
+      <section class="content-section watch-section reveal-on-scroll" id="veille" aria-labelledby="veille-title">
         <div class="section-heading">
           <h2 id="veille-title">Veille automatique</h2>
         </div>

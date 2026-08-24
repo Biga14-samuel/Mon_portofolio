@@ -1,5 +1,5 @@
 <template>
-  <section id="temoignages" class="testimonials-section reveal-on-scroll" aria-labelledby="testimonials-title">
+  <section id="temoignages" class="content-section testimonials-section" aria-labelledby="testimonials-title">
     <div class="section-heading">
       <h2 id="testimonials-title">Selon leurs propres mots</h2>
     </div>
@@ -89,7 +89,6 @@ defineEmits(['toggle-visibility', 'delete', 'add-testimonial']);
 
 <style scoped>
 .testimonials-section {
-  margin: 6rem 0;
   position: relative;
   overflow: hidden;
 }
