@@ -125,35 +125,32 @@
         </div>
         <div class="about-lead">
           <h3>
-            Construire des infrastructures fiables, lisibles et prêtes à détecter les incidents avant qu'ils ne
-            deviennent critiques.
+            Construire, déployer et sécuriser des infrastructures fiables, résilientes et prêtes à contrer les menaces modernes.
           </h3>
           <p>
-            Jeune diplômé en Licence Professionnelle Réseaux et Sécurité Informatique à l'IHTM, je suis passionné par la conception d'architectures sécurisées et l'administration des systèmes. Ma récente expérience chez PANESS IT m'a permis de consolider mes acquis en déployant de A à Z un environnement complet de supervision et de réponse aux incidents.
+            Jeune ingénieur de réalisation en Réseaux et Sécurité Informatique (diplômé en Licence Professionnelle à l'IHTM), j'allie rigueur d'ingénierie terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d'architectures réseau haute disponibilité (Cisco, Fortinet), l'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.
           </p>
         </div>
         <div class="about-grid">
           <article class="about-card">
             <span>01</span>
-            <h3>Ce que je fais</h3>
+            <h3>Ce que je réalise</h3>
             <p>
-              Administration réseau et système, intégration SIEM/EDR, supervision sécurité, durcissement de services,
-              scripting Python/Bash et documentation technique exploitable.
+              Conception et déploiement d'architectures réseau sécurisées, intégration de SIEM/SOC (Wazuh, Suricata, Sysmon), durcissement (Hardening) de serveurs, segmentation VLAN/Firewalling et automatisation via scripts Python/Bash.
             </p>
           </article>
           <article class="about-card">
             <span>02</span>
-            <h3>Comment je travaille</h3>
+            <h3>Ma démarche d'ingénieur</h3>
             <p>
-              Je pars du besoin terrain, je schématise l'architecture, je teste par scénarios, puis je documente les
-              choix techniques pour rendre les solutions maintenables et transmissibles.
+              Approche méthodique : analyse des risques, modélisation topologique, validation rigoureuse par scénarios d'attaque/défense, puis formalisation d'une documentation technique claire et de playbooks opérationnels.
             </p>
           </article>
           <article class="about-card">
             <span>03</span>
-            <h3>Ce que je recherche</h3>
+            <h3>Ce que j'apporte</h3>
             <p>
-              Un environnement stimulant où je pourrai approfondir mon expertise terrain et participer activement au maintien en conditions de sécurité de l'infrastructure.
+              Une force de réalisation concrète au sein d'une équipe IT ou SOC, avec une capacité avérée à concevoir des infrastructures robustes, assurer leur maintien en conditions de sécurité et répondre efficacement aux incidents.
             </p>
           </article>
         </div>
@@ -880,9 +877,12 @@ const contactDraft = reactive({ email: '', subject: '', message: '' });
 const contactStatus = ref('');
 const contactError = ref('');
 const typedRoles = [
-  'Administrateur réseau & sécurité',
-  'IT Consultant',
+  'Ingénieur Réalisation Réseau & Sécurité',
+  'Administrateur Réseau & Sécurité',
   'SOC Analyst Junior',
+  'Consultant IT & Cybersécurité',
+  'Administrateur Systèmes Linux / Windows',
+  'Spécialiste Détection & Réponse aux Incidents',
 ];
 const currentRoleIndex = ref(0);
 const currentTypedText = ref('');
