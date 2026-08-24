@@ -1757,10 +1757,11 @@ td {
 
 .case-modal {
   position: relative;
-  width: min(1100px, calc(100vw - 32px));
-  max-height: min(860px, calc(100vh - 32px));
+  width: min(1360px, calc(100vw - 28px));
+  max-height: min(94vh, 1000px);
+  min-height: 80vh;
   overflow: auto;
-  border-radius: 20px;
+  border-radius: 24px;
   background: #fff;
   box-shadow: var(--shadow-lift);
   animation: modalSlideUp 400ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -2181,7 +2182,10 @@ td {
   }
 }/* Réalisations : une vitrine visuelle distincte du récit de parcours. */
 .case-modal--project {
-  background: #17111d;
+  width: min(1380px, calc(100vw - 24px));
+  max-height: min(95vh, 1080px);
+  min-height: 88vh;
+  background: #140d1a;
   color: #fdf8ff;
 }
 

