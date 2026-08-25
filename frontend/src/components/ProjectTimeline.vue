@@ -107,7 +107,10 @@
         <div class="soc-phase-center">
           <button
             class="soc-phase-marker"
-            :class="`soc-phase-marker--${phase.severity}`"
+            :class="[
+              `soc-phase-marker--${phase.severity}`,
+              { 'soc-phase-marker--active': activePhaseIdx === idx }
+            ]"
             type="button"
             :aria-label="`Voir les détails de la phase ${phase.number} : ${phase.title}`"
             @click="openModal(phase)"
@@ -116,7 +119,8 @@
           </button>
           <span
             class="soc-phase-number"
-            :class="idx % 2 === 0 ? 'soc-phase-number--left' : 'soc-phase-number--right'"
+            :class="idx % 2 === 0 ? 'soc-phase-number--right' : 'soc-phase-number--left'"
+            :style="phaseNumberStyle(phase, idx)"
           >{{ String(idx + 1).padStart(2, '0') }}</span>
         </div>
 
@@ -453,22 +457,39 @@ const activeTab = ref('phases'); // 'phases' | 'scenarios' | 'topology'
 const wrapperEl = ref(null);
 const termCmdEl = ref(null);
 const activePhase = ref(null);
-const visiblePhaseIndices = ref([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-const lineProgress = ref(100);
+const visiblePhaseIndices = ref([]);
+const lineProgress = ref(0);
 
-// Couleur de la ligne selon la sévérité de la phase courante (dernière visible)
+// ── Couleurs par sévérité ──────────────────────
 const SEVERITY_COLORS = {
   info:     '#38bdf8',
   high:     '#e95420',
   critical: '#ef4444',
   medium:   '#c084fc',
 };
-const lineColor = computed(() => {
-  if (visiblePhaseIndices.value.length === 0) return SEVERITY_COLORS.info;
-  const maxIdx = Math.max(...visiblePhaseIndices.value);
-  const phase  = phases[maxIdx];
-  return SEVERITY_COLORS[phase?.severity] ?? SEVERITY_COLORS.info;
+
+// Index de la phase que le « niveau d'eau » a atteint
+const activePhaseIdx = computed(() => {
+  const n = phases.length;
+  return Math.min(n - 1, Math.floor((lineProgress.value / 100) * n));
 });
+
+// Couleur de la ligne = sévérité de la phase active
+const lineColor = computed(() => {
+  return SEVERITY_COLORS[phases[activePhaseIdx.value]?.severity] ?? SEVERITY_COLORS.info;
+});
+
+// Style du badge numéro de phase
+function phaseNumberStyle(phase, idx) {
+  const color = SEVERITY_COLORS[phase.severity] ?? '#38bdf8';
+  const isActive = activePhaseIdx.value === idx;
+  return {
+    color,
+    borderColor: isActive ? color : `${color}55`,
+    boxShadow: isActive ? `0 0 10px ${color}88` : 'none',
+    background: isActive ? `${color}22` : 'rgba(10,5,20,0.7)',
+  };
+}
 
 // ──────────────────────────────────────────────
 // KPIs du mémoire
@@ -1144,9 +1165,10 @@ const topologyVms = [
 ];
 
 // ──────────────────────────────────────────────
-// Scroll Reveal & Line Progress
+// Scroll Reveal & Line Progress (niveau d'eau)
 // ──────────────────────────────────────────────
 let observer;
+let trackEl = null;
 
 function openModal(phase) {
   activePhase.value = phase;
@@ -1158,20 +1180,37 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
-onMounted(() => {
-  // Fallback : rendre toutes les phases visibles après 400ms même sans scroll
-  const revealAll = () => {
-    phases.forEach((_, idx) => {
-      setTimeout(() => {
-        if (!visiblePhaseIndices.value.includes(idx)) {
-          visiblePhaseIndices.value.push(idx);
-        }
-        lineProgress.value = Math.round(((idx + 1) / phases.length) * 100);
-      }, idx * 120);
-    });
-  };
+// --- Calcul du niveau d'eau basé sur la position de scroll réelle ---
+function updateWaterLevel() {
+  if (!trackEl) return;
+  const rect = trackEl.getBoundingClientRect();
+  const wh   = window.innerHeight;
 
-  // IntersectionObserver sur le wrapper local
+  // On remplit la ligne entre le moment où le haut du track entre dans
+  // le viewport (à 80% depuis le haut) et le moment où son bas en sort (à 20%).
+  const fillStart = wh * 0.78; // point de départ : haut du track à 78% viewport
+  const scrolled  = fillStart - rect.top;  // distance parcourue
+  const progress  = Math.max(0, Math.min(100, (scrolled / rect.height) * 100));
+
+  lineProgress.value = Math.round(progress);
+
+  // Révéler les cartes de phase au fur et à mesure
+  const reached = Math.floor((progress / 100) * phases.length);
+  for (let i = 0; i <= reached && i < phases.length; i++) {
+    if (!visiblePhaseIndices.value.includes(i)) {
+      visiblePhaseIndices.value.push(i);
+    }
+  }
+}
+
+onMounted(() => {
+  trackEl = wrapperEl.value?.querySelector('.soc-timeline-track') ?? null;
+
+  // Écoute du scroll window pour l'effet niveau d'eau
+  window.addEventListener('scroll', updateWaterLevel, { passive: true });
+  updateWaterLevel(); // calcul initial (cas où la page est déjà scrollée)
+
+  // IntersectionObserver pour révéler les cartes en cas de scroll rapide
   if (wrapperEl.value) {
     observer = new IntersectionObserver(
       (entries) => {
@@ -1179,24 +1218,15 @@ onMounted(() => {
           if (entry.isIntersecting) {
             const idx = parseInt(entry.target.dataset.phaseIdx, 10);
             if (!isNaN(idx) && !visiblePhaseIndices.value.includes(idx)) {
-              setTimeout(() => {
-                visiblePhaseIndices.value.push(idx);
-                const maxIdx = Math.max(...visiblePhaseIndices.value);
-                lineProgress.value = Math.round(((maxIdx + 1) / phases.length) * 100);
-              }, 80);
+              visiblePhaseIndices.value.push(idx);
             }
           }
         });
       },
-      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+      { threshold: 0.05, rootMargin: '0px 0px -20px 0px' },
     );
     wrapperEl.value.querySelectorAll('.soc-phase-row').forEach((el) => observer.observe(el));
   }
-
-  // On déclenche le fallback au bout de 300ms si l'observer n'a rien capté
-  setTimeout(() => {
-    if (visiblePhaseIndices.value.length === 0) revealAll();
-  }, 300);
 
   // Animation typographie terminal
   if (termCmdEl.value) {
@@ -1215,6 +1245,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   observer?.disconnect();
+  window.removeEventListener('scroll', updateWaterLevel);
   document.body.style.overflow = '';
 });
 </script>
@@ -1362,7 +1393,7 @@ onBeforeUnmount(() => {
   height: 0;
   /* couleur et box-shadow injectés dynamiquement via :style */
   border-radius: 4px;
-  transition: height 0.5s ease, background 0.6s ease, box-shadow 0.6s ease;
+  transition: height 0.12s linear, background 0.5s ease, box-shadow 0.5s ease;
 }
 
 /* ══════════════════════════════════════════════
@@ -1402,28 +1433,31 @@ onBeforeUnmount(() => {
 
 .soc-phase-number {
   position: absolute;
-  top: 60px; /* sous le marqueur (52px + 8px gap) */
+  top: 68px; /* sous le marqueur (52px + 8px gap + 8px margin) */
   font-family: 'Ubuntu Mono', monospace;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.55);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   white-space: nowrap;
-  /* par défaut centré — décalé selon la classe */
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
+  /* fallback centré */
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* Phase paire (carte à gauche) : numéro à droite de la ligne */
+/* Phase paire (idx%2===0 → phase-row--left, carte à gauche) : numéro dans l'espace vide à droite */
 .soc-phase-number--right {
   left: auto;
-  right: -28px;
+  right: -42px;
   transform: none;
 }
 
-/* Phase impaire (carte à droite) : numéro à gauche de la ligne */
+/* Phase impaire (idx%2===1 → phase-row--right, carte à droite) : numéro dans l'espace vide à gauche */
 .soc-phase-number--left {
-  left: -28px;
+  left: -42px;
   transform: none;
 }
 
@@ -1444,9 +1478,19 @@ onBeforeUnmount(() => {
 
 .soc-phase-marker:hover,
 .soc-phase-marker:focus-visible {
-  transform: scale(1.2);
+  transform: scale(1.18);
   outline: none;
 }
+
+/* Phase active : pulsation douce autour du marqueur courant */
+.soc-phase-marker--active {
+  transform: scale(1.1);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+}
+.soc-phase-marker--active.soc-phase-marker--info     { box-shadow: 0 0 0 4px rgba(56,189,248,0.25),  0 0 24px rgba(56,189,248,0.4); }
+.soc-phase-marker--active.soc-phase-marker--high     { box-shadow: 0 0 0 4px rgba(233,84,32,0.25),   0 0 24px rgba(233,84,32,0.4); }
+.soc-phase-marker--active.soc-phase-marker--critical { box-shadow: 0 0 0 4px rgba(239,68,68,0.25),   0 0 24px rgba(239,68,68,0.4); }
+.soc-phase-marker--active.soc-phase-marker--medium   { box-shadow: 0 0 0 4px rgba(192,132,252,0.25), 0 0 24px rgba(192,132,252,0.4); }
 
 .soc-phase-marker--critical {
   border-color: #ef4444;
