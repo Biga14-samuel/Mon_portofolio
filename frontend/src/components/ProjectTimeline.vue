@@ -84,7 +84,7 @@
     <div v-show="activeTab === 'phases'" class="soc-timeline-track" role="list">
       <!-- Ligne verticale centrale -->
       <div class="soc-center-line" aria-hidden="true">
-        <div class="soc-center-line__fill" :style="{ height: lineProgress + '%' }"></div>
+        <div class="soc-center-line__fill" :style="{ height: lineProgress + '%', background: lineColor, boxShadow: '0 0 12px ' + lineColor + '80' }"></div>
       </div>
 
       <!-- ITEMS ALTERNANT GAUCHE / DROITE -->
@@ -114,7 +114,10 @@
           >
             <component :is="phase.icon" :size="18" />
           </button>
-          <span class="soc-phase-number">{{ String(idx + 1).padStart(2, '0') }}</span>
+          <span
+            class="soc-phase-number"
+            :class="idx % 2 === 0 ? 'soc-phase-number--left' : 'soc-phase-number--right'"
+          >{{ String(idx + 1).padStart(2, '0') }}</span>
         </div>
 
         <!-- Carte du contenu -->
@@ -216,23 +219,23 @@
           <!-- Détails cibles & vecteurs -->
           <div class="soc-sc-meta-grid">
             <div class="soc-sc-meta-item">
-              <span class="soc-sc-meta-label">🔴 Attaquant :</span>
+              <span class="soc-sc-meta-label">Attaquant :</span>
               <span class="soc-sc-meta-val code-text">{{ sc.attacker }}</span>
             </div>
             <div class="soc-sc-meta-item">
-              <span class="soc-sc-meta-label">🎯 Cible(s) :</span>
+              <span class="soc-sc-meta-label">Cible(s) :</span>
               <span class="soc-sc-meta-val code-text">{{ sc.target }}</span>
             </div>
             <div class="soc-sc-meta-item full-width">
-              <span class="soc-sc-meta-label">⚡ Vecteur d'attaque :</span>
+              <span class="soc-sc-meta-label">Vecteur d'attaque :</span>
               <span class="soc-sc-meta-val">{{ sc.vector }}</span>
             </div>
             <div class="soc-sc-meta-item full-width">
-              <span class="soc-sc-meta-label">🛡️ Détection &amp; Déclencheur :</span>
+              <span class="soc-sc-meta-label">Détection &amp; Déclencheur :</span>
               <span class="soc-sc-meta-val">{{ sc.detection }}</span>
             </div>
             <div class="soc-sc-meta-item full-width">
-              <span class="soc-sc-meta-label">⚡ Réponse Automatisée :</span>
+              <span class="soc-sc-meta-label">Réponse Automatisée :</span>
               <span class="soc-sc-meta-val highlight-val">{{ sc.response }}</span>
             </div>
           </div>
@@ -419,7 +422,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import {
   ShieldCheck,
   ShieldAlert,
@@ -453,6 +456,20 @@ const activePhase = ref(null);
 const visiblePhaseIndices = ref([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 const lineProgress = ref(100);
 
+// Couleur de la ligne selon la sévérité de la phase courante (dernière visible)
+const SEVERITY_COLORS = {
+  info:     '#38bdf8',
+  high:     '#e95420',
+  critical: '#ef4444',
+  medium:   '#c084fc',
+};
+const lineColor = computed(() => {
+  if (visiblePhaseIndices.value.length === 0) return SEVERITY_COLORS.info;
+  const maxIdx = Math.max(...visiblePhaseIndices.value);
+  const phase  = phases[maxIdx];
+  return SEVERITY_COLORS[phase?.severity] ?? SEVERITY_COLORS.info;
+});
+
 // ──────────────────────────────────────────────
 // KPIs du mémoire
 // ──────────────────────────────────────────────
@@ -461,7 +478,7 @@ const kpis = [
   { value: '5', label: 'VMs VirtualBox NAT' },
   { value: '4', label: 'Scénarios d\'attaque validés' },
   { value: '< 3s', label: 'Temps de réponse aux incidents' },
-  { value: '0 €', label: 'Coût licences logicielles' },
+  { value: '0 FCFA', label: 'Coût licences logicielles' },
   { value: '7', label: 'Outils SOC intégrés' },
 ];
 
@@ -494,7 +511,7 @@ Infrastructure : VirtualBox NAT 192.168.100.0/24
 Auteur        : Samnick Biga Raoul Aubin
 Encadreur pro : M. Awouafack Fabien (PANESS)
 Encadreur acad: M. Teka Wilfried (IHTM)
-Objectif      : SOC/SIEM/EDR complet 0€ de licences`,
+Objectif      : SOC/SIEM/EDR complet 0 FCFA de licences`,
     playbook: `# Architecture VirtualBox NAT — 5 Machines Virtuelles
 wazuh-server  : Amazon Linux 2023 (OVA)  — 192.168.100.10
 soc-services  : Ubuntu 24.04 (Docker)    — 192.168.100.20
@@ -831,7 +848,7 @@ def query_deepseek(description: str) -> str:
     severity: 'medium',
     snippetLabel: 'custom-wazuh_iris.py + custom-telegram.py',
     body: 'Création automatique de dossiers d\'incident structurés dans DFIR-IRIS via webhook lors de toute alerte critique. Simultanément, le bot Telegram envoie une notification instantanée formatée sur smartphone. Les analystes SOC sont alertés en temps réel sans avoir à consulter le dashboard Wazuh.',
-    snippet: `[SOC PANESS] 🔴 Alerte CRITIQUE (Niveau 12)
+    snippet: `[SOC PANESS] [ALERTE CRITIQUE] (Niveau 12)
 Règle: 100210 — Commande suspecte (nc)
 Agent: agent-linux (192.168.100.30)
 Heure: 2026-06-29T14:42:53Z
@@ -848,7 +865,7 @@ CHAT_ID   = "VOTRE-CHAT-ID"
 def format_alert(alert: dict) -> str:
     rule  = alert.get("rule", {})
     level = rule.get("level", 0)
-    severity = "🔴 CRITIQUE" if level >= 12 else "🟠 ÉLEVÉ" if level >= 7 else "🟡 MOYEN"
+    severity = "[CRITIQUE]" if level >= 12 else "[ELEVE]" if level >= 7 else "[MOYEN]"
     msg  = f"*[SOC PANESS]* {severity} (Niv.{level})\n"
     msg += f"Règle: {rule.get('id')} — {rule.get('description')}\n"
     msg += f"Agent: {alert.get('agent',{}).get('name')} ({alert.get('agent',{}).get('ip')})\n"
@@ -1060,7 +1077,7 @@ socat:red`,
 </integration>
 
 # Message Telegram envoyé automatiquement aux analystes
-🔴 *[SOC PANESS IT]* ALERTE CRITIQUE (Niveau 15)
+[ALERTE CRITIQUE] (Niveau 15) — SOC PANESS IT
 Règle: 108001 — YARA Malware détecté & supprimé
 Hôte: agent-linux (192.168.100.30)
 Ticket IRIS: Case #3
@@ -1342,10 +1359,10 @@ onBeforeUnmount(() => {
 
 .soc-center-line__fill {
   width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, #e95420 0%, #a855f7 50%, #e95420 100%);
+  height: 0;
+  /* couleur et box-shadow injectés dynamiquement via :style */
   border-radius: 4px;
-  box-shadow: 0 0 12px rgba(233, 84, 32, 0.6);
+  transition: height 0.5s ease, background 0.6s ease, box-shadow 0.6s ease;
 }
 
 /* ══════════════════════════════════════════════
@@ -1384,11 +1401,30 @@ onBeforeUnmount(() => {
 }
 
 .soc-phase-number {
+  position: absolute;
+  top: 60px; /* sous le marqueur (52px + 8px gap) */
   font-family: 'Ubuntu Mono', monospace;
   font-size: 12px;
   font-weight: 800;
-  color: #ff9d6c;
+  color: rgba(255, 255, 255, 0.55);
   letter-spacing: 0.05em;
+  white-space: nowrap;
+  /* par défaut centré — décalé selon la classe */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Phase paire (carte à gauche) : numéro à droite de la ligne */
+.soc-phase-number--right {
+  left: auto;
+  right: -28px;
+  transform: none;
+}
+
+/* Phase impaire (carte à droite) : numéro à gauche de la ligne */
+.soc-phase-number--left {
+  left: -28px;
+  transform: none;
 }
 
 /* Marqueur cliquable */
