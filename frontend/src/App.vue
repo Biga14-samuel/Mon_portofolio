@@ -419,7 +419,13 @@
     <div v-if="caseStudyItem" class="modal-backdrop" role="presentation" @click.self="closeCaseStudy(); playClick()">
       <section
         ref="caseModal"
-        :class="['case-modal', { 'case-modal--project': normalizeType(caseStudyItem.type) === 'realisation' }]"
+        :class="[
+          'case-modal', 
+          { 
+            'case-modal--project': normalizeType(caseStudyItem.type) === 'realisation',
+            'case-modal--skill': normalizeType(caseStudyItem.type) === 'competence'
+          }
+        ]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="case-title"
@@ -434,7 +440,9 @@
             <span>Retour</span>
           </button>
         </div>
-        <div class="case-hero" :class="{ 'case-hero--has-image': Boolean(casePrimaryImage) }">
+
+        <!-- En-tête générique pour réalisation, parcours et blog (la fiche compétence a son propre en-tête dédié) -->
+        <div v-if="normalizeType(caseStudyItem.type) !== 'competence'" class="case-hero" :class="{ 'case-hero--has-image': Boolean(casePrimaryImage) }">
           <div class="case-hero-copy" :style="storyStyle(0)">
             <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
             <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
@@ -524,16 +532,18 @@
 
         <!-- ===== COMPETENCE / STACK & OUTILS: Vue Fiche Technique & Bento Interactive ===== -->
         <template v-else-if="normalizeType(caseStudyItem.type) === 'competence'">
-          <SkillDetailView
-            :item="caseStudyItem"
-            :sections="activeCaseStudy"
-            :stack="caseStudyStack"
-            :pdf-url="casePdfUrl"
-            :primary-image="casePrimaryImage"
-            :detail-images="caseDetailImages"
-            @open-lightbox="(imgs, idx, title) => { openImageViewer(imgs, idx, title); playClick(); }"
-            @close="closeCaseStudy(); playClick()"
-          />
+          <div class="case-skill-body">
+            <SkillDetailView
+              :item="caseStudyItem"
+              :sections="activeCaseStudy"
+              :stack="caseStudyStack"
+              :pdf-url="casePdfUrl"
+              :primary-image="casePrimaryImage"
+              :detail-images="caseDetailImages"
+              @open-lightbox="(imgs, idx, title) => { openImageViewer(imgs, idx, title); playClick(); }"
+              @close="closeCaseStudy(); playClick()"
+            />
+          </div>
         </template>
 
         <!-- ===== PARCOURS & BLOG: Vue classique chronologique / article ===== -->

@@ -2127,6 +2127,23 @@ td {
 .case-modal--project .case-resources { margin-bottom: 0; border-radius: 0; border-width: 1px 0 0; background: #211724; }
 .case-modal--project .case-resources strong { color: #fff; }
 
+.case-modal--skill {
+  width: min(1480px, calc(100vw - 36px));
+  background: #fdfbfd;
+}
+
+.case-modal--skill .case-nav-header {
+  padding: 16px clamp(20px, 3.5vw, 48px) 12px;
+  background: rgba(253, 251, 253, 0.96);
+  border-bottom: 1px solid rgba(119, 33, 111, 0.08);
+}
+
+.case-skill-body {
+  padding: 24px clamp(20px, 3.5vw, 48px) 48px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 @media (max-width: 760px) {
   .case-modal--project .case-hero { grid-template-columns: 1fr; min-height: 0; }
   .case-modal--project .case-main-visual { width: 100%; justify-self: stretch; transform: none; }
@@ -2134,6 +2151,7 @@ td {
   .project-shot:first-child { grid-column: span 2; min-height: 250px; }
   .project-shot { min-height: 130px; }
   .case-modal--project .case-layout { grid-template-columns: 1fr; }
+  .case-skill-body { padding: 16px 14px 32px; }
 }
 .contact-section {
   width: min(1160px, calc(100% - 32px));
