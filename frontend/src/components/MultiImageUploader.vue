@@ -21,10 +21,16 @@
         <strong>Galerie d’images</strong>
         <p>Glissez plusieurs images ou cliquez pour en ajouter. Les vignettes servent de galerie dans le détail.</p>
       </div>
-      <button type="button" class="add-image-button" :disabled="loading" @click.stop="triggerFileSelect">
-        <Plus :size="16" aria-hidden="true" />
-        Ajouter
-      </button>
+      <div class="multi-image-actions">
+        <button v-if="normalizedImages.length" type="button" class="remove-all-button" :disabled="loading" @click.stop="removeAllImages">
+          <Trash2 :size="15" aria-hidden="true" />
+          Tout retirer
+        </button>
+        <button type="button" class="add-image-button" :disabled="loading" @click.stop="triggerFileSelect">
+          <Plus :size="16" aria-hidden="true" />
+          Ajouter
+        </button>
+      </div>
     </div>
 
     <div v-if="loading" class="multi-image-status">
@@ -146,6 +152,13 @@ function removeImage(index) {
   nextImages.splice(index, 1);
   updateImages(nextImages);
 }
+
+function removeAllImages() {
+  updateImages([]);
+  if (fileInput.value) {
+    fileInput.value.value = '';
+  }
+}
 </script>
 
 <style scoped>
@@ -189,6 +202,33 @@ function removeImage(index) {
   line-height: 1.45;
 }
 
+.multi-image-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.remove-all-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.remove-all-button:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
 .add-image-button {
   display: inline-flex;
   align-items: center;
@@ -202,7 +242,8 @@ function removeImage(index) {
   cursor: pointer;
 }
 
-.add-image-button:disabled {
+.add-image-button:disabled,
+.remove-all-button:disabled {
   opacity: 0.65;
   cursor: progress;
 }

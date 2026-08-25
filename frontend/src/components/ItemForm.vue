@@ -37,18 +37,18 @@
 
     <div class="form-row">
       <label>
-        Lien GitHub (optionnel)
+        {{ form.type === 'realisation' ? 'Lien GitHub / Dépôt (optionnel)' : 'Lien GitHub / Code source (optionnel)' }}
         <input v-model.trim="form.github_url" type="url" maxlength="500" placeholder="https://github.com/..." />
       </label>
       <label>
-        Lien Démo (optionnel)
+        {{ form.type === 'realisation' ? 'Lien Démo / En ligne (optionnel)' : form.type === 'parcours' ? 'Lien Site Web / Organisme (optionnel)' : 'Lien Démo / Accès (optionnel)' }}
         <input v-model.trim="form.demo_url" type="url" maxlength="500" placeholder="https://..." />
       </label>
     </div>
 
     <div class="form-row">
       <label>
-        Image de couverture (Optionnel)
+        {{ form.type === 'parcours' ? 'Image / Logo de structure (Optionnel)' : 'Image de couverture (Optionnel)' }}
         <ImageUploader v-model="form.image_url" @upload-error="handleUploadError" />
       </label>
       <label>
@@ -76,19 +76,19 @@
           <input v-model="form.content.tools" placeholder="Ex: Wazuh, Cisco, Linux (séparés par virgules)" />
         </label>
         <label>
-          Media / Illustration / Certificat
+          {{ form.type === 'parcours' ? 'Attestation / Diplôme / Media (Optionnel)' : 'Media / Illustration / Schéma (Optionnel)' }}
           <ImageUploader v-model="form.content.architecture_image" @upload-error="handleUploadError" />
         </label>
       </div>
 
       <label>
-        Galerie d'images / miniatures
+        Galerie d'images / Captures d'écran (Optionnel)
         <MultiImageUploader v-model="form.content.gallery_images" @upload-error="handleUploadError" />
       </label>
 
-      <label v-if="form.type === 'blog' || form.type === 'realisation'">
-        {{ form.type === 'realisation' ? 'Documentation PDF du projet' : "PDF de l'article" }}
-        <FileUploader v-model="form.content.pdf_url" accept="application/pdf" label="PDF de l'article" @upload-error="handleUploadError" />
+      <label v-if="form.type === 'blog' || form.type === 'realisation' || form.type === 'parcours'">
+        {{ form.type === 'realisation' ? 'Documentation / Mémoire PDF' : form.type === 'parcours' ? 'Attestation / Certificat PDF' : "PDF de l'article" }}
+        <FileUploader v-model="form.content.pdf_url" accept="application/pdf" :label="form.type === 'realisation' ? 'Mémoire ou Documentation PDF' : 'Document PDF'" @upload-error="handleUploadError" />
       </label>
 
       <label>

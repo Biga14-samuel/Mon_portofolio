@@ -10,8 +10,18 @@
         <span>{{ fileName }}</span>
         <small>{{ acceptLabel }}</small>
       </div>
+      <button 
+        type="button" 
+        class="uploader-delete-btn" 
+        title="Supprimer ce fichier" 
+        aria-label="Supprimer ce fichier"
+        @click.stop="removeFile"
+      >
+        <Trash2 :size="15" aria-hidden="true" />
+        <span>Supprimer</span>
+      </button>
       <div class="uploader-overlay">
-        <p>Cliquez ou glissez pour modifier</p>
+        <p>Cliquer pour changer de fichier</p>
       </div>
     </div>
     <div v-else class="uploader-content empty">
@@ -24,6 +34,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { Trash2 } from 'lucide-vue-next';
 import { uploadFile } from '../services/api';
 import { authState } from '../store/auth';
 
@@ -90,6 +101,13 @@ async function processFile(file) {
     loading.value = false;
   }
 }
+
+function removeFile() {
+  emit('update:modelValue', '');
+  if (fileInput.value) {
+    fileInput.value.value = '';
+  }
+}
 </script>
 
 <style scoped>
@@ -126,6 +144,33 @@ async function processFile(file) {
 .uploader-content.has-file { position: relative; }
 .file-preview { display: grid; gap: 0.35rem; }
 .file-preview span { font-weight: 700; color: var(--aubergine-dark); }
+
+.uploader-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: rgba(220, 38, 38, 0.9);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+.uploader-delete-btn:hover {
+  background: rgb(239, 68, 68);
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+}
+
 .uploader-overlay {
   position: absolute;
   inset: 0;

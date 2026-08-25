@@ -458,10 +458,10 @@
             <PillBadge :tone="tagTone(caseStudyItem.category)">{{ stripEmojis(caseStudyItem.category) }}</PillBadge>
             <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
             <p>{{ stripEmojis(caseStudyItem.description) }}</p>
-            <div v-if="normalizeType(caseStudyItem.type) === 'realisation' && (caseStudyItem.demo_url || caseStudyItem.github_url || casePdfUrl)" class="project-quick-actions">
+            <div v-if="normalizeType(caseStudyItem.type) === 'realisation' && (caseStudyItem.demo_url || caseStudyItem.github_url || (!isSocProject && casePdfUrl))" class="project-quick-actions">
               <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="project-action project-action--primary" @click="playClick" @mouseenter="playHover"><ExternalLink :size="18" aria-hidden="true" /><span>Voir la démo</span></a>
               <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><Github :size="18" aria-hidden="true" /><span>Code source</span></a>
-              <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><FileText :size="18" aria-hidden="true" /><span>Documentation PDF</span></a>
+              <a v-if="!isSocProject && casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><FileText :size="18" aria-hidden="true" /><span>Documentation PDF</span></a>
             </div>
           </div>
           <figure v-if="casePrimaryImage" class="case-hero-visual case-main-visual" :class="{ 'is-loaded': caseHeroImageLoaded }" :style="storyStyle(1)">
@@ -528,17 +528,17 @@
                 </article>
               </div>
             </div>
-          </template>
 
-          <!-- Resources (always shown for realisations) -->
-          <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle(10)">
-            <strong>Ressources du projet</strong>
-            <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-               <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
-               <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Documentation PDF</a>
-               <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
+            <!-- Resources (shown for non-SOC realisations) -->
+            <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle(10)">
+              <strong>Ressources du projet</strong>
+              <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                 <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
+                 <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Documentation PDF</a>
+                 <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
+              </div>
             </div>
-          </div>
+          </template>
         </template>
 
         <!-- ===== NON-REALISATION: Vue classique (parcours, competence, blog) ===== -->
