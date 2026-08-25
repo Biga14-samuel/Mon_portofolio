@@ -31,11 +31,13 @@
           </div>
           <div class="testimonial-author">
             <div class="author-info">
-              <span v-if="t.client_company">{{ t.client_company }}</span>
-              <strong v-else>{{ t.client_name }}</strong>
-              <a v-if="t.linkedin_url" :href="t.linkedin_url" target="_blank" rel="noreferrer" title="Profil LinkedIn" class="linkedin-link">
-                in
-              </a>
+              <div class="author-header">
+                <strong class="author-name">{{ t.client_name }}</strong>
+                <a v-if="t.linkedin_url" :href="t.linkedin_url" target="_blank" rel="noreferrer" title="Profil LinkedIn" class="linkedin-link">
+                  in
+                </a>
+              </div>
+              <span v-if="t.client_company" class="author-role">{{ t.client_company }}</span>
             </div>
             <div class="author-avatar" :title="t.client_name">
               {{ t.client_name.charAt(0) }}
@@ -169,20 +171,28 @@ defineEmits(['toggle-visibility', 'delete', 'add-testimonial']);
 
 .author-info {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
 }
 
-.author-info span {
-  font-size: 1.1rem;
+.author-header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.author-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--aubergine-dark);
+}
+
+.author-role {
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--muted);
-}
-
-.author-info strong {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--aubergine-dark);
+  line-height: 1.35;
 }
 
 .linkedin-link {

@@ -651,19 +651,19 @@
           <form @submit.prevent="handleCreateTestimonial">
             <label>
               Votre nom complet *
-              <input v-model.trim="testimonialDraft.client_name" required minlength="2" maxlength="140" />
+              <input v-model.trim="testimonialDraft.client_name" required minlength="2" maxlength="140" placeholder="Ex: Jean Dupont" />
             </label>
             <label>
-              Votre entreprise ou poste (optionnel)
-              <input v-model.trim="testimonialDraft.client_company" maxlength="140" />
+              Votre profession, entreprise ou poste (optionnel)
+              <input v-model.trim="testimonialDraft.client_company" maxlength="140" placeholder="Ex: Responsable SOC chez TechCorp, Ingénieur Cybersécurité, Consultant IT..." />
             </label>
             <label>
               Lien de votre profil LinkedIn (optionnel)
               <input v-model.trim="testimonialDraft.linkedin_url" type="url" maxlength="500" placeholder="https://linkedin.com/in/..." />
             </label>
             <label>
-              Votre message *
-              <textarea v-model.trim="testimonialDraft.content" required minlength="5" maxlength="2000" rows="5"></textarea>
+              Votre message / retour d'expérience *
+              <textarea v-model.trim="testimonialDraft.content" required minlength="5" maxlength="2000" rows="5" placeholder="Partagez votre avis, recommandation ou retour d'expérience..."></textarea>
             </label>
             <div class="form-actions">
               <button class="button secondary" type="button" @click="closeTestimonialModal(); playClick()" @mouseenter="playHover">Annuler</button>
