@@ -1,5 +1,5 @@
 <template>
-  <section class="content-section stack-section reveal-on-scroll" :id="id" :aria-labelledby="`${id}-title`">
+  <section class="content-section stack-section blueprint-bg reveal-on-scroll" :id="id" :aria-labelledby="`${id}-title`">
     <div class="section-heading">
       <h2 :id="`${id}-title`">
         <span>Stack &amp; Outils</span>
@@ -25,7 +25,7 @@
           </span>
         </div>
 
-        <!-- Grille fluide de cartes d'outils minimalistes et lisibles -->
+        <!-- Grille fluide de cartes d'outils minimalistes et ultra lisibles -->
         <div class="stack-items-grid">
           <article 
             v-for="item in group.items" 
@@ -153,13 +153,28 @@ function getToolsList(item) {
 </script>
 
 <style scoped>
-.stack-section {
+.stack-section.blueprint-bg {
   position: relative;
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto 80px;
+  padding: clamp(28px, 5vw, 44px);
+  border-radius: 24px;
+  background-color: var(--ubuntu-orange);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 28px 28px;
+  border: 1px solid rgba(169, 46, 7, 0.35);
+  box-shadow: 0 24px 52px rgba(169, 46, 7, 0.22);
+}
+
+.stack-section.blueprint-bg .section-heading h2 {
+  color: #ffffff;
 }
 
 .stack-intro {
   margin: 0.5rem 0 2rem;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 1.05rem;
   line-height: 1.5;
   max-width: 720px;
@@ -174,15 +189,16 @@ function getToolsList(item) {
 .stack-group-card {
   padding: 1.75rem 2rem;
   border-radius: 1.25rem;
-  background: var(--surface-card);
-  border: 1px solid var(--outline);
-  box-shadow: var(--shadow);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  background: rgba(255, 255, 255, 0.93);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(44, 0, 30, 0.14);
+  backdrop-filter: blur(12px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .stack-group-card:hover {
-  border-color: rgba(233, 84, 32, 0.3);
-  box-shadow: var(--shadow-lift);
+  box-shadow: 0 14px 40px rgba(44, 0, 30, 0.2);
+  transform: translateY(-2px);
 }
 
 .stack-group-header {
@@ -192,7 +208,7 @@ function getToolsList(item) {
   gap: 1rem;
   margin-bottom: 1.5rem;
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(119, 33, 111, 0.12);
 }
 
 .stack-group-title-area {
@@ -203,8 +219,8 @@ function getToolsList(item) {
 
 .stack-group-count {
   font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--muted);
+  font-weight: 700;
+  color: var(--aubergine);
 }
 
 .stack-items-grid {
@@ -214,22 +230,22 @@ function getToolsList(item) {
 }
 
 .stack-card {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: #ffffff;
+  border: 1px solid rgba(119, 33, 111, 0.14);
   border-radius: 1rem;
   padding: 1.35rem 1.4rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
 .stack-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(233, 84, 32, 0.4);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  background: var(--surface-1);
+  border-color: var(--ubuntu-orange);
+  box-shadow: 0 8px 24px rgba(233, 84, 32, 0.2);
 }
 
 .stack-card-header {
