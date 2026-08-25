@@ -648,10 +648,41 @@
       </div>
       <div class="footer-right">
         <span class="footer-clock">{{ clockLabel }}</span>
-        <div class="footer-socials">
-          <a href="https://www.linkedin.com/in/aubinbiga" target="_blank" rel="noreferrer">LinkedIn</a>
-          <a href="https://github.com/Biga14-samuel" target="_blank" rel="noreferrer">GitHub</a>
-          <a href="mailto:samuelbiga10@gmail.com">Email</a>
+        <div class="footer-socials" aria-label="Réseaux sociaux et contact">
+          <a
+            href="https://github.com/Biga14-samuel"
+            target="_blank"
+            rel="noreferrer"
+            class="footer-social-btn"
+            aria-label="GitHub"
+            title="GitHub"
+            @mouseenter="playHover"
+            @click="playClick"
+          >
+            <Github :size="19" aria-hidden="true" />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/aubinbiga"
+            target="_blank"
+            rel="noreferrer"
+            class="footer-social-btn"
+            aria-label="LinkedIn"
+            title="LinkedIn"
+            @mouseenter="playHover"
+            @click="playClick"
+          >
+            <Linkedin :size="19" aria-hidden="true" />
+          </a>
+          <a
+            href="mailto:samuelbiga10@gmail.com"
+            class="footer-social-btn"
+            aria-label="Gmail / Email"
+            title="Envoyer un email"
+            @mouseenter="playHover"
+            @click="playClick"
+          >
+            <Mail :size="19" aria-hidden="true" />
+          </a>
         </div>
       </div>
       <p class="footer-copy">© 2026 Raoul BIGA. Tous droits réservés.</p>
@@ -671,7 +702,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, X, SearchX } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import ItemCard from './components/ItemCard.vue';
