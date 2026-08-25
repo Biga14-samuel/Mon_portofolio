@@ -207,123 +207,78 @@
         </div>
       </section>
 
-      <section class="filter-band reveal-on-scroll" aria-label="Filtrer le portfolio">
-        <button
-          v-for="filter in filters"
-          :key="filter.value"
-          class="filter-pill"
-          :class="{ active: selectedType === filter.value }"
-          type="button"
-          :aria-pressed="selectedType === filter.value"
-          @click="selectedType = filter.value; playClick()"
-          @mouseenter="playHover"
-        >
-          {{ filter.label }}
-        </button>
-      </section>
-
-      <section v-if="categoryFilters.length" class="filter-band compact reveal-on-scroll" aria-label="Filtrer par tag">
-        <button
-          class="filter-pill small"
-          :class="{ active: selectedCategory === '' }"
-          type="button"
-          :aria-pressed="selectedCategory === ''"
-          @click="selectedCategory = ''; playClick()"
-          @mouseenter="playHover"
-        >
-          Tous les tags
-        </button>
-        <button
-          v-for="category in categoryFilters"
-          :key="category"
-          class="filter-pill"
-          :class="[{ active: selectedCategory === category }, tagTone(category)]"
-          type="button"
-          :aria-pressed="selectedCategory === category"
-          @click="selectedCategory = category; playClick()"
-          @mouseenter="playHover"
-        >
-          <span style="margin-right: 4px;" aria-hidden="true">{{ getCategoryIcon(category) }}</span>{{ category }}
-        </button>
-      </section>
-
-      <Transition name="filter-swap" mode="out-in" @after-enter="setupScrollReveal">
-        <div :key="`${selectedType}-${selectedCategory}`" class="portfolio-results">
-          <div v-if="loading" class="skeleton-container" aria-label="Chargement du portfolio...">
-            <div class="skeleton-grid">
-              <div v-for="n in 3" :key="n" class="skeleton-card">
-                <div class="skeleton-img"></div>
-                <div class="skeleton-content">
-                  <div class="skeleton-title"></div>
-                  <div class="skeleton-text"></div>
-                  <div class="skeleton-text short"></div>
-                </div>
+      <div class="portfolio-results">
+        <div v-if="loading" class="skeleton-container" aria-label="Chargement du portfolio...">
+          <div class="skeleton-grid">
+            <div v-for="n in 3" :key="n" class="skeleton-card">
+              <div class="skeleton-img"></div>
+              <div class="skeleton-content">
+                <div class="skeleton-title"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text short"></div>
               </div>
             </div>
           </div>
-          <div v-else class="portfolio-content">
-            <p v-if="loadError" class="form-error portfolio-load-error" role="alert">{{ loadError }}</p>
-
-            <ContentSection
-              v-if="!selectedType || selectedType === 'parcours'"
-              id="parcours"
-              title="Mon parcours"
-              :items="grouped.parcours"
-              empty="Aucun parcours publié pour le moment."
-              :editable="Boolean(authState.token)"
-              @edit="openEdit"
-              @delete="remove"
-              @view-case="openCaseStudy"
-            />
-            <StackToolsSection
-              v-if="!selectedType || selectedType === 'competence'"
-              id="competences"
-              :items="grouped.competence"
-              empty="Aucune compétence publiée pour le moment."
-              :editable="Boolean(authState.token)"
-              @edit="openEdit"
-              @delete="remove"
-              @view-case="openCaseStudy"
-            />
-            <RealisationsSection
-              v-if="!selectedType || selectedType === 'realisation'"
-              :items="grouped.realisation"
-              :editable="Boolean(authState.token)"
-              @edit="openEdit"
-              @delete="remove"
-              @view-case="openCaseStudy"
-              @add="openCreate('realisation'); playClick()"
-            />
-            <section
-              v-if="!selectedType || selectedType === 'blog'"
-              class="content-section blog-section reveal-on-scroll"
-              id="blog"
-              aria-labelledby="blog-title"
-            >
-              <div class="section-heading">
-                <h2 id="blog-title">Blog</h2>
-              </div>
-              <p v-if="authState.token" class="blog-intro">Articles, notes et retours d'expérience publiés depuis l'administration. Les PDF peuvent être attachés à chaque article.</p>
-              <div v-if="grouped.blog.length" class="blog-grid blog-grid--managed">
-                <ItemCard
-                  v-for="item in grouped.blog"
-                  :key="item.id"
-                  :item="item"
-                  :editable="Boolean(authState.token)"
-                  @edit="openEdit"
-                  @delete="remove"
-                  @view-case="openCaseStudy"
-                />
-              </div>
-              <div v-else class="empty-state-card blog-empty-state">
-                <SearchX class="empty-icon" :size="48" />
-                <p>Aucun article publié pour le moment. Les articles seront disponibles ici dès qu'ils seront ajoutés.</p>
-                <button v-if="authState.token" class="button primary" type="button" @click="openCreate('blog'); playClick()" @mouseenter="playHover">Ajouter un article</button>
-              </div>
-            </section>
-          </div>
         </div>
-      </Transition>
+        <div v-else class="portfolio-content">
+          <p v-if="loadError" class="form-error portfolio-load-error" role="alert">{{ loadError }}</p>
+
+          <ContentSection
+            id="parcours"
+            title="Mon parcours"
+            :items="grouped.parcours"
+            empty="Aucun parcours publié pour le moment."
+            :editable="Boolean(authState.token)"
+            @edit="openEdit"
+            @delete="remove"
+            @view-case="openCaseStudy"
+          />
+          <StackToolsSection
+            id="competences"
+            :items="grouped.competence"
+            empty="Aucune compétence publiée pour le moment."
+            :editable="Boolean(authState.token)"
+            @edit="openEdit"
+            @delete="remove"
+            @view-case="openCaseStudy"
+          />
+          <RealisationsSection
+            id="realisations"
+            :items="grouped.realisation"
+            :editable="Boolean(authState.token)"
+            @edit="openEdit"
+            @delete="remove"
+            @view-case="openCaseStudy"
+            @add="openCreate('realisation'); playClick()"
+          />
+          <section
+            class="content-section blog-section reveal-on-scroll"
+            id="blog"
+            aria-labelledby="blog-title"
+          >
+            <div class="section-heading">
+              <h2 id="blog-title">Blog</h2>
+            </div>
+            <p v-if="authState.token" class="blog-intro">Articles, notes et retours d'expérience publiés depuis l'administration. Les PDF peuvent être attachés à chaque article.</p>
+            <div v-if="grouped.blog.length" class="blog-grid blog-grid--managed">
+              <ItemCard
+                v-for="item in grouped.blog"
+                :key="item.id"
+                :item="item"
+                :editable="Boolean(authState.token)"
+                @edit="openEdit"
+                @delete="remove"
+                @view-case="openCaseStudy"
+              />
+            </div>
+            <div v-else class="empty-state-card blog-empty-state">
+              <SearchX class="empty-icon" :size="48" />
+              <p>Aucun article publié pour le moment. Les articles seront disponibles ici dès qu'ils seront ajoutés.</p>
+              <button v-if="authState.token" class="button primary" type="button" @click="openCreate('blog'); playClick()" @mouseenter="playHover">Ajouter un article</button>
+            </div>
+          </section>
+        </div>
+      </div>
 
       <TestimonialSection 
         :testimonials="testimonials"
@@ -1234,20 +1189,11 @@ const activeCaseStudy = computed(() => {
 });
 
 
-const categoryFilters = computed(() => {
-  const values = typeFilteredItems.value.map((item) => item.category).filter(Boolean);
-  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
-});
-
-const visibleItems = computed(() =>
-  selectedCategory.value ? typeFilteredItems.value.filter((item) => item.category === selectedCategory.value) : typeFilteredItems.value,
-);
-
 const grouped = computed(() => ({
-  parcours: sortChronologically(visibleItems.value.filter((item) => normalizeType(item.type) === 'parcours')),
-  competence: visibleItems.value.filter((item) => normalizeType(item.type) === 'competence'),
-  realisation: visibleItems.value.filter((item) => normalizeType(item.type) === 'realisation'),
-  blog: visibleItems.value.filter((item) => normalizeType(item.type) === 'blog'),
+  parcours: sortChronologically(items.value.filter((item) => normalizeType(item.type) === 'parcours')),
+  competence: items.value.filter((item) => normalizeType(item.type) === 'competence'),
+  realisation: items.value.filter((item) => normalizeType(item.type) === 'realisation'),
+  blog: items.value.filter((item) => normalizeType(item.type) === 'blog'),
 }));
 
 const defaultSocProject = {
