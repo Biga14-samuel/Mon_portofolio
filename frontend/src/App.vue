@@ -1396,6 +1396,7 @@ async function handleLogin() {
 function logout() {
   clearToken();
   closeForm();
+  loadItems();
 }
 
 function handleSessionExpired() {

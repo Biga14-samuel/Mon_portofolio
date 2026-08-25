@@ -266,18 +266,21 @@ def delete_item(
 
 @app.get("/api/testimonials", response_model=list[TestimonialRead])
 def list_testimonials(request: Request, db: Session = Depends(get_db)) -> list[Testimonial]:
-    # If admin token is provided, return all testimonials. Otherwise, only visible ones.
+    # If admin token is provided, return all testimonials (including non-visible ones for moderation).
     is_admin = False
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Bearer "):
-        token = auth_header.split(" ")[1]
+        token = auth_header.split(" ", 1)[1].strip()
         try:
-            from .auth import get_current_admin
-            # Just test if the token is valid
-            get_current_admin(token, get_settings())
-            is_admin = True
+            import secrets
+            from jose import jwt
+            app_settings = get_settings()
+            payload = jwt.decode(token, app_settings.jwt_secret, algorithms=["HS256"])
+            username = payload.get("sub")
+            if username and secrets.compare_digest(username, app_settings.admin_username):
+                is_admin = True
         except Exception:
-            pass
+            is_admin = False
 
     query = select(Testimonial).order_by(Testimonial.created_at.desc())
     if not is_admin:
