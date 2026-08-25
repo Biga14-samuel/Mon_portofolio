@@ -522,7 +522,21 @@
           </template>
         </template>
 
-        <!-- ===== NON-REALISATION: Vue classique (parcours, competence, blog) ===== -->
+        <!-- ===== COMPETENCE / STACK & OUTILS: Vue Fiche Technique & Bento Interactive ===== -->
+        <template v-else-if="normalizeType(caseStudyItem.type) === 'competence'">
+          <SkillDetailView
+            :item="caseStudyItem"
+            :sections="activeCaseStudy"
+            :stack="caseStudyStack"
+            :pdf-url="casePdfUrl"
+            :primary-image="casePrimaryImage"
+            :detail-images="caseDetailImages"
+            @open-lightbox="(imgs, idx, title) => { openImageViewer(imgs, idx, title); playClick(); }"
+            @close="closeCaseStudy(); playClick()"
+          />
+        </template>
+
+        <!-- ===== PARCOURS & BLOG: Vue classique chronologique / article ===== -->
         <template v-else>
           <div class="case-layout">
             <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(casePrimaryImage ? 2 : 1)">
@@ -744,6 +758,7 @@ import Lenis from '@studio-freight/lenis';
 import ItemForm from './components/ItemForm.vue';
 import PillBadge from './components/PillBadge.vue';
 import StackToolsSection from './components/StackToolsSection.vue';
+import SkillDetailView from './components/SkillDetailView.vue';
 import TagManager from './components/TagManager.vue';
 import { authState, clearToken, setToken } from './store/auth';
 import { createItem, deleteItem, getItems, login, resolveAssetUrl, updateItem, getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial as apiDeleteTestimonial, sendContactMessage, getVeille } from './services/api';
