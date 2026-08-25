@@ -207,6 +207,32 @@
         </div>
       </section>
 
+      <!-- Barre de filtrage par tags / domaines -->
+      <section v-if="categoryFilters.length" class="filter-band compact reveal-on-scroll" aria-label="Filtrer par tag">
+        <button
+          class="filter-pill small"
+          :class="{ active: selectedCategory === '' }"
+          type="button"
+          :aria-pressed="selectedCategory === ''"
+          @click="selectedCategory = ''; playClick()"
+          @mouseenter="playHover"
+        >
+          Tous les tags
+        </button>
+        <button
+          v-for="category in categoryFilters"
+          :key="category"
+          class="filter-pill"
+          :class="[{ active: selectedCategory === category }, tagTone(category)]"
+          type="button"
+          :aria-pressed="selectedCategory === category"
+          @click="selectedCategory = (selectedCategory === category ? '' : category); playClick()"
+          @mouseenter="playHover"
+        >
+          {{ category }}
+        </button>
+      </section>
+
       <div class="portfolio-results">
         <div v-if="loading" class="skeleton-container" aria-label="Chargement du portfolio...">
           <div class="skeleton-grid">
@@ -1220,11 +1246,20 @@ const activeCaseStudy = computed(() => {
 });
 
 
+const categoryFilters = computed(() => {
+  const values = items.value.map((item) => item.category).filter(Boolean);
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+});
+
+const visibleItems = computed(() =>
+  selectedCategory.value ? items.value.filter((item) => item.category === selectedCategory.value) : items.value,
+);
+
 const grouped = computed(() => ({
-  parcours: sortChronologically(items.value.filter((item) => normalizeType(item.type) === 'parcours')),
-  competence: items.value.filter((item) => normalizeType(item.type) === 'competence'),
-  realisation: items.value.filter((item) => normalizeType(item.type) === 'realisation'),
-  blog: items.value.filter((item) => normalizeType(item.type) === 'blog'),
+  parcours: sortChronologically(visibleItems.value.filter((item) => normalizeType(item.type) === 'parcours')),
+  competence: visibleItems.value.filter((item) => normalizeType(item.type) === 'competence'),
+  realisation: visibleItems.value.filter((item) => normalizeType(item.type) === 'realisation'),
+  blog: visibleItems.value.filter((item) => normalizeType(item.type) === 'blog'),
 }));
 
 const defaultSocProject = {
