@@ -5,59 +5,24 @@ function normalizeTag(category = '') {
     .toLowerCase();
 }
 
+const TAG_RULES = [
+  { tone: 'tag-cyber', keywords: ['cyber', 'securite', 'soc', 'detection', 'threat', 'incident'] },
+  { tone: 'tag-network', keywords: ['reseau', 'fibre'] },
+  { tone: 'tag-system', keywords: ['systeme', 'systemes', 'maintenance', 'virtualisation', 'cloud'] },
+  { tone: 'tag-web', keywords: ['web', 'programmation', 'scripting', 'dev'] },
+  { tone: 'tag-data', keywords: ['base', 'donnee', 'db'] },
+  { tone: 'tag-method', keywords: ['methodologie', 'gestion', 'conception'] },
+  { tone: 'tag-design', keywords: ['infographie', 'design'] },
+  { tone: 'tag-learning', keywords: ['diplome', 'certification', 'formation'] },
+];
+
 export function tagTone(category = '') {
   const value = normalizeTag(category);
+  if (!value) return 'neutral';
 
-  if (
-    value.includes('cyber') ||
-    value.includes('securite') ||
-    value.includes('soc') ||
-    value.includes('detection') ||
-    value.includes('threat') ||
-    value.includes('incident')
-  ) {
-    return 'tag-cyber';
-  }
-  if (value.includes('reseau') || value.includes('fibre')) {
-    return 'tag-network';
-  }
-  if (
-    value.includes('systeme') ||
-    value.includes('systemes') ||
-    value.includes('maintenance') ||
-    value.includes('virtualisation') ||
-    value.includes('cloud')
-  ) {
-    return 'tag-system';
-  }
-  if (
-    value.includes('web') ||
-    value.includes('programmation') ||
-    value.includes('scripting') ||
-    value.includes('dev')
-  ) {
-    return 'tag-web';
-  }
-  if (value.includes('base') || value.includes('donnee') || value === 'db') {
-    return 'tag-data';
-  }
-  if (
-    value.includes('methodologie') ||
-    value.includes('gestion') ||
-    value.includes('conception')
-  ) {
-    return 'tag-method';
-  }
-  if (value.includes('infographie') || value.includes('design')) {
-    return 'tag-design';
-  }
-  if (
-    value.includes('diplome') ||
-    value.includes('certification') ||
-    value.includes('formation')
-  ) {
-    return 'tag-learning';
-  }
+  const match = TAG_RULES.find((rule) =>
+    rule.keywords.some((kw) => value.includes(kw))
+  );
 
-  return 'neutral';
+  return match ? match.tone : 'neutral';
 }

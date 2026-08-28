@@ -39,8 +39,8 @@ Base.metadata.create_all(bind=engine)
 try:
     with engine.begin() as conn:
         conn.exec_driver_sql("ALTER TYPE item_type ADD VALUE IF NOT EXISTS 'blog'")
-except Exception:
-    pass
+except Exception as exc:
+    logger.debug("Type item_type 'blog' déjà existant ou non supporté: %s", exc)
 from .schemas import (
     ContactRequest,
     ItemCreate,
@@ -283,26 +283,26 @@ def delete_item(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
+def _is_admin_request(request: Request) -> bool:
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return False
+    token = auth_header.split(" ", 1)[1].strip()
+    try:
+        from jose import jwt
+        app_settings = get_settings()
+        payload = jwt.decode(token, app_settings.jwt_secret, algorithms=["HS256"])
+        username = payload.get("sub")
+        return bool(username and secrets.compare_digest(username, app_settings.admin_username))
+    except Exception:
+        return False
+
+
 @app.get("/api/testimonials", response_model=list[TestimonialRead])
 def list_testimonials(request: Request, db: Session = Depends(get_db)) -> list[Testimonial]:
     # If admin token is provided, return all testimonials (including non-visible ones for moderation).
-    is_admin = False
-    auth_header = request.headers.get("Authorization")
-    if auth_header and auth_header.startswith("Bearer "):
-        token = auth_header.split(" ", 1)[1].strip()
-        try:
-            import secrets
-            from jose import jwt
-            app_settings = get_settings()
-            payload = jwt.decode(token, app_settings.jwt_secret, algorithms=["HS256"])
-            username = payload.get("sub")
-            if username and secrets.compare_digest(username, app_settings.admin_username):
-                is_admin = True
-        except Exception:
-            is_admin = False
-
     query = select(Testimonial).order_by(Testimonial.created_at.desc())
-    if not is_admin:
+    if not _is_admin_request(request):
         query = query.where(Testimonial.is_visible == True)
         
     return list(db.scalars(query))
@@ -446,6 +446,30 @@ def send_contact_email(
 os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
+def _upload_to_supabase(
+    file_bytes: bytes,
+    unique_filename: str,
+    content_type: str,
+    settings: Settings,
+) -> str:
+    supabase_url = settings.supabase_url.rstrip("/")
+    bucket = (settings.supabase_bucket or "portfolio-uploads").strip()
+    upload_endpoint = f"{supabase_url}/storage/v1/object/{bucket}/{unique_filename}"
+    headers = {
+        "Authorization": f"Bearer {settings.supabase_key}",
+        "apikey": settings.supabase_key,
+        "Content-Type": content_type,
+    }
+    resp = requests.post(upload_endpoint, data=file_bytes, headers=headers, timeout=20)
+    if resp.status_code in (200, 201):
+        public_url = f"{supabase_url}/storage/v1/object/public/{bucket}/{unique_filename}"
+        logger.info("Fichier uploadé avec succès sur Supabase Storage: %s", public_url)
+        return public_url
+
+    logger.error("Erreur Supabase Storage (%s): %s", resp.status_code, resp.text)
+    raise HTTPException(status_code=500, detail=f"Erreur d'upload Supabase: {resp.text}")
+
+
 @app.post("/api/upload", dependencies=[Depends(get_current_admin)])
 async def upload_image(file: UploadFile = File(...), settings: Settings = Depends(get_settings)):
     ALLOWED_EXTENSIONS = {
@@ -454,9 +478,8 @@ async def upload_image(file: UploadFile = File(...), settings: Settings = Depend
         "image/png": "png",
         "image/gif": "gif",
         "image/webp": "webp",
-        "application/pdf": "pdf"
+        "application/pdf": "pdf",
     }
-    
     content_type = (file.content_type or "").lower()
     if content_type not in ALLOWED_EXTENSIONS:
         raise HTTPException(
@@ -467,35 +490,12 @@ async def upload_image(file: UploadFile = File(...), settings: Settings = Depend
     ext = ALLOWED_EXTENSIONS[content_type]
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
 
-    # Supabase Storage direct upload (cloud-persistent)
     if settings.supabase_url and settings.supabase_key:
-        try:
-            file_bytes = await file.read()
-            supabase_url = settings.supabase_url.rstrip("/")
-            bucket = (settings.supabase_bucket or "portfolio-uploads").strip()
-            upload_endpoint = f"{supabase_url}/storage/v1/object/{bucket}/{unique_filename}"
-            
-            headers = {
-                "Authorization": f"Bearer {settings.supabase_key}",
-                "apikey": settings.supabase_key,
-                "Content-Type": content_type,
-            }
-            
-            resp = requests.post(upload_endpoint, data=file_bytes, headers=headers, timeout=20)
-            if resp.status_code in [200, 201]:
-                public_url = f"{supabase_url}/storage/v1/object/public/{bucket}/{unique_filename}"
-                logger.info(f"Fichier uploadé avec succès sur Supabase Storage: {public_url}")
-                return {"url": public_url}
-            else:
-                logger.error(f"Erreur Supabase Storage ({resp.status_code}): {resp.text}")
-                raise HTTPException(status_code=500, detail=f"Erreur d'upload Supabase: {resp.text}")
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.error(f"Exception lors de l'upload Supabase: {e}")
-            raise HTTPException(status_code=500, detail=f"Impossible d'uploader le fichier vers Supabase: {str(e)}")
+        file_bytes = await file.read()
+        public_url = _upload_to_supabase(file_bytes, unique_filename, content_type, settings)
+        return {"url": public_url}
 
-    # Fallback disque local (développement local sans Supabase Storage configuré)
+    # Fallback disque local
     file_path = os.path.join("uploads", unique_filename)
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
