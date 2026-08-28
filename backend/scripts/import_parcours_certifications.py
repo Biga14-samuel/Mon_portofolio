@@ -24,9 +24,15 @@ CERTIFICATIONS = [
         'category': 'Marketing',
         'title': 'Certification — Marketing Digital',
         'subtitle': '2024 | Obtenue',
-        'description': "Acquisition des bases du marketing digital, de la stratégie de contenu et du développement de la présence en ligne.",
+        'description': (
+            "Acquisition des bases du marketing digital, de la stratégie "
+            "de contenu et du développement de la présence en ligne."
+        ),
         'content': {
-            'objective': 'Comprendre les fondamentaux du marketing digital et appliquer une stratégie de visibilité cohérente.',
+            'objective': (
+                'Comprendre les fondamentaux du marketing digital '
+                'et appliquer une stratégie de visibilité cohérente.'
+            ),
             'tools': 'Marketing, Contenu, Présence en ligne',
             'architecture': (
                 '- Construction d’un plan éditorial orienté visibilité.\n'
@@ -46,9 +52,15 @@ CERTIFICATIONS = [
         'category': 'Entrepreneuriat',
         'title': 'Certification — Entrepreneuriat',
         'subtitle': '2024 | MIU (Obtenue)',
-        'description': "Certification sur la création d'entreprise, la modélisation économique (Business Plan, SWOT) et la gestion de projet.",
+        'description': (
+            "Certification sur la création d'entreprise, la modélisation "
+            "économique (Business Plan, SWOT) et la gestion de projet."
+        ),
         'content': {
-            'objective': 'Comprendre les ressorts de la création d’entreprise et de la structuration d’un projet viable.',
+            'objective': (
+                'Comprendre les ressorts de la création d’entreprise '
+                'et de la structuration d’un projet viable.'
+            ),
             'tools': 'Business Plan, SWOT, Gestion de projet',
             'architecture': (
                 '- Étude du besoin, positionnement et proposition de valeur.\n'
@@ -68,7 +80,10 @@ CERTIFICATIONS = [
         'category': 'Cybersécurité',
         'title': 'Certification — Ethical Hacking (Hacker Éthique)',
         'subtitle': '2026 | Cisco NetAcad & Credly (Obtenue)',
-        'description': "Maîtrise des concepts de hacking éthique, exécution des techniques de post-exploitation, analyse de vulnérabilités et sécurité du Cloud/IoT.",
+        'description': (
+            "Maîtrise des concepts de hacking éthique, exécution des techniques "
+            "de post-exploitation, analyse de vulnérabilités et sécurité du Cloud/IoT."
+        ),
         'content': {
             'objective': 'Approfondir les techniques de sécurité offensive et la compréhension des vulnérabilités.',
             'tools': 'Cybersécurité, Hacking éthique, Cloud, IoT',
@@ -90,7 +105,10 @@ CERTIFICATIONS = [
         'category': 'Réseaux',
         'title': "CCNA — Routage, Switching & Réseautage d'entreprise",
         'subtitle': '2026 | Cisco NetAcad (En cours)',
-        'description': "Formation approfondie sur les essentiels de la commutation, le routage, la sécurité des infrastructures LAN/WLAN et l'automatisation réseau.",
+        'description': (
+            "Formation approfondie sur les essentiels de la commutation, le routage, "
+            "la sécurité des infrastructures LAN/WLAN et l'automatisation réseau."
+        ),
         'content': {
             'objective': 'Renforcer les bases réseau sur le routage, la commutation et l’architecture d’entreprise.',
             'tools': 'Routage, Switching, LAN, WLAN, Automatisation',
@@ -112,9 +130,15 @@ CERTIFICATIONS = [
         'category': 'Sécurité Réseau',
         'title': 'Certification — Sécurité des réseaux en entreprise & Défense du réseau',
         'subtitle': '2026 | Cisco NetAcad (En cours)',
-        'description': "Apprentissage des techniques de surveillance réseau, de défense périmétrique, de sécurisation des flux et de gestion des alertes de sécurité.",
+        'description': (
+            "Apprentissage des techniques de surveillance réseau, de défense périmétrique, "
+            "de sécurisation des flux et de gestion des alertes de sécurité."
+        ),
         'content': {
-            'objective': 'Approfondir la défense réseau et la surveillance des incidents dans un contexte d’entreprise.',
+            'objective': (
+                'Approfondir la défense réseau et la surveillance '
+                'des incidents dans un contexte d’entreprise.'
+            ),
             'tools': 'Surveillance réseau, Défense périmétrique, Alertes',
             'architecture': (
                 '- Analyse des flux et de la posture de défense du réseau.\n'

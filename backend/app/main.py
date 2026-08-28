@@ -41,7 +41,20 @@ try:
         conn.exec_driver_sql("ALTER TYPE item_type ADD VALUE IF NOT EXISTS 'blog'")
 except Exception:
     pass
-from .schemas import ItemCreate, ItemRead, ItemType, ItemUpdate, LoginRequest, TagCreate, TagRead, TokenResponse, TestimonialCreate, TestimonialRead, TestimonialUpdate, ContactRequest
+from .schemas import (
+    ContactRequest,
+    ItemCreate,
+    ItemRead,
+    ItemType,
+    ItemUpdate,
+    LoginRequest,
+    TagCreate,
+    TagRead,
+    TestimonialCreate,
+    TestimonialRead,
+    TestimonialUpdate,
+    TokenResponse,
+)
 
 app = FastAPI(title="Portfolio API", version="1.0.0")
 settings = get_settings()
@@ -151,7 +164,10 @@ def get_veille(limit: int = 8) -> dict[str, object]:
             stale_payload["items"] = stale_payload.get("items", [])[:limit]
             stale_payload["stale"] = True
             return stale_payload
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Impossible de récupérer la veille automatique pour le moment.") from exc
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Impossible de récupérer la veille automatique pour le moment.",
+        ) from exc
 
 
 @app.get("/api/tags", response_model=list[TagRead])
@@ -333,7 +349,11 @@ def delete_testimonial(
 
 @app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("3/minute")
-def send_contact_email(request: Request, payload: ContactRequest, settings: Settings = Depends(get_settings)) -> dict[str, str]:
+def send_contact_email(
+    request: Request,
+    payload: ContactRequest,
+    settings: Settings = Depends(get_settings),
+) -> dict[str, str]:
     if not settings.smtp_user or not settings.smtp_password or not settings.smtp_recipient:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
@@ -403,7 +423,10 @@ def send_contact_email(request: Request, payload: ContactRequest, settings: Sett
 
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Impossible d'envoyer l'e-mail. Vérifiez la configuration SMTP et vos informations d'identification.",
+            detail=(
+                "Impossible d'envoyer l'e-mail. "
+                "Vérifiez la configuration SMTP et vos identifiants."
+            ),
         ) from exc
 
     return {"status": "accepted"}
@@ -425,7 +448,10 @@ async def upload_image(file: UploadFile = File(...), settings: Settings = Depend
     
     content_type = (file.content_type or "").lower()
     if content_type not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail="Type de fichier non autorisé. Seules les images (JPEG, PNG, GIF, WEBP) et les PDF sont acceptés.")
+        raise HTTPException(
+            status_code=400,
+            detail="Type de fichier non autorisé. Seules les images (JPEG, PNG, GIF, WEBP) et PDF sont acceptés.",
+        )
 
     ext = ALLOWED_EXTENSIONS[content_type]
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
