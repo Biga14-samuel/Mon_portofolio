@@ -1,203 +1,229 @@
 <template>
-  <canvas ref="canvasRef" class="antigravity-canvas" aria-hidden="true"></canvas>
+  <canvas ref="canvasRef" class="particle-canvas" aria-hidden="true"></canvas>
 </template>
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 
-const canvasRef = ref(null);
+// ── Props ────────────────────────────────────────────────────────────────────
+const props = defineProps({
+  density: {
+    type: Number,
+    default: 1.0,
+  },
+});
 
-// Palette officielle Ubuntu avec variantes douces et élégantes
-const UBUNTU_COLORS = [
-  '#E95420', // Ubuntu Orange
-  '#77216F', // Canonical Aubergine
-  '#5E2750', // Mid Aubergine
-  '#2C001E', // Dark Aubergine
-  '#FCA886', // Light Orange
-  '#C48ABC', // Light Aubergine
-  '#AEA79F', // Warm Grey
-];
-
-const CONFIG = {
-  particleCount: 50,
-  speedFactor: 0.7,
-  gravity: -0.035, // Flottaison antigravité ascendante
-  interactionRadius: 160,
-  friction: 0.97,
-};
-
-let animationFrameId = null;
-const spriteCache = {};
-
-function getSprite(color, shapeType) {
-  const key = `${color}-${shapeType}`;
-  if (spriteCache[key]) return spriteCache[key];
-
-  const size = 64;
-  const center = size / 2;
-  const drawSize = 28;
-
-  const c = document.createElement('canvas');
-  c.width = size;
-  c.height = size;
-  const cx = c.getContext('2d');
-
-  // Ombre douce cuite dans le sprite pour accélération GPU
-  cx.shadowColor = 'rgba(44, 0, 30, 0.12)';
-  cx.shadowBlur = 12;
-  cx.shadowOffsetX = 3;
-  cx.shadowOffsetY = 4;
-  cx.fillStyle = color;
-
-  cx.translate(center, center);
-  cx.beginPath();
-
-  if (shapeType === 0) {
-    // Cercle (forme privilégiée)
-    cx.arc(0, 0, drawSize / 2, 0, Math.PI * 2);
-  } else if (shapeType === 1) {
-    // Carré adouci
-    const r = drawSize / 2;
-    cx.roundRect ? cx.roundRect(-r, -r, drawSize, drawSize, 6) : cx.rect(-r, -r, drawSize, drawSize);
-  } else {
-    // Triangle doux
-    cx.moveTo(0, -drawSize / 2);
-    cx.lineTo(drawSize / 2, drawSize / 2);
-    cx.lineTo(-drawSize / 2, drawSize / 2);
-    cx.closePath();
+// ── Palette Ubuntu pondérée ───────────────────────────────────────────────────
+// Poids : Orange 30%, Orange clair 15%, Aubergine foncée 20%, Aubergine 25%, Gris 10%
+const PALETTE_WEIGHTED = [];
+(function buildPalette() {
+  const entries = [
+    { color: '#E95420', weight: 30 }, // Orange principal
+    { color: '#F7A16E', weight: 15 }, // Orange clair
+    { color: '#2C001E', weight: 20 }, // Aubergine foncée
+    { color: '#77216F', weight: 25 }, // Aubergine
+    { color: '#AEA79F', weight: 10 }, // Gris chaud
+  ];
+  for (const { color, weight } of entries) {
+    for (let i = 0; i < weight; i++) PALETTE_WEIGHTED.push(color);
   }
+})();
 
-  cx.fill();
-  spriteCache[key] = c;
-  return c;
+function pickColor() {
+  return PALETTE_WEIGHTED[Math.floor(Math.random() * PALETTE_WEIGHTED.length)];
 }
 
-class Particle {
-  constructor(w, h, randomY = true) {
-    this.init(w, h, randomY);
+// ── Paramètres ────────────────────────────────────────────────────────────────
+const MOUSE_RADIUS = 150;
+const REPULSION_FORCE = 0.04;
+const RETURN_SPEED = 0.06; // fraction vers laquelle revient la vitesse naturelle
+
+// ── Classe Particule ─────────────────────────────────────────────────────────
+class Stick {
+  constructor(w, h, edgeBias = false) {
+    this._init(w, h, edgeBias);
   }
 
-  init(w, h, randomY = false) {
-    this.x = Math.random() * w;
-    this.y = randomY ? Math.random() * h : h + 40;
-    this.visualSize = Math.random() * 16 + 8; // 8px à 24px
-    this.vx = (Math.random() - 0.5) * 1.6 * CONFIG.speedFactor;
-    this.vy = (Math.random() - 0.5) * 1.6 * CONFIG.speedFactor - Math.random() * 0.8;
-    this.color = UBUNTU_COLORS[Math.floor(Math.random() * UBUNTU_COLORS.length)];
-    this.rotation = Math.random() * Math.PI * 2;
-    this.rotationSpeed = (Math.random() - 0.5) * 0.03;
-
-    // 80% cercles, 10% carrés arrondis, 10% triangles
-    const rand = Math.random();
-    this.shapeType = rand < 0.8 ? 0 : rand < 0.9 ? 1 : 2;
-
-    this.sprite = getSprite(this.color, this.shapeType);
-    this.depth = Math.random() * 0.9 + 0.5; // Effet de profondeur 3D
-  }
-
-  update(w, h, mouseX, mouseY) {
-    this.vy += CONFIG.gravity * 0.05 * this.depth;
-    this.x += this.vx * this.depth;
-    this.y += this.vy * this.depth;
-    this.rotation += this.rotationSpeed;
-
-    // Répulsion souris fluide
-    const dx = this.x - mouseX;
-    const dy = this.y - mouseY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist < CONFIG.interactionRadius) {
-      const force = (CONFIG.interactionRadius - dist) / CONFIG.interactionRadius;
-      const angle = Math.atan2(dy, dx);
-      const push = force * 3.5;
-      this.vx += Math.cos(angle) * push;
-      this.vy += Math.sin(angle) * push;
+  _init(w, h, edgeBias = false) {
+    // Distribution avec légère surreprésentation sur les bords/coins
+    if (edgeBias && Math.random() < 0.25) {
+      // Placer sur un bord ou un coin
+      const side = Math.floor(Math.random() * 4);
+      const margin = 80;
+      if (side === 0) { this.x = Math.random() * w; this.y = Math.random() * margin; }
+      else if (side === 1) { this.x = w - Math.random() * margin; this.y = Math.random() * h; }
+      else if (side === 2) { this.x = Math.random() * w; this.y = h - Math.random() * margin; }
+      else { this.x = Math.random() * margin; this.y = Math.random() * h; }
+    } else {
+      this.x = Math.random() * w;
+      this.y = Math.random() * h;
     }
 
-    this.vx *= CONFIG.friction;
-    this.vy *= CONFIG.friction;
+    // Vitesse de dérive naturelle
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.15 + Math.random() * 0.35; // 0.15 → 0.50 px/frame
+    this.vxNatural = Math.cos(angle) * speed;
+    this.vyNatural = Math.sin(angle) * speed;
 
-    // Recyclage des limites d'écran
-    if (this.x < -40) this.x = w + 40;
-    if (this.x > w + 40) this.x = -40;
-    if (this.y < -50) this.init(w, h, false);
+    // Vélocité effective (peut être perturbée par la souris)
+    this.vx = this.vxNatural;
+    this.vy = this.vyNatural;
+
+    // Forme : bâtonnet court
+    this.length = 6 + Math.random() * 8;          // 6–14 px
+    this.lineWidth = 1.5 + Math.random() * 1.0;   // 1.5–2.5 px
+    this.rotation = Math.random() * Math.PI * 2;   // 0–360°
+    this.dRotation = (Math.random() - 0.5) * 0.006; // ±0.3°/frame en radians
+
+    // Couleur & opacité — fixées à la création
+    this.color = pickColor();
+    this.alpha = 0.35 + Math.random() * 0.50;      // 0.35–0.85
+  }
+
+  update(w, h, mx, my) {
+    // Légère variation de rotation
+    this.rotation += this.dRotation;
+
+    // Répulsion souris
+    const dx = this.x - mx;
+    const dy = this.y - my;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < MOUSE_RADIUS && dist > 0) {
+      const t = 1 - dist / MOUSE_RADIUS;
+      const force = t * REPULSION_FORCE;
+      this.vx += (dx / dist) * force;
+      this.vy += (dy / dist) * force;
+    }
+
+    // Retour progressif vers la trajectoire naturelle
+    this.vx += (this.vxNatural - this.vx) * RETURN_SPEED;
+    this.vy += (this.vyNatural - this.vy) * RETURN_SPEED;
+
+    // Déplacement
+    this.x += this.vx;
+    this.y += this.vy;
+
+    // Wrap-around (côté opposé)
+    if (this.x < -20) this.x = w + 20;
+    else if (this.x > w + 20) this.x = -20;
+    if (this.y < -20) this.y = h + 20;
+    else if (this.y > h + 20) this.y = -20;
   }
 
   draw(ctx) {
+    const half = this.length / 2;
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rotation);
-    const scaleFactor = (this.visualSize * this.depth) / 28;
-    const renderSize = 64 * scaleFactor;
-    ctx.drawImage(this.sprite, -renderSize / 2, -renderSize / 2, renderSize, renderSize);
+    ctx.globalAlpha = this.alpha;
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = this.lineWidth;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-half, 0);
+    ctx.lineTo(half, 0);
+    ctx.stroke();
     ctx.restore();
   }
 }
+
+// ── Logique principale ────────────────────────────────────────────────────────
+const canvasRef = ref(null);
+let raf = null;
 
 onMounted(() => {
   const canvas = canvasRef.value;
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
-  let width = window.innerWidth;
-  let height = window.innerHeight;
-
-  function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.scale(dpr, dpr);
-  }
-
-  window.addEventListener('resize', resize, { passive: true });
-  resize();
-
-  const particles = [];
-  for (let i = 0; i < CONFIG.particleCount; i++) {
-    particles.push(new Particle(width, height, true));
-  }
-
+  const ctx = canvas.getContext('2d', { alpha: false }); // alpha:false = fond opaque, perf. meilleure
+  let W = 0;
+  let H = 0;
+  let dpr = 1;
+  let particles = [];
   let mouseX = -1000;
   let mouseY = -1000;
 
-  function handlePointerMove(e) {
+  // ── Resize ────────────────────────────────────────────────────────────────
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    rebuildParticles(true);
+  }
+
+  function rebuildParticles(keepExisting = false) {
+    const area = W * H;
+    const target = Math.round(Math.min(280, Math.max(200, area / 3000)) * props.density);
+    if (!keepExisting || particles.length === 0) {
+      particles = [];
+      for (let i = 0; i < target; i++) {
+        particles.push(new Stick(W, H, true));
+      }
+    } else {
+      // Ajuster le nombre en conservant l'existant
+      while (particles.length < target) particles.push(new Stick(W, H, true));
+      if (particles.length > target) particles.length = target;
+    }
+  }
+
+  // ── Boucle d'animation ────────────────────────────────────────────────────
+  function animate() {
+    // Effacement blanc pur — pas de traîne
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, W, H);
+
+    for (let i = 0, n = particles.length; i < n; i++) {
+      particles[i].update(W, H, mouseX, mouseY);
+      particles[i].draw(ctx);
+    }
+
+    raf = requestAnimationFrame(animate);
+  }
+
+  // ── Événements ───────────────────────────────────────────────────────────
+  function onPointerMove(e) {
     mouseX = e.clientX;
     mouseY = e.clientY;
   }
 
-  window.addEventListener('pointermove', handlePointerMove, { passive: true });
-
-  function animate() {
-    ctx.clearRect(0, 0, width, height);
-    for (let i = 0; i < particles.length; i++) {
-      particles[i].update(width, height, mouseX, mouseY);
-      particles[i].draw(ctx);
-    }
-    animationFrameId = requestAnimationFrame(animate);
+  function onPointerLeave() {
+    mouseX = -1000;
+    mouseY = -1000;
   }
 
+  const ro = new ResizeObserver(resize);
+  ro.observe(document.documentElement);
+
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('pointerleave', onPointerLeave, { passive: true });
+
+  resize();
   animate();
 
   onUnmounted(() => {
-    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    window.removeEventListener('resize', resize);
-    window.removeEventListener('pointermove', handlePointerMove);
+    if (raf) cancelAnimationFrame(raf);
+    ro.disconnect();
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerleave', onPointerLeave);
   });
 });
 </script>
 
 <style scoped>
-.antigravity-canvas {
+.particle-canvas {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
+  z-index: -1;
   pointer-events: none;
-  z-index: 0;
-  opacity: 0.72;
-  will-change: transform;
+  display: block;
 }
 </style>
