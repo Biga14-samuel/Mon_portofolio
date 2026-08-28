@@ -166,10 +166,6 @@
             <div class="featured-project-card__content">
               <div class="featured-badge-row">
                 <PillBadge :tone="tagTone(featuredProject.category)">{{ featuredProject.category }}</PillBadge>
-                <span class="featured-status-pill">
-                  <ShieldCheck :size="14" aria-hidden="true" />
-                  <span>Pièce Maîtresse &amp; Mémoire RSI</span>
-                </span>
               </div>
               <h3>{{ featuredProject.title }}</h3>
               <p>{{ featuredProject.description }}</p>
