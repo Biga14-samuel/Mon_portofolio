@@ -16,7 +16,7 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
-def upgrade() -> None:
+def _upgrade_items_columns() -> None:
     op.add_column("items", sa.Column("display_order", sa.Integer(), nullable=False, server_default="0"))
     op.add_column("items", sa.Column("github_url", sa.String(length=500), nullable=True))
     op.add_column("items", sa.Column("demo_url", sa.String(length=500), nullable=True))
@@ -24,6 +24,8 @@ def upgrade() -> None:
     op.create_index(op.f("ix_items_display_order"), "items", ["display_order"], unique=False)
     op.alter_column("items", "display_order", server_default=None)
 
+
+def _upgrade_tags_table() -> None:
     op.create_table(
         "tags",
         sa.Column("id", sa.Integer(), nullable=False),
@@ -37,6 +39,8 @@ def upgrade() -> None:
     op.create_index(op.f("ix_tags_name"), "tags", ["name"], unique=False)
     op.create_index(op.f("ix_tags_type"), "tags", ["type"], unique=False)
 
+
+def _seed_initial_tags() -> None:
     tags_table = sa.table(
         "tags",
         sa.column("type", sa.String),
@@ -79,6 +83,12 @@ def upgrade() -> None:
             {"type": "realisation", "name": "Base de données"},
         ],
     )
+
+
+def upgrade() -> None:
+    _upgrade_items_columns()
+    _upgrade_tags_table()
+    _seed_initial_tags()
 
 
 def downgrade() -> None:

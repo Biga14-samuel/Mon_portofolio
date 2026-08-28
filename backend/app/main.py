@@ -109,6 +109,37 @@ def list_items(type: ItemType | None = None, db: Session = Depends(get_db)) -> l
         query = query.where(Item.type == type)
     return list(db.scalars(query))
 
+def _parse_cisa_feed(data: dict, url: str, now: float) -> dict[str, object]:
+    vulnerabilities = data.get("vulnerabilities", []) if isinstance(data, dict) else []
+    vulnerabilities = sorted(
+        [v for v in vulnerabilities if isinstance(v, dict)],
+        key=lambda v: (v.get("dateAdded") or "", v.get("cveID") or ""),
+        reverse=True,
+    )
+    items = [
+        {
+            "cveID": vuln.get("cveID", ""),
+            "vendorProject": vuln.get("vendorProject", ""),
+            "product": vuln.get("product", ""),
+            "vulnerabilityName": vuln.get("vulnerabilityName", ""),
+            "dateAdded": vuln.get("dateAdded", ""),
+            "shortDescription": vuln.get("shortDescription", ""),
+            "requiredAction": vuln.get("requiredAction", ""),
+            "dueDate": vuln.get("dueDate", ""),
+        }
+        for vuln in vulnerabilities[:12]
+    ]
+    return {
+        "catalogVersion": data.get("catalogVersion", ""),
+        "dateReleased": data.get("dateReleased", ""),
+        "count": data.get("count", len(vulnerabilities)),
+        "sourceUrl": url,
+        "items": items,
+        "updatedAt": now,
+        "stale": False,
+    }
+
+
 @app.get("/api/veille")
 def get_veille(limit: int = 8) -> dict[str, object]:
     limit = max(1, min(limit, 12))
@@ -123,38 +154,10 @@ def get_veille(limit: int = 8) -> dict[str, object]:
     try:
         response = requests.get(url, timeout=20, headers={"Accept": "application/json"})
         response.raise_for_status()
-        data = response.json()
-        vulnerabilities = data.get("vulnerabilities", []) if isinstance(data, dict) else []
-        vulnerabilities = sorted(
-            [v for v in vulnerabilities if isinstance(v, dict)],
-            key=lambda v: (v.get("dateAdded") or "", v.get("cveID") or ""),
-            reverse=True,
-        )
-        items = [
-            {
-                "cveID": vuln.get("cveID", ""),
-                "vendorProject": vuln.get("vendorProject", ""),
-                "product": vuln.get("product", ""),
-                "vulnerabilityName": vuln.get("vulnerabilityName", ""),
-                "dateAdded": vuln.get("dateAdded", ""),
-                "shortDescription": vuln.get("shortDescription", ""),
-                "requiredAction": vuln.get("requiredAction", ""),
-                "dueDate": vuln.get("dueDate", ""),
-            }
-            for vuln in vulnerabilities[:12]
-        ]
-        payload = {
-            "catalogVersion": data.get("catalogVersion", ""),
-            "dateReleased": data.get("dateReleased", ""),
-            "count": data.get("count", len(vulnerabilities)),
-            "sourceUrl": url,
-            "items": items,
-            "updatedAt": now,
-            "stale": False,
-        }
+        payload = _parse_cisa_feed(response.json(), url, now)
         app.state.veille_cache = {"payload": payload, "expires_at": now + 120}
         response_payload = dict(payload)
-        response_payload["items"] = items[:limit]
+        response_payload["items"] = payload["items"][:limit]
         return response_payload
     except Exception as exc:
         logger.exception("Échec de récupération de la veille CISA: %s", exc)
@@ -347,6 +350,63 @@ def delete_testimonial(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
+def _build_contact_email(payload: ContactRequest, settings: Settings) -> EmailMessage:
+    msg = EmailMessage()
+    msg.set_content(
+        "Nouveau message depuis votre portfolio\n\n"
+        f"Nom / email: {payload.email}\n"
+        f"Objet: {payload.subject or 'Sans objet'}\n\n"
+        f"Message:\n{payload.message}"
+    )
+    msg['Subject'] = payload.subject if payload.subject else 'Nouveau message depuis votre portfolio'
+    msg['From'] = settings.smtp_user
+    msg['To'] = settings.smtp_recipient
+    msg['Reply-To'] = payload.email
+    return msg
+
+
+def _send_via_sendgrid(
+    msg: EmailMessage,
+    payload: ContactRequest,
+    settings: Settings,
+) -> tuple[bool, str | None]:
+    if not settings.sendgrid_api_key:
+        return False, "no_sendgrid_key"
+    url = "https://api.sendgrid.com/v3/mail/send"
+    headers = {
+        "Authorization": f"Bearer {settings.sendgrid_api_key}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "personalizations": [
+            {"to": [{"email": settings.smtp_recipient}], "subject": msg['Subject']}
+        ],
+        "from": {"email": settings.smtp_user},
+        "reply_to": {"email": payload.email},
+        "content": [{"type": "text/plain", "value": msg.get_content()}],
+    }
+    try:
+        resp = requests.post(url, headers=headers, json=data, timeout=15)
+        if resp.status_code in (200, 202):
+            return True, None
+        return False, f"sendgrid_status_{resp.status_code}: {resp.text}"
+    except Exception as e:
+        return False, str(e)
+
+
+def _send_via_smtp(msg: EmailMessage, settings: Settings) -> None:
+    if settings.smtp_port == 465:
+        with smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port, timeout=30) as server:
+            server.login(settings.smtp_user, settings.smtp_password)
+            server.send_message(msg)
+    else:
+        with smtplib.SMTP(settings.smtp_server, settings.smtp_port, timeout=30) as server:
+            if server.has_extn("STARTTLS"):
+                server.starttls()
+            server.login(settings.smtp_user, settings.smtp_password)
+            server.send_message(msg)
+
+
 @app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("3/minute")
 def send_contact_email(
@@ -360,63 +420,14 @@ def send_contact_email(
             detail="L'envoi d'email n'est pas encore configuré (SMTP manquant).",
         )
 
-    msg = EmailMessage()
-    msg.set_content(
-        "Nouveau message depuis votre portfolio\n\n"
-        f"Nom / email: {payload.email}\n"
-        f"Objet: {payload.subject or 'Sans objet'}\n\n"
-        f"Message:\n{payload.message}"
-    )
-    msg['Subject'] = payload.subject if payload.subject else 'Nouveau message depuis votre portfolio'
-    msg['From'] = settings.smtp_user
-    msg['To'] = settings.smtp_recipient
-    msg['Reply-To'] = payload.email
-
-    def send_via_sendgrid():
-        if not settings.sendgrid_api_key:
-            return False, "no_sendgrid_key"
-
-        url = "https://api.sendgrid.com/v3/mail/send"
-        headers = {
-            "Authorization": f"Bearer {settings.sendgrid_api_key}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "personalizations": [{"to": [{"email": settings.smtp_recipient}], "subject": msg['Subject']}],
-            "from": {"email": settings.smtp_user},
-            "reply_to": {"email": payload.email},
-            "content": [{"type": "text/plain", "value": msg.get_content()}],
-        }
-        try:
-            resp = requests.post(url, headers=headers, json=data, timeout=15)
-            if resp.status_code in (200, 202):
-                return True, None
-            return False, f"sendgrid_status_{resp.status_code}: {resp.text}"
-        except Exception as e:
-            return False, str(e)
+    msg = _build_contact_email(payload, settings)
 
     try:
-        if settings.smtp_port == 465:
-            with smtplib.SMTP_SSL(settings.smtp_server, settings.smtp_port, timeout=30) as server:
-                server.login(settings.smtp_user, settings.smtp_password)
-                server.send_message(msg)
-        else:
-            with smtplib.SMTP(settings.smtp_server, settings.smtp_port, timeout=30) as server:
-                if server.has_extn("STARTTLS"):
-                    server.starttls()
-                server.login(settings.smtp_user, settings.smtp_password)
-                server.send_message(msg)
+        _send_via_smtp(msg, settings)
     except Exception as exc:
         logger.exception("Échec de l'envoi SMTP: %s", exc)
-        try:
-            tb = traceback.format_exc()
-            print("[SMTP ERROR TRACEBACK]", tb, file=sys.stderr)
-        except Exception:
-            logger.exception("Erreur lors de l'écriture du traceback")
-
-        # If network errors (outbound blocked) or other failures, try SendGrid fallback
         if settings.sendgrid_api_key:
-            ok, info = send_via_sendgrid()
+            ok, info = _send_via_sendgrid(msg, payload, settings)
             if ok:
                 return {"status": "accepted_via_sendgrid"}
             logger.error("SendGrid fallback failed: %s", info)
