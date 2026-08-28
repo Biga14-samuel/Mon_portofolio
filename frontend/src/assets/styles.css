@@ -1147,48 +1147,130 @@ textarea {
 
 .featured-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  grid-template-columns: 1fr;
   gap: 24px;
 }
 
 .featured-project-card {
-  min-height: 420px;
+  min-height: 380px;
   display: flex;
-  align-items: end;
+  align-items: center;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 24px;
   background: var(--aubergine-dark);
-  box-shadow: var(--shadow);
+  box-shadow: 0 16px 40px rgba(44, 0, 30, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   transition:
     transform 260ms ease,
-    box-shadow 260ms ease,
-    filter 260ms ease;
+    box-shadow 260ms ease;
   will-change: transform;
 }
 
 .featured-project-card:hover {
-  transform: translateY(-6px) scale(1.015);
-  box-shadow: var(--shadow-lift);
-  filter: saturate(1.04);
+  transform: translateY(-4px);
+  box-shadow: 0 24px 50px rgba(44, 0, 30, 0.24);
 }
 
 .featured-project-card__content {
-  max-width: 720px;
-  padding: clamp(28px, 5vw, 46px);
+  width: 100%;
+  padding: clamp(28px, 5vw, 48px);
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.featured-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.featured-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .featured-project-card h3 {
-  margin: 18px 0 14px;
-  font-size: clamp(30px, 4vw, 48px);
-  line-height: 1.1;
+  margin: 0.25rem 0;
+  font-size: clamp(26px, 3.8vw, 42px);
+  line-height: 1.15;
+  color: #ffffff;
+  font-weight: 800;
 }
 
 .featured-project-card p {
-  margin: 0 0 24px;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 18px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 1.05rem;
   line-height: 1.65;
+  max-width: 920px;
+}
+
+.featured-key-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.85rem;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.metric-pill {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.metric-pill strong {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ff9d6c;
+}
+
+.metric-pill span {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.featured-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+
+.featured-actions .button.primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: var(--ubuntu-orange-dark);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(233, 84, 32, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.featured-actions .button.primary:hover {
+  background: #c84112;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(233, 84, 32, 0.45);
 }
 
 .empty-featured {
@@ -1203,48 +1285,6 @@ textarea {
 
 .empty-featured h3 {
   color: var(--aubergine-dark);
-}
-
-.future-projects {
-  display: grid;
-  gap: 14px;
-}
-
-.future-project-card {
-  min-height: 74px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 18px 20px;
-  border: 1px solid rgba(119, 33, 111, 0.13);
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: var(--shadow);
-  transition:
-    transform 220ms ease,
-    box-shadow 220ms ease,
-    border-color 220ms ease;
-  will-change: transform;
-}
-
-.future-project-card:hover {
-  transform: translateY(-4px) scale(1.015);
-  border-color: rgba(233, 84, 32, 0.34);
-  box-shadow: var(--shadow-lift);
-}
-
-.future-project-card span {
-  color: currentColor;
-  font-weight: 700;
-}
-
-.future-project-card small {
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(233, 84, 32, 0.12);
-  color: #a92e07;
-  font-weight: 700;
 }
 
 .admin-layout {

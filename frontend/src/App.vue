@@ -157,19 +157,49 @@
         </div>
       </section>
 
-      <section class="featured-section reveal-on-scroll" id="projets-a-la-une" aria-labelledby="featured-title">
+      <section class="featured-section reveal-on-scroll" id="projet-a-la-une" aria-labelledby="featured-title">
         <div class="section-heading">
-          <h2 id="featured-title">Projets à la une</h2>
+          <h2 id="featured-title">Projet à la une</h2>
         </div>
-        <div class="featured-grid">
+        <div class="featured-grid featured-grid--single">
           <article v-if="featuredProject" class="featured-project-card">
             <div class="featured-project-card__content">
-              <PillBadge :tone="tagTone(featuredProject.category)">{{ featuredProject.category }}</PillBadge>
+              <div class="featured-badge-row">
+                <PillBadge :tone="tagTone(featuredProject.category)">{{ featuredProject.category }}</PillBadge>
+                <span class="featured-status-pill">
+                  <ShieldCheck :size="14" aria-hidden="true" />
+                  <span>Pièce Maîtresse &amp; Mémoire RSI</span>
+                </span>
+              </div>
               <h3>{{ featuredProject.title }}</h3>
               <p>{{ featuredProject.description }}</p>
-              <button class="button primary" type="button" @click="openCaseStudy(featuredProject); playClick()" @mouseenter="playHover">
-                Voir l'étude de cas
-              </button>
+
+              <!-- Points clés du projet SOC -->
+              <div class="featured-key-metrics">
+                <div class="metric-pill">
+                  <strong>5 VMs</strong>
+                  <span>VirtualBox NAT</span>
+                </div>
+                <div class="metric-pill">
+                  <strong>9 Phases</strong>
+                  <span>Déploiement</span>
+                </div>
+                <div class="metric-pill">
+                  <strong>4 Scénarios</strong>
+                  <span>Tests réels &amp; Attaques</span>
+                </div>
+                <div class="metric-pill">
+                  <strong>0 FCFA</strong>
+                  <span>Licences Open-Source</span>
+                </div>
+              </div>
+
+              <div class="featured-actions">
+                <button class="button primary" type="button" @click="openCaseStudy(featuredProject); playClick()" @mouseenter="playHover">
+                  <Terminal :size="16" aria-hidden="true" />
+                  <span>Explorer l'architecture &amp; les scénarios d'attaque</span>
+                </button>
+              </div>
             </div>
           </article>
           <article v-else class="featured-project-card empty-featured">
@@ -181,13 +211,6 @@
               </p>
             </div>
           </article>
-
-          <div class="future-projects" aria-label="Domaines de projets futurs">
-            <article v-for="category in futureProjectCategories" :key="category" class="future-project-card" :class="tagTone(category)">
-              <span>{{ category }}</span>
-              <small>À venir</small>
-            </article>
-          </div>
         </div>
       </section>
 
@@ -752,7 +775,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX, ShieldCheck, Terminal } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import ItemCard from './components/ItemCard.vue';
