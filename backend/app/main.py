@@ -248,7 +248,7 @@ def _is_admin_request(request: Request) -> bool:
         app_settings = get_settings()
         payload = jwt.decode(token, app_settings.jwt_secret, algorithms=["HS256"])
         username = payload.get("sub")
-        return bool(username and secrets.compare_digest(username, app_settings.admin_username))
+        return bool(username and _secrets.compare_digest(username, app_settings.admin_username))
     except Exception:
         return False
 
@@ -265,7 +265,7 @@ def list_testimonials(request: Request, db: Session = Depends(get_db)) -> list[T
 
 @app.post("/api/testimonials", response_model=TestimonialRead, status_code=status.HTTP_201_CREATED)
 @limiter.limit("5/minute")
-def create_testimonial(_request: Request, payload: TestimonialCreate, db: Session = Depends(get_db)) -> Testimonial:
+def create_testimonial(request: Request, payload: TestimonialCreate, db: Session = Depends(get_db)) -> Testimonial:  # noqa: ARG001
     testimonial = Testimonial(**payload.model_dump())
     db.add(testimonial)
     db.commit()
@@ -365,7 +365,7 @@ def _send_via_smtp(msg: EmailMessage, settings: Settings) -> None:
 @app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("3/minute")
 def send_contact_email(
-    _request: Request,
+    request: Request,  # noqa: ARG001 — required by slowapi
     payload: ContactRequest,
     settings: Settings = Depends(get_settings),
 ) -> dict[str, str]:
