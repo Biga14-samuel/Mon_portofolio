@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     smtp_recipient: str = "samuelbiga10@gmail.com"
     sendgrid_api_key: str | None = None
+    supabase_url: str | None = None
+    supabase_key: str | None = None
+    supabase_bucket: str = "portfolio-uploads"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

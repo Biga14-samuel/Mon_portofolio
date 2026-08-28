@@ -413,7 +413,7 @@ os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.post("/api/upload", dependencies=[Depends(get_current_admin)])
-async def upload_image(file: UploadFile = File(...)):
+async def upload_image(file: UploadFile = File(...), settings: Settings = Depends(get_settings)):
     ALLOWED_EXTENSIONS = {
         "image/jpeg": "jpg",
         "image/jpg": "jpg",
@@ -427,12 +427,39 @@ async def upload_image(file: UploadFile = File(...)):
     if content_type not in ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail="Type de fichier non autorisé. Seules les images (JPEG, PNG, GIF, WEBP) et les PDF sont acceptés.")
 
-    # Force the extension based on the content type, ignore the original filename's extension completely
     ext = ALLOWED_EXTENSIONS[content_type]
-    
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
-    file_path = os.path.join("uploads", unique_filename)
 
+    # Supabase Storage direct upload (cloud-persistent)
+    if settings.supabase_url and settings.supabase_key:
+        try:
+            file_bytes = await file.read()
+            supabase_url = settings.supabase_url.rstrip("/")
+            bucket = (settings.supabase_bucket or "portfolio-uploads").strip()
+            upload_endpoint = f"{supabase_url}/storage/v1/object/{bucket}/{unique_filename}"
+            
+            headers = {
+                "Authorization": f"Bearer {settings.supabase_key}",
+                "apikey": settings.supabase_key,
+                "Content-Type": content_type,
+            }
+            
+            resp = requests.post(upload_endpoint, data=file_bytes, headers=headers, timeout=20)
+            if resp.status_code in [200, 201]:
+                public_url = f"{supabase_url}/storage/v1/object/public/{bucket}/{unique_filename}"
+                logger.info(f"Fichier uploadé avec succès sur Supabase Storage: {public_url}")
+                return {"url": public_url}
+            else:
+                logger.error(f"Erreur Supabase Storage ({resp.status_code}): {resp.text}")
+                raise HTTPException(status_code=500, detail=f"Erreur d'upload Supabase: {resp.text}")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Exception lors de l'upload Supabase: {e}")
+            raise HTTPException(status_code=500, detail=f"Impossible d'uploader le fichier vers Supabase: {str(e)}")
+
+    # Fallback disque local (développement local sans Supabase Storage configuré)
+    file_path = os.path.join("uploads", unique_filename)
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
