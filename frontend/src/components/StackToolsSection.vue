@@ -237,7 +237,7 @@ const filteredRealizationGroups = computed(() => {
   return realizationGroups.value
     .map((group) => {
       const matched = group.items.filter((item) => {
-        const haystack = `${item.title} ${item.subtitle || ''} ${item.description || ''} ${item.content?.tools || ''}`.toLowerCase();
+        const haystack = `${item.title} ${item.subtitle || ''} ${item.description || ''} ${item.category || ''} ${item.content?.tools || ''}`.toLowerCase();
         return haystack.includes(query);
       });
       if (!matched.length) return null;
