@@ -136,7 +136,7 @@ onMounted(() => {
   const canvas = canvasRef.value;
   if (!canvas) return;
 
-  const ctx = canvas.getContext('2d', { alpha: false }); // alpha:false = fond opaque, perf. meilleure
+  const ctx = canvas.getContext('2d', { alpha: true });
   let W = 0;
   let H = 0;
   let dpr = 1;
@@ -174,9 +174,7 @@ onMounted(() => {
 
   // ── Boucle d'animation ────────────────────────────────────────────────────
   function animate() {
-    // Effacement blanc pur — pas de traîne
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, W, H);
+    ctx.clearRect(0, 0, W, H);
 
     for (let i = 0, n = particles.length; i < n; i++) {
       particles[i].update(W, H, mouseX, mouseY);
@@ -222,7 +220,7 @@ onMounted(() => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   display: block;
 }

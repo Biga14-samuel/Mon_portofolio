@@ -107,10 +107,19 @@
                 </div>
               </div>
 
-              <!-- Description -->
-              <p class="live-card-desc">{{ item.description }}</p>
+              <!-- Mise en avant : Réalisation / Projet d'acquisition -->
+              <div class="live-card-origin-box">
+                <span class="origin-label">Acquis sur :</span>
+                <span class="origin-badge" :class="`origin-badge--${getSkillOrigin(item).type}`">
+                  <Briefcase :size="13" class="origin-icon" />
+                  <span>{{ getSkillOrigin(item).label }}</span>
+                </span>
+              </div>
 
-              <!-- Tags / Outils liés -->
+              <!-- Savoir-faire synthétique (sans répétitions inutiles) -->
+              <p class="live-card-desc">{{ getCleanSummary(item.description) }}</p>
+
+              <!-- Tags / Outils clés liés -->
               <div v-if="getToolsList(item).length" class="live-card-tags">
                 <span 
                   v-for="tool in getToolsList(item)" 
@@ -128,7 +137,7 @@
                   type="button" 
                   @click="$emit('view-case', item)"
                 >
-                  <span>Fiche détaillée</span>
+                  <span>Fiche détaillée &amp; Preuves</span>
                   <ArrowUpRight :size="15" aria-hidden="true" />
                 </button>
 
@@ -185,7 +194,8 @@ import {
   Cpu, 
   Activity, 
   FileCode2, 
-  Database 
+  Database,
+  Briefcase
 } from 'lucide-vue-next';
 import PillBadge from './PillBadge.vue';
 import { tagTone } from '../services/tags';
@@ -294,6 +304,53 @@ function getToolsList(item) {
     .map((t) => t.trim())
     .filter(Boolean)
     .slice(0, 4);
+}
+
+function getSkillOrigin(item) {
+  const text = `${item.title} ${item.subtitle || ''} ${item.description || ''} ${item.category || ''} ${item.content?.tools || ''}`.toLowerCase();
+  
+  if (text.includes('wazuh') || text.includes('yara') || text.includes('shuffle') || text.includes('iris') || text.includes('misp') || text.includes('fim') || text.includes('deepseek') || text.includes('telegram')) {
+    return {
+      label: 'Projet SOC Open-Source (PANESS IT)',
+      type: 'soc',
+    };
+  }
+  if (text.includes('suricata') || text.includes('nids') || text.includes('wireshark') || text.includes('nmap') || text.includes('tcp') || text.includes('port')) {
+    return {
+      label: 'Projet SOC / NIDS & Détection Réseau',
+      type: 'network',
+    };
+  }
+  if (text.includes('auditd') || text.includes('sysmon') || text.includes('edr') || text.includes('active response')) {
+    return {
+      label: 'Projet SOC / Télémétrie Endpoints',
+      type: 'endpoint',
+    };
+  }
+  if (text.includes('docker') || text.includes('virtualbox') || text.includes('linux') || text.includes('windows') || text.includes('debian') || text.includes('multi-os')) {
+    return {
+      label: 'Lab Virtualisé (5 VMs VirtualBox)',
+      type: 'lab',
+    };
+  }
+  if (text.includes('python') || text.includes('bash') || text.includes('script') || text.includes('api') || text.includes('webhook')) {
+    return {
+      label: 'Automatisation & Intégrations API',
+      type: 'script',
+    };
+  }
+  return {
+    label: 'Lab & Validation Opérationnelle',
+    type: 'default',
+  };
+}
+
+function getCleanSummary(desc) {
+  if (!desc) return '';
+  if (desc.length > 160) {
+    return desc.slice(0, 155).replace(/[,;.\s]+$/, '') + '...';
+  }
+  return desc;
 }
 </script>
 
@@ -590,11 +647,59 @@ function getToolsList(item) {
   margin-top: 5px;
 }
 
+.live-card-origin-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.55rem 0.75rem;
+  background: rgba(119, 33, 111, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--ubuntu-orange-dark);
+}
+
+.origin-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.origin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--aubergine-dark);
+}
+
+.origin-icon {
+  color: var(--ubuntu-orange-dark);
+  flex-shrink: 0;
+}
+
+.origin-badge--soc .origin-icon {
+  color: #e95420;
+}
+
+.origin-badge--network .origin-icon {
+  color: #005a9c;
+}
+
+.origin-badge--endpoint .origin-icon {
+  color: #77216f;
+}
+
+.origin-badge--lab .origin-icon {
+  color: #1f7a3f;
+}
+
 .live-card-desc {
   margin: 0;
   color: var(--muted);
-  font-size: 0.93rem;
-  line-height: 1.6;
+  font-size: 0.92rem;
+  line-height: 1.55;
   flex-grow: 1;
 }
 
