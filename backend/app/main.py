@@ -1,11 +1,11 @@
 import smtplib
 from email.message import EmailMessage
-from datetime import datetime, timezone
-import requests
-from fastapi import Depends, FastAPI, HTTPException, Request, Response, status, UploadFile, File
+from fastapi import (
+    Depends, FastAPI, HTTPException, Request, Response, status,
+    UploadFile, File,
+)
 import logging
-import sys
-import traceback
+import requests
 
 # Use uvicorn logger for consistency in Render logs
 logger = logging.getLogger("uvicorn.error")
@@ -19,9 +19,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-
-
-
 from .auth import (
     check_rate_limit,
     clear_failed_attempts,
@@ -41,6 +38,7 @@ try:
         conn.exec_driver_sql("ALTER TYPE item_type ADD VALUE IF NOT EXISTS 'blog'")
 except Exception as exc:
     logger.debug("Type item_type 'blog' déjà existant ou non supporté: %s", exc)
+
 from .schemas import (
     ContactRequest,
     ItemCreate,
@@ -88,18 +86,31 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+import secrets as _secrets
+
+
 @app.post("/api/login", response_model=TokenResponse)
-def login(request: Request, payload: LoginRequest, settings: Settings = Depends(get_settings)) -> TokenResponse:
+def login(
+    request: Request,
+    payload: LoginRequest,
+    settings: Settings = Depends(get_settings),
+) -> TokenResponse:
     check_rate_limit(request)
-    import secrets
-    valid_username = secrets.compare_digest(payload.username, settings.admin_username)
+    valid_username = _secrets.compare_digest(
+        payload.username, settings.admin_username
+    )
     valid_password = verify_password(payload.password, settings.admin_password_hash)
     if not valid_username or not valid_password:
         register_failed_attempt(request)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Identifiants invalides.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Identifiants invalides.",
+        )
 
     clear_failed_attempts(request)
-    return TokenResponse(access_token=create_access_token(settings.admin_username, settings))
+    return TokenResponse(
+        access_token=create_access_token(settings.admin_username, settings)
+    )
 
 
 @app.get("/api/items", response_model=list[ItemRead])
@@ -109,68 +120,12 @@ def list_items(type: ItemType | None = None, db: Session = Depends(get_db)) -> l
         query = query.where(Item.type == type)
     return list(db.scalars(query))
 
-def _parse_cisa_feed(data: dict, url: str, now: float) -> dict[str, object]:
-    vulnerabilities = data.get("vulnerabilities", []) if isinstance(data, dict) else []
-    vulnerabilities = sorted(
-        [v for v in vulnerabilities if isinstance(v, dict)],
-        key=lambda v: (v.get("dateAdded") or "", v.get("cveID") or ""),
-        reverse=True,
-    )
-    items = [
-        {
-            "cveID": vuln.get("cveID", ""),
-            "vendorProject": vuln.get("vendorProject", ""),
-            "product": vuln.get("product", ""),
-            "vulnerabilityName": vuln.get("vulnerabilityName", ""),
-            "dateAdded": vuln.get("dateAdded", ""),
-            "shortDescription": vuln.get("shortDescription", ""),
-            "requiredAction": vuln.get("requiredAction", ""),
-            "dueDate": vuln.get("dueDate", ""),
-        }
-        for vuln in vulnerabilities[:12]
-    ]
-    return {
-        "catalogVersion": data.get("catalogVersion", ""),
-        "dateReleased": data.get("dateReleased", ""),
-        "count": data.get("count", len(vulnerabilities)),
-        "sourceUrl": url,
-        "items": items,
-        "updatedAt": now,
-        "stale": False,
-    }
+from .veille import get_veille_payload
 
 
 @app.get("/api/veille")
 def get_veille(limit: int = 8) -> dict[str, object]:
-    limit = max(1, min(limit, 12))
-    now = datetime.now(timezone.utc).timestamp()
-    cached = getattr(app.state, "veille_cache", None)
-    if cached and now < cached.get("expires_at", 0):
-        cached_payload = dict(cached["payload"])
-        cached_payload["items"] = cached_payload.get("items", [])[:limit]
-        return cached_payload
-
-    url = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
-    try:
-        response = requests.get(url, timeout=20, headers={"Accept": "application/json"})
-        response.raise_for_status()
-        payload = _parse_cisa_feed(response.json(), url, now)
-        app.state.veille_cache = {"payload": payload, "expires_at": now + 120}
-        response_payload = dict(payload)
-        response_payload["items"] = payload["items"][:limit]
-        return response_payload
-    except Exception as exc:
-        logger.exception("Échec de récupération de la veille CISA: %s", exc)
-        cached = getattr(app.state, "veille_cache", None)
-        if cached:
-            stale_payload = dict(cached["payload"])
-            stale_payload["items"] = stale_payload.get("items", [])[:limit]
-            stale_payload["stale"] = True
-            return stale_payload
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Impossible de récupérer la veille automatique pour le moment.",
-        ) from exc
+    return get_veille_payload(app.state, limit)
 
 
 @app.get("/api/tags", response_model=list[TagRead])
@@ -303,14 +258,14 @@ def list_testimonials(request: Request, db: Session = Depends(get_db)) -> list[T
     # If admin token is provided, return all testimonials (including non-visible ones for moderation).
     query = select(Testimonial).order_by(Testimonial.created_at.desc())
     if not _is_admin_request(request):
-        query = query.where(Testimonial.is_visible == True)
+        query = query.where(Testimonial.is_visible.is_(True))
         
     return list(db.scalars(query))
 
 
 @app.post("/api/testimonials", response_model=TestimonialRead, status_code=status.HTTP_201_CREATED)
 @limiter.limit("5/minute")
-def create_testimonial(request: Request, payload: TestimonialCreate, db: Session = Depends(get_db)) -> Testimonial:
+def create_testimonial(_request: Request, payload: TestimonialCreate, db: Session = Depends(get_db)) -> Testimonial:
     testimonial = Testimonial(**payload.model_dump())
     db.add(testimonial)
     db.commit()
@@ -410,7 +365,7 @@ def _send_via_smtp(msg: EmailMessage, settings: Settings) -> None:
 @app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("3/minute")
 def send_contact_email(
-    request: Request,
+    _request: Request,
     payload: ContactRequest,
     settings: Settings = Depends(get_settings),
 ) -> dict[str, str]:
@@ -501,6 +456,4 @@ async def upload_image(file: UploadFile = File(...), settings: Settings = Depend
         shutil.copyfileobj(file.file, buffer)
 
     return {"url": f"/uploads/{unique_filename}"}
-
-# Trigger reload now
 

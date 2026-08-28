@@ -1,14 +1,20 @@
 export function stripEmojis(input) {
   if (!input && input !== 0) return '';
-  const str = String(input);
-  // Regex to remove most emoji characters and pictographs
-  const emojiPattern = new RegExp(
-    '([\\u2700-\\u27BF]|' +
-    '[\\uE000-\\uF8FF]|' +
-    '[\\uD83C-\\uDBFF\\uDC00-\\uDFFF]|' +
-    '[\\u2011-\\u26FF]|' +
-    '[\\uFE00-\\uFE0F])',
-    'g',
-  );
-  return str.replace(emojiPattern, '').trim();
+  return Array.from(String(input))
+    .filter((char) => {
+      const code = char.codePointAt(0);
+      if (!code) return false;
+      // Supplemental symbols and pictographs, Emojis
+      if (code >= 0x1f300 && code <= 0x1faff) return false;
+      // Dingbats and misc symbols
+      if (code >= 0x2600 && code <= 0x27bf) return false;
+      // Variation selectors and zero-width joiner
+      if (code >= 0xfe00 && code <= 0xfe0f) return false;
+      if (code === 0x200d) return false;
+      // Regional indicators / Flags
+      if (code >= 0x1f1e0 && code <= 0x1f1ff) return false;
+      return true;
+    })
+    .join('')
+    .trim();
 }
