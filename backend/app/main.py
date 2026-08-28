@@ -33,7 +33,7 @@ from .auth import (
 )
 from .config import Settings, get_settings
 from .database import get_db, engine, Base
-from .models import ITEM_TYPES, Item, Tag, Testimonial
+from .models import Item, Tag, Testimonial
 
 Base.metadata.create_all(bind=engine)
 try:
