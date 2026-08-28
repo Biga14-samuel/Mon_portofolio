@@ -1,19 +1,23 @@
 import { reactive } from 'vue';
 
-const TOKEN_KEY = 'cercle_admin_token';
+const STORAGE_SESSION_KEY = 'portfolio_admin_session';
 
 export const authState = reactive({
-  token: sessionStorage.getItem(TOKEN_KEY) || '',
+  token: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(STORAGE_SESSION_KEY) || '' : '',
 });
 
 export function setToken(token) {
   authState.token = token;
-  sessionStorage.setItem(TOKEN_KEY, token);
+  if (typeof sessionStorage !== 'undefined') {
+    sessionStorage.setItem(STORAGE_SESSION_KEY, token);
+  }
 }
 
 export function clearToken() {
   authState.token = '';
-  sessionStorage.removeItem(TOKEN_KEY);
+  if (typeof sessionStorage !== 'undefined') {
+    sessionStorage.removeItem(STORAGE_SESSION_KEY);
+  }
 }
 
 export function isAuthenticated() {

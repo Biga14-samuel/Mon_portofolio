@@ -7,37 +7,35 @@ Usage:
 
 This script is safe by default (dry-run). It supports SQLite and Postgres via the project's DB config.
 """
-import re
+import unicodedata
 import argparse
 from pprint import pprint
 
 from app.database import SessionLocal
 from app.models import Item, Tag, Testimonial
 
-# Broad emoji/pictograph ranges
-EMOJI_RE = re.compile(
-    r'['
-    r'\U0001F300-\U0001F5FF'  # symbols & pictographs
-    r'\U0001F600-\U0001F64F'  # emoticons
-    r'\U0001F680-\U0001F6FF'  # transport & map
-    r'\U0001F1E0-\U0001F1FF'  # flags
-    r'\U00002700-\U000027BF'  # dingbats
-    r'\U00002600-\U000026FF'  # misc symbols
-    r'\U0000FE00-\U0000FE0F'  # variation selectors
-    r'\U0001F900-\U0001F9FF'  # supplemental symbols and pictographs
-    r'\U0000200D'              # zero width joiner
-    r']+', flags=re.UNICODE)
 
-VARIATION_SELECTORS = re.compile(r"[\uFE0E\uFE0F]")
+def is_emoji_or_symbol(char: str) -> bool:
+    """Safely determines if a character is an emoji, symbol, or variation selector without regex."""
+    code = ord(char)
+    # Variation selectors (FE00-FE0F) and Zero Width Joiner (200D)
+    if code in (0x200D, 0xFE0E, 0xFE0F) or (0xFE00 <= code <= 0xFE0F):
+        return True
+    # Surrogates and Supplemental symbols / Emojis (1F300-1FAFF)
+    if 0x1F300 <= code <= 0x1FAFF or 0x1F1E0 <= code <= 0x1F1FF:
+        return True
+    # Dingbats and Misc symbols (2600-27BF)
+    if 0x2600 <= code <= 0x27BF:
+        return True
+    # Unicode category 'So' (Symbol Other)
+    cat = unicodedata.category(char)
+    return cat in ('So', 'Sk')
 
 
 def strip_emojis(text: str | None) -> str | None:
     if text is None:
         return None
-    s = str(text)
-    s = EMOJI_RE.sub('', s)
-    s = VARIATION_SELECTORS.sub('', s)
-    return s.strip()
+    return "".join(c for c in str(text) if not is_emoji_or_symbol(c)).strip()
 
 
 def process_items(session, apply: bool):
