@@ -12,7 +12,7 @@
         </h2>
       </div>
       <p class="stack-intro">
-        Savoir-faire et technologies validés en conditions opérationnelles, classés par projet. Cliquez sur une compétence pour consulter sa fiche détaillée.
+        Savoir-faire et technologies validés en conditions opérationnelles, classés par réalisation. Cliquez sur une compétence pour consulter sa fiche détaillée.
       </p>
     </div>
 
@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <!-- Groupes structurés par Réalisation -->
+    <!-- Groupes dynamiques structurés par Réalisation -->
     <div v-if="filteredRealizationGroups.length" class="stack-active-container">
       <div 
         v-for="group in filteredRealizationGroups" 
@@ -48,7 +48,7 @@
         <!-- En-tête de la réalisation -->
         <div class="stack-realization-banner">
           <div class="realization-banner-title">
-            <component :is="group.icon" :size="20" class="realization-icon" aria-hidden="true" />
+            <component :is="group.icon || ShieldAlert" :size="20" class="realization-icon" aria-hidden="true" />
             <div>
               <h3 class="realization-title-text">{{ group.title }}</h3>
               <span class="realization-badge-pill">{{ group.badge }}</span>
@@ -59,7 +59,7 @@
           </span>
         </div>
 
-        <!-- Grille compacte de mini-cartes épurées (pas de pavé de texte redondant) -->
+        <!-- Grille compacte de mini-cartes ultra-épurées (sans badges redondants) -->
         <div class="stack-compact-grid">
           <div 
             v-for="item in group.items" 
@@ -79,11 +79,6 @@
                 </div>
                 
                 <span v-if="item.subtitle" class="compact-card-subtitle">{{ item.subtitle }}</span>
-                
-                <!-- Puces outils succinctes -->
-                <div v-if="getToolsList(item).length" class="compact-card-tools">
-                  <span v-for="t in getToolsList(item)" :key="t" class="compact-tool-chip">{{ t }}</span>
-                </div>
               </div>
 
               <div class="compact-card-action">
@@ -92,7 +87,7 @@
               </div>
             </button>
 
-            <!-- Actions admin en survol/mode admin -->
+            <!-- Actions admin en mode admin -->
             <div v-if="editable" class="compact-admin-actions" aria-label="Actions administrateur">
               <button 
                 class="icon-button small" 
@@ -146,6 +141,7 @@ import {
 const props = defineProps({
   id: { type: String, required: true },
   items: { type: Array, required: true },
+  realisations: { type: Array, default: () => [] },
   empty: { type: String, required: true },
   editable: { type: Boolean, default: false },
 });
@@ -154,63 +150,83 @@ defineEmits(['edit', 'delete', 'view-case']);
 
 const searchQuery = ref('');
 
-// Groupes par réalisation concrète
+// Groupes par réalisation dynamique (prend en compte toutes les réalisations du portfolio)
 const realizationGroups = computed(() => {
-  const groups = {
-    soc: {
-      id: 'soc',
-      title: 'Conception & Déploiement SOC Open-Source (PANESS IT)',
-      badge: 'Projet SOC SIEM / SOAR',
-      icon: ShieldAlert,
+  const realisationsList = props.realisations || [];
+  const groupsMap = new Map();
+
+  // 1. Initialiser les groupes pour chaque réalisation réelle
+  realisationsList.forEach((r) => {
+    const isCyber = (r.category || '').toLowerCase().includes('cyber');
+    const isNetwork = (r.category || '').toLowerCase().includes('réseau') || (r.category || '').toLowerCase().includes('network');
+    
+    groupsMap.set(r.title.toLowerCase().trim(), {
+      id: `real-${r.id}`,
+      title: r.title,
+      badge: r.category || 'Réalisation',
+      icon: isCyber ? ShieldAlert : isNetwork ? Cpu : Server,
       items: [],
-    },
-    lab: {
-      id: 'lab',
-      title: 'Infrastructure Réseau & Virtualisation Multi-OS',
-      badge: 'Lab 5 VMs VirtualBox',
-      icon: Server,
-      items: [],
-    },
-    network: {
-      id: 'network',
-      title: 'Détection Réseau & Analyse de Flux (NIDS)',
-      badge: 'Suricata / Wireshark / Nmap',
-      icon: Cpu,
-      items: [],
-    },
-    automation: {
-      id: 'automation',
-      title: 'Automatisation, Scripting & Pipelines de Réponse',
-      badge: 'Python / Bash / Webhooks API',
-      icon: FileCode2,
-      items: [],
-    },
-    other: {
-      id: 'other',
-      title: 'Autres Compétences Techniques & Méthodologies',
-      badge: 'Transversal',
-      icon: Layers,
-      items: [],
-    }
+    });
+  });
+
+  // Groupe pour les compétences transversales / de base
+  const generalGroup = {
+    id: 'general',
+    title: 'Compétences Transversales & Environnements Systèmes',
+    badge: 'Socle Technique',
+    icon: Layers,
+    items: [],
   };
 
   props.items.forEach((item) => {
-    const text = `${item.title} ${item.subtitle || ''} ${item.description || ''} ${item.category || ''} ${item.content?.tools || ''}`.toLowerCase();
+    // A. Lien explicite via item.content.realisation_title
+    const explicitReal = item.content?.realisation_title?.toLowerCase().trim();
+    if (explicitReal && groupsMap.has(explicitReal)) {
+      groupsMap.get(explicitReal).items.push(item);
+      return;
+    }
+
+    // B. Correspondance par mot-clé avec les titres des réalisations existantes
+    const itemText = `${item.title} ${item.subtitle || ''} ${item.description || ''} ${item.category || ''} ${item.content?.tools || ''}`.toLowerCase();
     
-    if (text.includes('wazuh') || text.includes('yara') || text.includes('shuffle') || text.includes('iris') || text.includes('misp') || text.includes('fim') || text.includes('deepseek') || text.includes('telegram')) {
-      groups.soc.items.push(item);
-    } else if (text.includes('suricata') || text.includes('wireshark') || text.includes('nmap') || text.includes('cisco') || text.includes('protocole') || text.includes('nids')) {
-      groups.network.items.push(item);
-    } else if (text.includes('python') || text.includes('bash') || text.includes('script') || text.includes('api') || text.includes('webhook')) {
-      groups.automation.items.push(item);
-    } else if (text.includes('docker') || text.includes('virtualbox') || text.includes('linux') || text.includes('windows') || text.includes('debian') || text.includes('multi-os') || text.includes('auditd') || text.includes('sysmon')) {
-      groups.lab.items.push(item);
+    let matchedGroup = null;
+    for (const [key, group] of groupsMap.entries()) {
+      const keyWords = key.split(/[\s,;:–—\-_]+/).filter((w) => w.length > 3);
+      if (keyWords.some((w) => itemText.includes(w))) {
+        matchedGroup = group;
+        break;
+      }
+    }
+
+    if (matchedGroup) {
+      matchedGroup.items.push(item);
     } else {
-      groups.other.items.push(item);
+      if (groupsMap.size > 0 && (itemText.includes('soc') || itemText.includes('wazuh') || itemText.includes('yara') || itemText.includes('suricata') || itemText.includes('shuffle') || itemText.includes('iris') || itemText.includes('misp') || itemText.includes('fim') || itemText.includes('auditd') || itemText.includes('sysmon'))) {
+        const firstGroup = Array.from(groupsMap.values())[0];
+        firstGroup.items.push(item);
+      } else {
+        generalGroup.items.push(item);
+      }
     }
   });
 
-  return Object.values(groups).filter(g => g.items.length > 0);
+  const result = Array.from(groupsMap.values()).filter((g) => g.items.length > 0);
+  if (generalGroup.items.length > 0) {
+    result.push(generalGroup);
+  }
+
+  // Si aucune réalisation n'est encore enregistrée, afficher un groupe de secours avec les compétences
+  if (result.length === 0 && props.items.length > 0) {
+    result.push({
+      id: 'default',
+      title: 'Compétences & Outils Techniques',
+      badge: 'Général',
+      icon: Terminal,
+      items: [...props.items],
+    });
+  }
+
+  return result;
 });
 
 // Filtrage par texte de recherche
@@ -232,16 +248,6 @@ const filteredRealizationGroups = computed(() => {
     })
     .filter(Boolean);
 });
-
-function getToolsList(item) {
-  const raw = item?.content?.tools || '';
-  if (!raw) return [];
-  return raw
-    .split(/[,;|]+/)
-    .map((t) => t.trim())
-    .filter(Boolean)
-    .slice(0, 4);
-}
 </script>
 
 <style scoped>
@@ -424,8 +430,8 @@ function getToolsList(item) {
 /* Grille compacte */
 .stack-compact-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.85rem;
 }
 
 .stack-compact-card-wrapper {
@@ -437,13 +443,13 @@ function getToolsList(item) {
   text-align: left;
   background: #ffffff;
   border: 1px solid rgba(119, 33, 111, 0.14);
-  border-radius: 14px;
-  padding: 1rem 1.15rem;
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.85rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  gap: 0.65rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   cursor: pointer;
   font-family: inherit;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
@@ -452,13 +458,13 @@ function getToolsList(item) {
 .stack-compact-card:hover {
   transform: translateY(-3px);
   border-color: var(--ubuntu-orange);
-  box-shadow: 0 8px 20px rgba(233, 84, 32, 0.18);
+  box-shadow: 0 6px 18px rgba(233, 84, 32, 0.18);
 }
 
 .compact-card-main {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.25rem;
 }
 
 .compact-card-top {
@@ -470,7 +476,7 @@ function getToolsList(item) {
 
 .compact-card-title {
   margin: 0;
-  font-size: 1.02rem;
+  font-size: 1rem;
   font-weight: 800;
   color: var(--aubergine-dark);
   line-height: 1.3;
@@ -494,32 +500,15 @@ function getToolsList(item) {
   flex-shrink: 0;
 }
 
-.compact-card-tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.4rem;
-}
-
-.compact-tool-chip {
-  padding: 0.18rem 0.45rem;
-  border-radius: 6px;
-  background: rgba(119, 33, 111, 0.06);
-  border: 1px solid rgba(119, 33, 111, 0.12);
-  color: var(--aubergine-dark);
-  font-size: 0.74rem;
-  font-weight: 700;
-}
-
 .compact-card-action {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.35rem;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: var(--ubuntu-orange-dark);
-  padding-top: 0.4rem;
+  padding-top: 0.35rem;
   border-top: 1px dashed rgba(119, 33, 111, 0.1);
 }
 

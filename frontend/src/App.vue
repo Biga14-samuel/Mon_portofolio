@@ -281,6 +281,7 @@
           <StackToolsSection
             id="competences"
             :items="grouped.competence"
+            :realisations="grouped.realisation"
             empty="Aucune compétence publiée pour le moment."
             :editable="Boolean(authState.token)"
             @edit="openEdit"

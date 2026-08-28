@@ -20,6 +20,16 @@
       <small v-if="availableCategories.length === 0" style="color: var(--accent);">Aucun tag. Veuillez en ajouter via "Gérer les tags".</small>
     </label>
 
+    <label v-if="form.type === 'competence'">
+      Réalisation source (Projet où cette compétence a été acquise)
+      <select v-model="form.content.realisation_title">
+        <option value="">-- Sélectionner la réalisation liée (ou transversale) --</option>
+        <option v-for="real in availableRealisations" :key="real.id" :value="real.title">
+          {{ real.title }}
+        </option>
+      </select>
+    </label>
+
     <label>
       Titre
       <input v-model.trim="form.title" required maxlength="140" :placeholder="form.type === 'realisation' ? 'Ex: Conception & Déploiement d\'un SOC Open-Source' : form.type === 'blog' ? 'Ex: Guide d\'analyse des alertes Wazuh' : 'Ex: Administrateur Réseau & Sécurité'" />
@@ -122,7 +132,7 @@
 
 <script setup>
 import { reactive, ref, watch, computed, onMounted } from 'vue';
-import { getTags } from '../services/api';
+import { getTags, getItems } from '../services/api';
 import ImageUploader from './ImageUploader.vue';
 import MultiImageUploader from './MultiImageUploader.vue';
 import FileUploader from './FileUploader.vue';
@@ -137,6 +147,7 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'cancel']);
 const error = ref('');
 const allTags = ref([]);
+const availableRealisations = ref([]);
 
 function handleUploadError(msg) {
   error.value = msg;
@@ -167,6 +178,7 @@ const form = reactive({
   image_url: '',
   display_order: 0,
   content: {
+    realisation_title: '',
     objective: '',
     architecture: '',
     architecture_image: '',
@@ -185,8 +197,10 @@ onMounted(async () => {
     if (!form.category && availableCategories.value.length > 0) {
       form.category = availableCategories.value[0];
     }
+    const realItems = await getItems('realisation');
+    availableRealisations.value = realItems || [];
   } catch (e) {
-    console.error('Erreur chargement tags', e);
+    console.error('Erreur chargement tags/réalisations', e);
   }
 });
 
