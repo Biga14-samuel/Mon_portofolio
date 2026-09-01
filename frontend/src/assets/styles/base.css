@@ -22,6 +22,35 @@
   font-family: 'Ubuntu Sans', Ubuntu, system-ui, sans-serif;
   color: var(--text);
   background: var(--surface);
+  color-scheme: light;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UBUNTU YARU DARK MODE
+   ══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --ubuntu-orange: #e95420;
+  --ubuntu-orange-dark: #ff6b3d;
+  --aubergine: #dda0dd;
+  --aubergine-dark: #f0c0ec;
+  --surface: #190915;
+  --surface-card: #251221;
+  --surface-soft: #2e1829;
+  --text: #f5edf3;
+  --muted: #bda8b7;
+  --outline: #472641;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 12px 36px rgba(0, 0, 0, 0.65);
+  --tag-cyber: #ff4d88;
+  --tag-network: #4da6ff;
+  --tag-system: #4ade80;
+  --tag-web: #c084fc;
+  --tag-data: #2dd4bf;
+  --tag-method: #fb923c;
+  --tag-design: #f87171;
+  --tag-learning: #a3e635;
+  color-scheme: dark;
 }
 
 * {
@@ -163,14 +192,24 @@ nav a:hover {
   color: var(--aubergine-dark);
 }
 
-.nav-button--sound {
+.nav-button--sound,
+.nav-button--theme {
   background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-button--sound:hover,
+.nav-button--theme:hover {
+  background: rgba(255, 255, 255, 0.24);
   color: #ffffff;
 }
 
-.nav-button--sound:hover {
-  background: rgba(255, 255, 255, 0.22);
-  color: #ffffff;
+.theme-label {
+  font-size: 12px;
+  letter-spacing: 0.02em;
 }
 
 .hamburger {
