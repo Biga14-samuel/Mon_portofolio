@@ -1200,7 +1200,16 @@ const caseDetailImages = computed(() => {
 
 const casePrimaryImage = computed(() => caseDetailImages.value[0] || '');
 const caseGalleryImages = computed(() => caseDetailImages.value.slice(1));
-const casePdfUrl = computed(() => resolveAssetUrl(caseStudyItem.value?.content?.pdf_url || ''));
+const casePdfUrl = computed(() => {
+  const itemPdf = caseStudyItem.value?.content?.pdf_url;
+  if (itemPdf && !itemPdf.includes('CV_Samnick')) {
+    return resolveAssetUrl(itemPdf);
+  }
+  if (isSocProject.value) {
+    return '/Memoire_SOC_PANESS_Samnick_Biga.pdf';
+  }
+  return itemPdf ? resolveAssetUrl(itemPdf) : '';
+});
 
 // Identifies SOC projects: item whose category, title, description or tools contains "soc", "wazuh" or "siem"
 const isSocProject = computed(() => {
@@ -1360,7 +1369,7 @@ const defaultSocProject = {
     alert_flow: 'Détection multi-couches (Auditd, Sysmon, Suricata, FIM) -> Corrélation Wazuh -> Enrichissement Threat Intel (MISP) & IA (DeepSeek) -> Orchestration SOAR (Shuffle) -> Ticket incident (DFIR-IRIS) -> Notification instantanée (Bot Telegram).',
     lessons: 'Maîtrise du cycle complet de réponse aux incidents, création de playbooks et scripts d\'automatisation Python/Bash, intégration d\'APIs de sécurité et validation par 4 scénarios d\'attaques réelles.',
     impact: 'Infrastructure opérationnelle pour PANESS IT avec 0€ de coût de licences logicielles, détection et neutralisation des menaces en moins de 3 secondes.',
-    pdf_url: '/CV_Samnick_Biga_Raoul_Aubin.pdf',
+    pdf_url: '/Memoire_SOC_PANESS_Samnick_Biga.pdf',
   }
 };
 
