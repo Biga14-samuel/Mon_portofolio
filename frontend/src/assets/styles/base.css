@@ -96,10 +96,10 @@ a {
   gap: clamp(10px, 2vw, 24px);
   padding: 8px 18px;
   border-radius: 999px;
-  background: rgba(44, 0, 30, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(44, 0, 30, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   box-shadow: none;
   color: #fff;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
