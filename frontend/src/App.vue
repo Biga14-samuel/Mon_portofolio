@@ -124,11 +124,11 @@
       </section>
 
       <section class="about-section reveal-on-scroll" id="apropos" aria-labelledby="about-title" style="position: relative; overflow: hidden;">
-        <div class="giant-watermark">ÉVOLUER</div>
+        <div class="giant-watermark" aria-hidden="true">ÉVOLUER</div>
         <div class="section-heading" style="position: relative; z-index: 1;">
           <h2 id="about-title">À propos</h2>
         </div>
-        <div class="about-lead">
+        <div class="about-lead" style="position: relative; z-index: 1;">
           <h3>
             Construire, déployer et sécuriser des infrastructures fiables, résilientes et prêtes à contrer les menaces modernes.
           </h3>
@@ -136,7 +136,7 @@
             Jeune ingénieur de réalisation en Réseaux et Sécurité Informatique (diplômé en Licence Professionnelle à l'IHTM), j'allie rigueur d'ingénierie terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d'architectures réseau haute disponibilité (Cisco, Fortinet), l'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.
           </p>
         </div>
-        <div class="about-grid">
+        <div class="about-grid" style="position: relative; z-index: 1;">
           <article class="about-card">
             <span>01</span>
             <h3>Ce que je réalise</h3>
