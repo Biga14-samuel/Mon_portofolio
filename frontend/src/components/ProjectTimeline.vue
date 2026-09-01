@@ -499,7 +499,7 @@ const kpis = [
   { value: '5', label: 'VMs VirtualBox NAT' },
   { value: '4', label: 'Scénarios d\'attaque validés' },
   { value: '< 3s', label: 'Temps de réponse aux incidents' },
-  { value: '100%', label: 'Open-Source (0€ licences)' },
+  { value: '100%', label: 'Open-Source (0 FCFA de licences)' },
   { value: '7', label: 'Outils SOC intégrés' },
 ];
 

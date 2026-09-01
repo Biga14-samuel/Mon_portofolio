@@ -79,7 +79,7 @@
           </p>
           <ul class="hero-facts" aria-label="Informations principales">
             <li>Yaoundé, Cameroun</li>
-            <li>Réseaux (Cisco, Fortinet), Systèmes (Linux/Windows), Sécurité (SIEM, EDR)</li>
+            <li>Réseaux (Cisco, PfSense), Systèmes (Linux/Windows), Sécurité (SIEM, EDR)</li>
             <li>Détection, réponse aux incidents et hardening</li>
           </ul>
           <div class="hero-actions">
@@ -133,7 +133,7 @@
             Construire, déployer et sécuriser des infrastructures fiables, résilientes et prêtes à contrer les menaces modernes.
           </h3>
           <p>
-            Jeune ingénieur de réalisation en Réseaux et Sécurité Informatique (diplômé en Licence Professionnelle à l'IHTM), j'allie rigueur d'ingénierie terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d'architectures réseau haute disponibilité (Cisco, Fortinet), l'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.
+            Jeune ingénieur de réalisation en Réseaux et Sécurité Informatique (diplômé en Licence Professionnelle à l'IHTM), j'allie rigueur d'ingénierie terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d'architectures réseau haute disponibilité (Cisco, PfSense), l'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.
           </p>
         </div>
         <div class="about-grid" style="position: relative; z-index: 1;">
@@ -923,7 +923,7 @@ const contactEmail = 'samuelbiga10@gmail.com';
 const suggestedQuestions = [
   'Êtes-vous disponible pour une opportunité ?',
   'Quels sont vos tarifs pour une mission ?',
-  'Pouvez-vous configurer un firewall Fortinet ?',
+  'Pouvez-vous configurer un firewall PfSense ?',
   'Quel est votre niveau en Python et automatisation ?',
   'Intervenez-vous sur les réseaux et systèmes Linux/Windows ?',
 ];
@@ -1368,7 +1368,7 @@ const defaultSocProject = {
     architecture: 'Réseau NAT VirtualBox 192.168.100.0/24 interconnectant 5 machines virtuelles : wazuh-server (Amazon Linux 2023), soc-services (Docker MISP/IRIS/Shuffle), agent-linux (Debian 12), agent-windows (Win 10), kali-attacker (Kali Linux).',
     alert_flow: 'Détection multi-couches (Auditd, Sysmon, Suricata, FIM) -> Corrélation Wazuh -> Enrichissement Threat Intel (MISP) & IA (DeepSeek) -> Orchestration SOAR (Shuffle) -> Ticket incident (DFIR-IRIS) -> Notification instantanée (Bot Telegram).',
     lessons: 'Maîtrise du cycle complet de réponse aux incidents, création de playbooks et scripts d\'automatisation Python/Bash, intégration d\'APIs de sécurité et validation par 4 scénarios d\'attaques réelles.',
-    impact: 'Infrastructure opérationnelle pour PANESS IT avec 0€ de coût de licences logicielles, détection et neutralisation des menaces en moins de 3 secondes.',
+    impact: 'Infrastructure opérationnelle pour PANESS IT avec 0 FCFA de coût de licences logicielles, détection et neutralisation des menaces en moins de 3 secondes.',
     pdf_url: '/Memoire_SOC_PANESS_Samnick_Biga.pdf',
   }
 };
