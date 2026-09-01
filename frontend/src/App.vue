@@ -82,23 +82,31 @@
             <li>Réseaux (Cisco, Fortinet), Systèmes (Linux/Windows), Sécurité (SIEM, EDR)</li>
             <li>Détection, réponse aux incidents et hardening</li>
           </ul>
+          <!-- Boutons CTA hero : hiérarchie claire en 2 rangées -->
           <div class="hero-actions">
-            <a class="button button-pill primary" href="#realisations" @click="playClick" @mouseenter="playHover">
-              Voir mes projets
-              <span class="icon-circle"><ArrowDown :size="16" /></span>
-            </a>
-            <a class="button button-pill secondary" href="#contact" @click="playClick" @mouseenter="playHover">
-              Me contacter
-              <span class="icon-circle"><ArrowRight :size="16" /></span>
-            </a>
-            <a class="button button-pill tertiary" href="/CV_Samnick_Biga_Raoul_Aubin.pdf" download="CV_Samnick_Biga_Raoul_Aubin.pdf" @click="playClick" @mouseenter="playHover" style="background: rgba(233, 84, 32, 0.1); color: var(--ubuntu-orange);">
-              Télécharger mon CV
-              <span class="icon-circle" style="background: var(--ubuntu-orange); color: white;"><FileDown :size="16" /></span>
-            </a>
-            <button class="button button-pill quaternary" type="button" @click="sharePortfolio" @mouseenter="playHover" style="background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);">
-              Partager
-              <span class="icon-circle" style="background: rgba(255, 255, 255, 0.2); color: white;"><Share2 :size="16" /></span>
-            </button>
+            <!-- Rangée 1 : actions principales -->
+            <div class="hero-actions__primary">
+              <a class="button button-pill hero-cta-main" href="#contact" @click="playClick" @mouseenter="playHover">
+                Me contacter
+                <span class="icon-circle"><ArrowRight :size="16" /></span>
+              </a>
+              <a class="button button-pill hero-cta-secondary" href="#realisations" @click="playClick" @mouseenter="playHover">
+                Voir mes projets
+                <span class="icon-circle"><ArrowDown :size="16" /></span>
+              </a>
+            </div>
+            <!-- Rangée 2 : liens discrets -->
+            <div class="hero-actions__links">
+              <a class="hero-text-link" href="/CV_Samnick_Biga_Raoul_Aubin.pdf" download="CV_Samnick_Biga_Raoul_Aubin.pdf" @click="playClick" @mouseenter="playHover">
+                <FileDown :size="14" aria-hidden="true" />
+                Télécharger le CV
+              </a>
+              <span class="hero-actions__sep" aria-hidden="true">·</span>
+              <button class="hero-text-link" type="button" @click="sharePortfolio" @mouseenter="playHover">
+                <Share2 :size="14" aria-hidden="true" />
+                Partager
+              </button>
+            </div>
           </div>
           <a class="scroll-cue" href="#realisations" aria-label="Descendre vers les projets" @click="playClick" @mouseenter="playHover">
             <span></span>
