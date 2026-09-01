@@ -25,11 +25,6 @@
           <span class="hamburger-line"></span>
         </button>
         <nav class="nav-links" :class="{ 'is-open': menuOpen }" aria-label="Navigation principale" @click="menuOpen = false">
-          <button class="nav-button nav-button--theme" type="button" @click.stop="toggleTheme" @mouseenter="playHover" :aria-label="isDark ? 'Passer en mode clair' : 'Passer en mode sombre'" :title="isDark ? 'Mode clair' : 'Mode sombre'">
-            <Sun v-if="isDark" :size="15" aria-hidden="true" />
-            <Moon v-else :size="15" aria-hidden="true" />
-            <span class="theme-label">{{ isDark ? 'Clair' : 'Sombre' }}</span>
-          </button>
           <button class="nav-button nav-button--sound" @click.stop="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
             {{ audioEnabled ? 'Son ON' : 'Son OFF' }}
           </button>
@@ -781,7 +776,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX, ShieldCheck, Terminal, Share2, Sun, Moon } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX, ShieldCheck, Terminal, Share2 } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import ItemCard from './components/ItemCard.vue';
@@ -822,26 +817,6 @@ function handleImgError(e) {
   } catch (err) {
     // noop
   }
-}
-
-const isDark = ref(false);
-
-function applyTheme(dark) {
-  isDark.value = dark;
-  if (typeof document !== 'undefined') {
-    if (dark) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      try { localStorage.setItem('portfolio-theme', 'dark'); } catch (e) {}
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-      try { localStorage.setItem('portfolio-theme', 'light'); } catch (e) {}
-    }
-  }
-}
-
-function toggleTheme() {
-  playClick();
-  applyTheme(!isDark.value);
 }
 
 const currentPath = ref(window.location.pathname);
@@ -1404,17 +1379,11 @@ const featuredProject = computed(() => {
 });
 
 onMounted(async () => {
-  // --- THÈME SOMBRE / CLAIR ---
+  // S'assurer que le thème clair est actif par défaut
   try {
-    const savedTheme = localStorage.getItem('portfolio-theme');
-    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      applyTheme(true);
-    } else {
-      applyTheme(false);
-    }
-  } catch (e) {
-    applyTheme(false);
-  }
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.removeItem('portfolio-theme');
+  } catch (e) {}
 
   // --- PROTECTION DU CONTENU ---
   // Désactiver le clic droit
