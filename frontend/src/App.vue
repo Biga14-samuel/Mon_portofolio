@@ -95,6 +95,10 @@
               Télécharger mon CV
               <span class="icon-circle" style="background: var(--ubuntu-orange); color: white;"><FileDown :size="16" /></span>
             </a>
+            <button class="button button-pill quaternary" type="button" @click="sharePortfolio" @mouseenter="playHover" style="background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);">
+              Partager
+              <span class="icon-circle" style="background: rgba(255, 255, 255, 0.2); color: white;"><Share2 :size="16" /></span>
+            </button>
           </div>
           <a class="scroll-cue" href="#realisations" aria-label="Descendre vers les projets" @click="playClick" @mouseenter="playHover">
             <span></span>
@@ -772,7 +776,7 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX, ShieldCheck, Terminal } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX, ShieldCheck, Terminal, Share2 } from 'lucide-vue-next';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import ItemCard from './components/ItemCard.vue';
@@ -827,6 +831,40 @@ function notifyError(msg) {
   playError();
   toast.error(msg);
 }
+
+const sharePortfolio = async () => {
+  playClick();
+  const shareUrl = 'https://raoulbiga-phi.vercel.app/';
+  const shareData = {
+    title: 'Samnick Biga Raoul Aubin | Portfolio IT & Cybersécurité',
+    text: 'Découvrez le portfolio professionnel de Samnick Biga Raoul Aubin (Réseau, Systèmes & Cybersécurité SOC) :',
+    url: shareUrl,
+  };
+
+  if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+    try {
+      await navigator.share(shareData);
+      playSuccess();
+      toast.success('Lien partagé avec succès !');
+      return;
+    } catch (err) {
+      if (err?.name === 'AbortError') return;
+    }
+  }
+
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareUrl);
+      playSuccess();
+      toast.success('Lien du portfolio copié dans le presse-papiers !');
+      return;
+    }
+  } catch {
+    // fallback
+  }
+
+  toast.info(`Lien du portfolio : ${shareUrl}`);
+};
 
 onErrorCaptured((err) => {
   console.error("Vue Error Captured:", err);
