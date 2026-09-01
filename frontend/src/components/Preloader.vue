@@ -2,10 +2,6 @@
   <transition name="preloader">
     <div v-if="show" class="preloader-overlay">
       <div class="preloader-content">
-        <div class="logo-text">
-          <span class="brand-mark"></span>
-          SAMNICK BIGA
-        </div>
 
         <!-- Berceau de Newton — 5 boules couleurs Ubuntu -->
         <div class="newton-cradle">
@@ -55,26 +51,6 @@ onMounted(() => {
   gap: 2rem;
 }
 
-/* ── Logo texte ──────────────────────────────────────────── */
-.logo-text {
-  font-family: 'Ubuntu', 'Inter', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.brand-mark {
-  display: inline-block;
-  width: 28px;
-  height: 28px;
-  background: #e95420; /* Ubuntu Orange */
-  border-radius: 50%;
-  box-shadow: 0 0 18px #e9542066;
-}
 
 /* ── Texte sous le loader ───────────────────────────────── */
 .preloader-hint {
