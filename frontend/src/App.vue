@@ -77,11 +77,11 @@
             Je conçois, sécurise et documente des environnements réseau avec une attention particulière pour la
             supervision, la détection et la réponse aux incidents.
           </p>
-          <div class="hero-tags" aria-label="Informations principales" role="list">
-            <span class="hero-tag" role="listitem">📍 Yaoundé, Cameroun</span>
-            <span class="hero-tag" role="listitem">🌐 Réseaux · Systèmes · Sécurité</span>
-            <span class="hero-tag hero-tag--accent" role="listitem">🛡️ SOC · SIEM · EDR · Hardening</span>
-          </div>
+          <ul class="hero-facts" aria-label="Informations principales">
+            <li>Yaoundé, Cameroun</li>
+            <li>Réseaux (Cisco, Fortinet), Systèmes (Linux/Windows), Sécurité (SIEM, EDR)</li>
+            <li>Détection, réponse aux incidents et hardening</li>
+          </ul>
           <!-- Boutons CTA hero : hiérarchie claire en 2 rangées -->
           <div class="hero-actions">
             <!-- Rangée 1 : actions principales -->
