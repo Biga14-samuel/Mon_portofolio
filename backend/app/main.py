@@ -265,7 +265,9 @@ def list_testimonials(request: Request, db: Session = Depends(get_db)) -> list[T
 
 @app.post("/api/testimonials", response_model=TestimonialRead, status_code=status.HTTP_201_CREATED)
 @limiter.limit("5/minute")
-def create_testimonial(request: Request, payload: TestimonialCreate, db: Session = Depends(get_db)) -> Testimonial:  # noqa: ARG001
+def create_testimonial(  # noqa: ARG001 — request required by slowapi
+    request: Request, payload: TestimonialCreate, db: Session = Depends(get_db)
+) -> Testimonial:
     testimonial = Testimonial(**payload.model_dump())
     db.add(testimonial)
     db.commit()

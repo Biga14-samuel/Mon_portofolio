@@ -93,6 +93,13 @@ def process_testimonials(session, apply: bool):
     return changed, samples
 
 
+import logging
+from pprint import pformat
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
+
+
 def main():
     parser = argparse.ArgumentParser(description='Purge emojis in DB text fields')
     parser.add_argument('--apply', action='store_true', help='Apply changes to the database')
@@ -102,32 +109,29 @@ def main():
 
     session = SessionLocal()
     try:
-        print('Scanning DB for emoji occurrences (dry-run={})...'.format(not apply))
+        logger.info('Scanning DB for emoji occurrences (dry-run=%s)...', not apply)
         items_changed, item_samples = process_items(session, apply)
         tags_changed, tag_samples = process_tags(session, apply)
         tests_changed, test_samples = process_testimonials(session, apply)
 
-        print('\nSummary:')
-        print(f'  Items affected: {items_changed}')
-        print(f'  Tags affected: {tags_changed}')
-        print(f'  Testimonials affected: {tests_changed}')
+        logger.info('\nSummary:')
+        logger.info('  Items affected: %d', items_changed)
+        logger.info('  Tags affected: %d', tags_changed)
+        logger.info('  Testimonials affected: %d', tests_changed)
 
         if item_samples:
-            print('\nItem samples:')
-            pprint(item_samples[:5])
+            logger.info('\nItem samples:\n%s', pformat(item_samples[:5]))
         if tag_samples:
-            print('\nTag samples:')
-            pprint(tag_samples[:5])
+            logger.info('\nTag samples:\n%s', pformat(tag_samples[:5]))
         if test_samples:
-            print('\nTestimonial samples:')
-            pprint(test_samples[:5])
+            logger.info('\nTestimonial samples:\n%s', pformat(test_samples[:5]))
 
         if apply:
             session.commit()
-            print('\nChanges applied and committed.')
+            logger.info('\nChanges applied and committed.')
         else:
             session.rollback()
-            print('\nDry-run complete. No changes were written. Rerun with --apply to apply.')
+            logger.info('\nDry-run complete. No changes were written. Rerun with --apply to apply.')
 
     finally:
         session.close()

@@ -192,6 +192,11 @@ def normalize_existing_orders(session):
                 break
 
 
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
+
 session = SessionLocal()
 try:
     for tag_name in TAGS:
@@ -200,6 +205,6 @@ try:
         upsert_item(session, payload)
     normalize_existing_orders(session)
     session.commit()
-    print(f"Upserted {len(CERTIFICATIONS)} certification items and normalized parcours order.")
+    logger.info("Upserted %d certification items and normalized parcours order.", len(CERTIFICATIONS))
 finally:
     session.close()

@@ -2,9 +2,12 @@
 """Import a single 'Parcours' item: Brevet de Technicien (2020).
 Run with the project's venv and PYTHONPATH set to backend.
 """
-from datetime import datetime
+import logging
 from app.database import SessionLocal
 from app.models import Item
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 session = SessionLocal()
 try:
@@ -42,6 +45,6 @@ try:
     )
     session.add(item)
     session.commit()
-    print('Inserted item id:', item.id)
+    logger.info("Inserted item id: %s", item.id)
 finally:
     session.close()

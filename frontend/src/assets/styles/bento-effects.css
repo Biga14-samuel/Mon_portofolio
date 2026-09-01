@@ -1,0 +1,268 @@
+
+.pill-badge.orange {
+  border-color: rgba(233, 84, 32, 0.24);
+  background: rgba(233, 84, 32, 0.13);
+  color: #a92e07;
+}
+
+.pill-badge.neutral {
+  border-color: rgba(90, 65, 57, 0.2);
+  background: rgba(90, 65, 57, 0.08);
+  color: var(--muted);
+}
+
+:where(.pill-badge, .filter-pill, .future-project-card).tag-cyber {
+  border-color: color-mix(in srgb, var(--tag-cyber) 32%, transparent);
+  background: color-mix(in srgb, var(--tag-cyber) 13%, white);
+  color: var(--tag-cyber);
+}
+
+:where(.pill-badge, .filter-pill, .future-project-card).tag-network {
+  border-color: color-mix(in srgb, var(--tag-network) 32%, transparent);
+  background: color-mix(in srgb, var(--tag-network) 12%, white);
+  color: var(--tag-network);
+}
+
+:where(.pill-badge, .filter-pill, .future-project-card).tag-system {
+  border-color: color-mix(in srgb, var(--tag-system) 32%, transparent);
+  background: color-mix(in srgb, var(--tag-system) 12%, white);
+  color: var(--tag-system);
+}
+
+:where(.pill-badge, .filter-pill, .future-project-card).tag-web {
+  border-color: color-mix(in srgb, var(--tag-web) 32%, transparent);
+  background: color-mix(in srgb, var(--tag-web) 12%, white);
+  color: var(--tag-web);
+}
+
+:where(.pill-badge, .filter-pill, .future-project-card).tag-data {
+  border-color: color-mix(in srgb, var(--tag-data) 32%, transparent);
+  background: color-mix(in srgb, var(--tag-data) 12%, white);
+  color: var(--tag-data);
+}
+
+:where(.pill-badge, .filter-pill, .future-project-card).tag-method {
+  border-color: color-mix(in srgb, var(--tag-method) 34%, transparent);
+  background: color-mix(in srgb, var(--tag-method) 13%, white);
+  color: var(--tag-method);
+}
+
+:where(.pill-badge, .filter-pill, .future-project-card).tag-design {
+  border-color: color-mix(in srgb, var(--tag-design) 32%, transparent);
+  background: color-mix(in srgb, var(--tag-design) 12%, white);
+  color: var(--tag-design);
+}
+
+:where(.pill-badge, .filter-pill, .future-project-card).tag-learning {
+  border-color: color-mix(in srgb, var(--tag-learning) 32%, transparent);
+  background: color-mix(in srgb, var(--tag-learning) 12%, white);
+  color: var(--tag-learning);
+}
+
+.filter-pill.active.tag-cyber,
+.filter-pill.active.tag-network,
+.filter-pill.active.tag-system,
+.filter-pill.active.tag-web,
+.filter-pill.active.tag-data,
+.filter-pill.active.tag-method,
+.filter-pill.active.tag-design,
+.filter-pill.active.tag-learning {
+  color: #fff;
+}
+
+.filter-pill.active.tag-cyber {
+  background: var(--tag-cyber);
+  box-shadow: 0 10px 22px rgba(176, 0, 75, 0.2);
+}
+
+.filter-pill.active.tag-network {
+  background: var(--tag-network);
+  box-shadow: 0 10px 22px rgba(0, 90, 156, 0.2);
+}
+
+.filter-pill.active.tag-system {
+  background: var(--tag-system);
+  box-shadow: 0 10px 22px rgba(31, 122, 63, 0.2);
+}
+
+.filter-pill.active.tag-web {
+  background: var(--tag-web);
+  box-shadow: 0 10px 22px rgba(122, 61, 184, 0.2);
+}
+
+.filter-pill.active.tag-data {
+  background: var(--tag-data);
+  box-shadow: 0 10px 22px rgba(0, 108, 112, 0.2);
+}
+
+.filter-pill.active.tag-method {
+  background: var(--tag-method);
+  box-shadow: 0 10px 22px rgba(154, 77, 0, 0.18);
+}
+
+.filter-pill.active.tag-design {
+  background: var(--tag-design);
+  box-shadow: 0 10px 22px rgba(194, 59, 34, 0.18);
+}
+
+.filter-pill.active.tag-learning {
+  background: var(--tag-learning);
+  box-shadow: 0 10px 22px rgba(77, 95, 0, 0.18);
+}
+
+.portfolio-results {
+  animation: portfolioResultsIn 260ms ease both;
+}
+
+.filter-swap-enter-active,
+.filter-swap-leave-active {
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.filter-swap-enter-from,
+.filter-swap-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@keyframes portfolioResultsIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-section {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto 80px;
+}
+
+.portfolio-load-error {
+  width: min(760px, 100%);
+  margin: 0 auto 28px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  text-align: center;
+}
+
+@keyframes animatedWordFlow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 560ms ease,
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-heading {
+  border-bottom: 1px solid rgba(44, 0, 30, 0.08);
+  margin-bottom: 40px;
+  padding-bottom: 16px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--aubergine-dark);
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.content-section {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto 160px;
+}
+
+.cards-grid,
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.item-card,
+.stat-card,
+.login-card,
+.modal,
+.admin-table-card {
+  border-radius: 20px;
+  background: var(--surface-card);
+  box-shadow: var(--shadow);
+}
+
+.item-card {
+  min-height: 220px;
+  padding: 28px;
+  border-left: 5px solid var(--aubergine);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+  will-change: transform;
+}
+
+.item-card.realisation {
+  border-color: var(--ubuntu-orange);
+}
+
+.item-card:hover {
+  transform: translateY(-5px) scale(1.012);
+  box-shadow: var(--shadow-lift);
+}
+
+.item-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.item-card h3 {
+  margin: 22px 0 12px;
+  font-size: 24px;
+}
+
+.item-card p,
+.empty-state,
+.login-card p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.case-link {
+  margin-top: 18px;
+  border: 0;
+  border-bottom: 2px solid rgba(233, 84, 32, 0.45);
+  background: transparent;
+  color: var(--aubergine);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0 0 4px;
+}
