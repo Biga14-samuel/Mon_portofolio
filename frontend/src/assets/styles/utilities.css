@@ -89,8 +89,9 @@ footer {
   }
 
   .profile-photo-card {
-    width: min(100%, 560px);
-    height: clamp(440px, 78vw, 620px);
+    width: fit-content;
+    max-width: min(100%, 500px);
+    height: auto;
     margin: 0 auto;
   }
 

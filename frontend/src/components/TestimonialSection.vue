@@ -39,9 +39,6 @@
               </div>
               <span v-if="t.client_company" class="author-role">{{ t.client_company }}</span>
             </div>
-            <div class="author-avatar" :title="t.client_name">
-              {{ t.client_name.charAt(0) }}
-            </div>
           </div>
 
           <div v-if="editable" class="card-actions admin-controls">
@@ -215,19 +212,6 @@ defineEmits(['toggle-visibility', 'delete', 'add-testimonial']);
   opacity: 1;
 }
 
-.author-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: rgba(233, 84, 32, 0.13);
-  color: #a92e07;
-  border-radius: 50%;
-  font-size: 1rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
 
 .carousel-fade {
   position: absolute;
