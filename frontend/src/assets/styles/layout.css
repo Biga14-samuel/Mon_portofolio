@@ -91,84 +91,34 @@
   flex-wrap: wrap;
 }
 
-/* ── Hero CTA : 2 rangées ────────────────────────────────── */
 .hero-actions {
-  flex-direction: column;
-  align-items: flex-start;
+  display: flex;
+  align-items: center;
   gap: 14px;
-}
-
-.hero-actions__primary {
-  display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
+  margin-top: 24px;
 }
 
-/* Bouton principal — plein Ubuntu orange */
-.button.hero-cta-main {
+.button.button-pill.tertiary {
+  background: rgba(233, 84, 32, 0.12);
+  color: var(--ubuntu-orange);
+  border: 1px solid rgba(233, 84, 32, 0.35);
+}
+
+.button.button-pill.tertiary .icon-circle {
   background: var(--ubuntu-orange);
-  color: #fff;
-  border: none;
-  box-shadow: 0 4px 20px rgba(233, 84, 32, 0.35);
-}
-.button.hero-cta-main .icon-circle {
-  background: rgba(255,255,255,0.25);
-  color: #fff;
-}
-.button.hero-cta-main:hover {
-  background: #d14415;
-  box-shadow: 0 8px 28px rgba(233, 84, 32, 0.5);
+  color: #ffffff;
 }
 
-/* Bouton secondaire — outline transparent */
-.button.hero-cta-secondary {
-  background: transparent;
+.button.button-pill.quaternary {
+  background: var(--surface-card);
   color: var(--text);
-  border: 1.5px solid rgba(255,255,255,0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
-.button.hero-cta-secondary .icon-circle {
-  background: rgba(255,255,255,0.1);
+
+.button.button-pill.quaternary .icon-circle {
+  background: rgba(255, 255, 255, 0.12);
   color: var(--text);
-}
-.button.hero-cta-secondary:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.4);
-}
-
-/* Rangée liens discrets */
-.hero-actions__links {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.hero-actions__sep {
-  color: rgba(255,255,255,0.3);
-  font-size: 1.1rem;
-  line-height: 1;
-  user-select: none;
-}
-
-/* Lien texte discret (CV + Partager) */
-.hero-text-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  padding: 4px 2px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: rgba(255,255,255,0.52);
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-.hero-text-link:hover {
-  color: rgba(255,255,255,0.9);
 }
 
 .contact-links {

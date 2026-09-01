@@ -250,13 +250,3 @@
   background: transparent;
   position: relative;
 }
-
-.pill-badge::before {
-  content: '';
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  margin-right: 10px;
-  background-color: currentColor;
-}
