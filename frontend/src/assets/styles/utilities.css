@@ -171,20 +171,22 @@ img {
 /* =========================================
    CUSTOM PASTEL TOASTS (VUE-SONNER)
    ========================================= */
+[data-sonner-toast].toast-pastel-success,
 .toast-pastel-success {
-  background-color: #d1e7dd !important;
-  background-image: none !important;
-  color: #0f5132 !important;
-  border: 1px solid #badbcc !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  background-color: #d1e7dd;
+  background-image: none;
+  color: #0f5132;
+  border: 1px solid #badbcc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+[data-sonner-toast].toast-pastel-error,
 .toast-pastel-error {
-  background-color: #f8d7da !important;
-  background-image: none !important;
-  color: #842029 !important;
-  border: 1px solid #f5c2c7 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  background-color: #f8d7da;
+  background-image: none;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* =========================================

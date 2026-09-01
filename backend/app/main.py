@@ -265,9 +265,10 @@ def list_testimonials(request: Request, db: Session = Depends(get_db)) -> list[T
 
 @app.post("/api/testimonials", response_model=TestimonialRead, status_code=status.HTTP_201_CREATED)
 @limiter.limit("5/minute")
-def create_testimonial(  # noqa: ARG001 — request required by slowapi
+def create_testimonial(
     request: Request, payload: TestimonialCreate, db: Session = Depends(get_db)
 ) -> Testimonial:
+    _ = request.client  # Explicitly reference request for linter while satisfying slowapi
     testimonial = Testimonial(**payload.model_dump())
     db.add(testimonial)
     db.commit()
@@ -367,10 +368,11 @@ def _send_via_smtp(msg: EmailMessage, settings: Settings) -> None:
 @app.post("/api/contact", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("3/minute")
 def send_contact_email(
-    request: Request,  # noqa: ARG001 — required by slowapi
+    request: Request,
     payload: ContactRequest,
     settings: Settings = Depends(get_settings),
 ) -> dict[str, str]:
+    _ = request.client  # Explicitly reference request for linter while satisfying slowapi
     if not settings.smtp_user or not settings.smtp_password or not settings.smtp_recipient:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,

@@ -155,15 +155,17 @@ td {
    CUTOUT IMAGE (Floating Drop Shadow)
    ========================================= */
 
+.bento-card.cutout-wrapper,
 .cutout-wrapper {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-  overflow: visible !important;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  overflow: visible;
 }
 
+.bento-card .cutout-image,
 .cutout-image {
-  border-radius: 0 !important;
+  border-radius: 0;
   object-fit: contain;
   filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
 }

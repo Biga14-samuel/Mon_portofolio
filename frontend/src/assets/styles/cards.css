@@ -246,8 +246,8 @@
   text-transform: uppercase;
   letter-spacing: 2.5px;
   font-weight: 700;
-  border: none !important;
-  background: transparent !important;
+  border: none;
+  background: transparent;
   position: relative;
 }
 

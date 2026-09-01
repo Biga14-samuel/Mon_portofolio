@@ -1,20 +1,21 @@
+const EMOJI_RANGES = [
+  [0x1f300, 0x1faff], // Supplemental symbols and pictographs, Emojis
+  [0x2600, 0x27bf],   // Dingbats and misc symbols
+  [0xfe00, 0xfe0f],   // Variation selectors
+  [0x1f1e0, 0x1f1ff], // Regional indicators / Flags
+];
+
+function isEmojiCode(code) {
+  if (!code) return false;
+  if (code === 0x200d) return true;
+  return EMOJI_RANGES.some(([min, max]) => code >= min && code <= max);
+}
+
 export function stripEmojis(input) {
   if (!input && input !== 0) return '';
   return Array.from(String(input))
-    .filter((char) => {
-      const code = char.codePointAt(0);
-      if (!code) return false;
-      // Supplemental symbols and pictographs, Emojis
-      if (code >= 0x1f300 && code <= 0x1faff) return false;
-      // Dingbats and misc symbols
-      if (code >= 0x2600 && code <= 0x27bf) return false;
-      // Variation selectors and zero-width joiner
-      if (code >= 0xfe00 && code <= 0xfe0f) return false;
-      if (code === 0x200d) return false;
-      // Regional indicators / Flags
-      if (code >= 0x1f1e0 && code <= 0x1f1ff) return false;
-      return true;
-    })
+    .filter((char) => !isEmojiCode(char.codePointAt(0)))
     .join('')
     .trim();
 }
+
