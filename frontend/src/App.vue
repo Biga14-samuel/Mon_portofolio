@@ -795,7 +795,21 @@ import StackToolsSection from './components/StackToolsSection.vue';
 import SkillDetailView from './components/SkillDetailView.vue';
 import TagManager from './components/TagManager.vue';
 import { authState, clearToken, setToken } from './store/auth';
-import { createItem, deleteItem, getItems, login, resolveAssetUrl, updateItem, getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial as apiDeleteTestimonial, sendContactMessage, getVeille } from './services/api';
+import {
+  createItem,
+  deleteItem,
+  getItems,
+  login,
+  resolveAssetUrl,
+  updateItem,
+  getTestimonials,
+  createTestimonial,
+  updateTestimonial,
+  deleteTestimonial as apiDeleteTestimonial,
+  sendContactMessage,
+  getVeille,
+} from './services/api';
+
 import TestimonialSection from './components/TestimonialSection.vue';
 import { tagTone } from './services/tags';
 import NotFound from './components/NotFound.vue';

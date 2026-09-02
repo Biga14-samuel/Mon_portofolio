@@ -1,0 +1,27 @@
+/* =========================================
+   STYLES SPÉCIFIQUES SECTION RÉALISATIONS
+   Lisibilité des cartes sans impact sur les fiches de détail.
+   ========================================= */
+#realisations .item-card__meta {
+  gap: 14px;
+  line-height: 1.35;
+}
+
+#realisations .item-card__meta .pill-badge {
+  letter-spacing: 1.4px;
+  line-height: 1.35;
+}
+
+#realisations .item-card__meta > span {
+  line-height: 1.5;
+}
+
+#realisations .item-card h3 {
+  letter-spacing: 0;
+  line-height: 1.18;
+  text-wrap: balance;
+}
+
+#realisations .item-card p {
+  line-height: 1.72;
+}

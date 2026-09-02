@@ -411,12 +411,15 @@ def _upload_to_supabase(
     content_type: str,
     settings: Settings,
 ) -> str:
-    supabase_url = settings.supabase_url.rstrip("/")
-    bucket = (settings.supabase_bucket or "portfolio-uploads").strip()
+    raw_url = (settings.supabase_url or "").strip().rstrip("/")
+    if "/rest" in raw_url:
+        raw_url = raw_url.split("/rest")[0].rstrip("/")
+    supabase_url = raw_url
+    bucket = (settings.supabase_bucket or "portfolio-uploads").strip().strip("/")
     upload_endpoint = f"{supabase_url}/storage/v1/object/{bucket}/{unique_filename}"
     headers = {
-        "Authorization": f"Bearer {settings.supabase_key}",
-        "apikey": settings.supabase_key,
+        "Authorization": f"Bearer {settings.supabase_key.strip()}",
+        "apikey": settings.supabase_key.strip(),
         "Content-Type": content_type,
     }
     resp = requests.post(upload_endpoint, data=file_bytes, headers=headers, timeout=20)

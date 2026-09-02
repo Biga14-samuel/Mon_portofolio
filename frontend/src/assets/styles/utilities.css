@@ -182,35 +182,35 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 1ms !important;
-    animation-duration: 1ms !important;
-    animation-iteration-count: 1 !important;
+  html *,
+  html *::before,
+  html *::after {
+    scroll-behavior: auto;
+    transition-duration: 1ms;
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
   }
 
-  .reveal-on-scroll {
-    opacity: 1 !important;
-    transform: none !important;
+  html .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
   }
 
-  .profile-photo-card img,
-  .item-card:hover,
-  .about-card:hover,
-  .stack-column:hover,
-  .stack-tool:hover,
-  .contact-panel a:hover,
-  .featured-project-card:hover,
-  .future-project-card:hover,
-  .case-step:hover,
-  .button:hover {
-    transform: none !important;
+  html .profile-photo-card img,
+  html .item-card:hover,
+  html .about-card:hover,
+  html .stack-column:hover,
+  html .stack-tool:hover,
+  html .contact-panel a:hover,
+  html .featured-project-card:hover,
+  html .future-project-card:hover,
+  html .case-step:hover,
+  html .button:hover {
+    transform: none;
   }
 
-  .animated-word {
-    animation: none !important;
+  html .animated-word {
+    animation: none;
   }
 }
 
@@ -497,10 +497,4 @@ img {
   display: block;
   min-height: 0;
   margin-top: auto;
-}
-/* Lisibilité des cartes Réalisations : sans effet sur les fiches de détail. */
-#realisations .item-card__meta { gap: 14px; line-height: 1.35; }
-#realisations .item-card__meta .pill-badge { letter-spacing: 1.4px; line-height: 1.35; }
-#realisations .item-card__meta > span { line-height: 1.5; }
-#realisations .item-card h3 { letter-spacing: 0; line-height: 1.18; text-wrap: balance; }
-#realisations .item-card p { line-height: 1.72; }
+}
