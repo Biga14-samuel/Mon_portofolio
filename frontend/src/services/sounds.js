@@ -18,16 +18,6 @@ export function toggleSound() {
   return isEnabled;
 }
 
-export function setSoundEnabled(val) {
-  isEnabled = val;
-  if (isEnabled) {
-    initAudio();
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-  }
-}
-
 export function isSoundEnabled() {
   return isEnabled;
 }

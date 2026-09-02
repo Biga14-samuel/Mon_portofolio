@@ -20,6 +20,3 @@ export function clearToken() {
   }
 }
 
-export function isAuthenticated() {
-  return Boolean(authState.token);
-}
