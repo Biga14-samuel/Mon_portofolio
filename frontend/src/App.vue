@@ -166,7 +166,20 @@
           <h2 id="featured-title">Projet à la une</h2>
         </div>
         <div class="featured-grid featured-grid--single">
-          <article v-if="featuredProject" class="featured-project-card">
+          <!-- Chargement (Skeleton) -->
+          <article v-if="loading" class="featured-project-card skeleton-card" style="padding: 32px;" aria-label="Chargement du projet à la une...">
+            <div class="featured-project-card__content">
+              <div class="skeleton-title" style="width: 140px; height: 26px; border-radius: 999px; margin-bottom: 18px;"></div>
+              <div class="skeleton-title" style="width: 65%; height: 32px; margin-bottom: 14px;"></div>
+              <div class="skeleton-text" style="width: 90%; margin-bottom: 8px;"></div>
+              <div class="skeleton-text short" style="width: 70%; margin-bottom: 24px;"></div>
+              <div class="featured-key-metrics" style="opacity: 0.6;">
+                <div v-for="i in 4" :key="i" class="metric-pill skeleton-card" style="height: 58px;"></div>
+              </div>
+            </div>
+          </article>
+          <!-- Projet chargé -->
+          <article v-else-if="featuredProject" class="featured-project-card">
             <div class="featured-project-card__content">
               <div class="featured-badge-row">
                 <PillBadge :tone="tagTone(featuredProject.category)">{{ featuredProject.category }}</PillBadge>
@@ -202,6 +215,7 @@
               </div>
             </div>
           </article>
+          <!-- État vide -->
           <article v-else class="featured-project-card empty-featured">
             <div class="featured-project-card__content">
               <PillBadge tone="neutral">À sélectionner</PillBadge>
@@ -257,25 +271,14 @@
       </section>
 
       <div class="portfolio-results">
-        <div v-if="loading" class="skeleton-container" aria-label="Chargement du portfolio...">
-          <div class="skeleton-grid">
-            <div v-for="n in 3" :key="n" class="skeleton-card">
-              <div class="skeleton-img"></div>
-              <div class="skeleton-content">
-                <div class="skeleton-title"></div>
-                <div class="skeleton-text"></div>
-                <div class="skeleton-text short"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else class="portfolio-content">
+        <div class="portfolio-content">
           <p v-if="loadError" class="form-error portfolio-load-error" role="alert">{{ loadError }}</p>
 
           <ContentSection
             id="parcours"
             title="Mon parcours"
             :items="grouped.parcours"
+            :loading="loading"
             empty="Aucun parcours publié pour le moment."
             :editable="Boolean(authState.token)"
             @edit="openEdit"
@@ -286,6 +289,7 @@
             id="competences"
             :items="grouped.competence"
             :realisations="grouped.realisation"
+            :loading="loading"
             empty="Aucune compétence publiée pour le moment."
             :editable="Boolean(authState.token)"
             @edit="openEdit"
@@ -295,6 +299,7 @@
           <RealisationsSection
             id="realisations"
             :items="grouped.realisation"
+            :loading="loading"
             :editable="Boolean(authState.token)"
             @edit="openEdit"
             @delete="remove"
@@ -310,7 +315,18 @@
               <h2 id="blog-title">Blog</h2>
             </div>
             <p v-if="authState.token" class="blog-intro">Articles, notes et retours d'expérience publiés depuis l'administration. Les PDF peuvent être attachés à chaque article.</p>
-            <div v-if="grouped.blog.length" class="blog-grid blog-grid--managed">
+            
+            <!-- Chargement Blog (Skeleton) -->
+            <div v-if="loading" class="blog-grid blog-grid--managed" aria-label="Chargement du blog...">
+              <div v-for="n in 2" :key="n" class="skeleton-card" style="min-height: 200px; padding: 24px; border-radius: 16px;">
+                <div class="skeleton-title" style="width: 50%; height: 22px; margin-bottom: 14px;"></div>
+                <div class="skeleton-text" style="width: 90%; margin-bottom: 8px;"></div>
+                <div class="skeleton-text short" style="width: 65%;"></div>
+              </div>
+            </div>
+
+            <!-- Articles chargés -->
+            <div v-else-if="grouped.blog.length" class="blog-grid blog-grid--managed">
               <ItemCard
                 v-for="item in grouped.blog"
                 :key="item.id"

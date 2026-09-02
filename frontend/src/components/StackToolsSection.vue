@@ -38,8 +38,24 @@
       </div>
     </div>
 
+    <!-- État de chargement (Skeleton) -->
+    <div v-if="loading" class="stack-active-container" aria-label="Chargement des compétences...">
+      <div v-for="n in 2" :key="n" class="stack-group-block" style="padding: 24px;">
+        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 20px;">
+          <div class="skeleton-img" style="width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;"></div>
+          <div class="skeleton-title" style="width: 40%; height: 24px;"></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;">
+          <div v-for="k in 4" :key="k" class="skeleton-card" style="height: 72px; border-radius: 12px; padding: 12px;">
+            <div class="skeleton-title" style="width: 70%; height: 16px; margin-bottom: 8px;"></div>
+            <div class="skeleton-text short" style="width: 45%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Groupes dynamiques structurés par Réalisation -->
-    <div v-if="filteredRealizationGroups.length" class="stack-active-container">
+    <div v-else-if="filteredRealizationGroups.length" class="stack-active-container">
       <div 
         v-for="group in filteredRealizationGroups" 
         :key="group.id" 
@@ -143,6 +159,7 @@ const props = defineProps({
   items: { type: Array, required: true },
   realisations: { type: Array, default: () => [] },
   empty: { type: String, required: true },
+  loading: { type: Boolean, default: false },
   editable: { type: Boolean, default: false },
 });
 
