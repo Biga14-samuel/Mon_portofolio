@@ -131,11 +131,35 @@ export function deleteTestimonial(id, token) {
   });
 }
 
-export function sendContactMessage(email, subject, message) {
-  return request('/api/contact', {
-    method: 'POST',
-    body: JSON.stringify({ email, subject, message }),
-  });
+export async function sendContactMessage(email, subject, message) {
+  const WEB3FORMS_KEY = 'b8b2578f-5ef6-4fe5-a2f5-485c99ae5985';
+
+  try {
+    const formData = new FormData();
+    formData.append('access_key', WEB3FORMS_KEY);
+    formData.append('email', email);
+    formData.append('from_name', email);
+    formData.append('subject', subject || 'Nouveau message depuis votre portfolio');
+    formData.append('message', message);
+    formData.append('botcheck', '');
+
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+    if (response.ok && data.success) {
+      return data;
+    }
+    throw new Error(data.message || "Échec Web3Forms");
+  } catch (web3Error) {
+    // Fallback automatique vers l'API backend si besoin
+    return request('/api/contact', {
+      method: 'POST',
+      body: JSON.stringify({ email, subject, message }),
+    });
+  }
 }
 
 export function uploadImage(file, token) {
