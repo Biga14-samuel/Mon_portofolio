@@ -38,17 +38,21 @@
       </div>
     </div>
 
-    <!-- État de chargement (Skeleton) -->
+    <!-- État de chargement (Skeleton Dashboard & Outils) -->
     <div v-if="loading" class="stack-active-container" aria-label="Chargement des compétences...">
-      <div v-for="n in 2" :key="n" class="stack-group-block" style="padding: 24px;">
-        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 20px;">
-          <div class="skeleton-img" style="width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;"></div>
-          <div class="skeleton-title" style="width: 40%; height: 24px;"></div>
+      <div v-for="n in 2" :key="n" class="skeleton-card" style="padding: 24px; margin-bottom: 20px;">
+        <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 20px;">
+          <div class="skeleton-circle skeleton-shimmer" style="width: 40px; height: 40px;"></div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <div class="skeleton-pill skeleton-shimmer" style="width: 35%; height: 20px;"></div>
+            <div class="skeleton-pill skeleton-shimmer" style="width: 20%; height: 12px;"></div>
+          </div>
+          <div class="skeleton-pill skeleton-shimmer" style="width: 80px; height: 24px;"></div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;">
-          <div v-for="k in 4" :key="k" class="skeleton-card" style="height: 72px; border-radius: 12px; padding: 12px;">
-            <div class="skeleton-title" style="width: 70%; height: 16px; margin-bottom: 8px;"></div>
-            <div class="skeleton-text short" style="width: 45%;"></div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
+          <div v-for="k in 6" :key="k" class="skeleton-shimmer" style="height: 64px; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: center; gap: 6px;">
+            <div class="skeleton-pill" style="width: 70%; height: 14px; background: rgba(255,255,255,0.12);"></div>
+            <div class="skeleton-pill" style="width: 40%; height: 10px; background: rgba(255,255,255,0.08);"></div>
           </div>
         </div>
       </div>

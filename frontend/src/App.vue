@@ -166,15 +166,17 @@
           <h2 id="featured-title">Projet à la une</h2>
         </div>
         <div class="featured-grid featured-grid--single">
-          <!-- Chargement (Skeleton) -->
-          <article v-if="loading" class="featured-project-card skeleton-card" style="padding: 32px;" aria-label="Chargement du projet à la une...">
+          <!-- Chargement (Skeleton style moderne) -->
+          <article v-if="loading" class="featured-project-card skeleton-featured" aria-label="Chargement du projet à la une...">
             <div class="featured-project-card__content">
-              <div class="skeleton-title" style="width: 140px; height: 26px; border-radius: 999px; margin-bottom: 18px;"></div>
-              <div class="skeleton-title" style="width: 65%; height: 32px; margin-bottom: 14px;"></div>
-              <div class="skeleton-text" style="width: 90%; margin-bottom: 8px;"></div>
-              <div class="skeleton-text short" style="width: 70%; margin-bottom: 24px;"></div>
-              <div class="featured-key-metrics" style="opacity: 0.6;">
-                <div v-for="i in 4" :key="i" class="metric-pill skeleton-card" style="height: 58px;"></div>
+              <div class="skeleton-pill skeleton-shimmer" style="width: 130px; height: 26px; margin-bottom: 18px;"></div>
+              <div class="skeleton-pill skeleton-shimmer" style="width: 65%; height: 32px; margin-bottom: 14px;"></div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px;">
+                <div class="skeleton-pill skeleton-shimmer" style="width: 95%; height: 16px;"></div>
+                <div class="skeleton-pill skeleton-shimmer" style="width: 70%; height: 16px;"></div>
+              </div>
+              <div class="featured-key-metrics">
+                <div v-for="i in 4" :key="i" class="metric-pill skeleton-shimmer" style="height: 60px; border-radius: 14px;"></div>
               </div>
             </div>
           </article>
@@ -316,12 +318,16 @@
             </div>
             <p v-if="authState.token" class="blog-intro">Articles, notes et retours d'expérience publiés depuis l'administration. Les PDF peuvent être attachés à chaque article.</p>
             
-            <!-- Chargement Blog (Skeleton) -->
+            <!-- Chargement Blog (Skeleton style moderne) -->
             <div v-if="loading" class="blog-grid blog-grid--managed" aria-label="Chargement du blog...">
-              <div v-for="n in 2" :key="n" class="skeleton-card" style="min-height: 200px; padding: 24px; border-radius: 16px;">
-                <div class="skeleton-title" style="width: 50%; height: 22px; margin-bottom: 14px;"></div>
-                <div class="skeleton-text" style="width: 90%; margin-bottom: 8px;"></div>
-                <div class="skeleton-text short" style="width: 65%;"></div>
+              <div v-for="n in 2" :key="n" class="skeleton-card" style="padding: 24px; gap: 14px;">
+                <div class="skeleton-pill skeleton-shimmer" style="width: 100px; height: 22px;"></div>
+                <div class="skeleton-pill skeleton-shimmer" style="width: 60%; height: 22px;"></div>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+                  <div class="skeleton-pill skeleton-shimmer" style="width: 100%; height: 14px;"></div>
+                  <div class="skeleton-pill skeleton-shimmer" style="width: 80%; height: 14px;"></div>
+                  <div class="skeleton-pill skeleton-shimmer" style="width: 50%; height: 14px;"></div>
+                </div>
               </div>
             </div>
 

@@ -5,14 +5,23 @@
       <h2 id="realisations-title">Mes réalisations</h2>
     </div>
 
-    <!-- État de chargement (Skeleton) -->
+    <!-- État de chargement (Skeleton style YouTube / Média) -->
     <div v-if="loading" class="cards-grid" aria-label="Chargement des réalisations...">
-      <div v-for="n in 3" :key="n" class="skeleton-card" style="min-height: 320px; border-radius: 20px; overflow: hidden;">
-        <div class="skeleton-img" style="height: 180px;"></div>
-        <div class="skeleton-content">
-          <div class="skeleton-title" style="width: 65%; height: 24px;"></div>
-          <div class="skeleton-text" style="width: 95%;"></div>
-          <div class="skeleton-text short" style="width: 70%;"></div>
+      <div v-for="n in 3" :key="n" class="skeleton-card" style="border-radius: 20px; overflow: hidden;">
+        <!-- Miniature / Thumbnail -->
+        <div class="skeleton-img skeleton-shimmer" style="height: 190px; width: 100%;"></div>
+        <!-- Contenu -->
+        <div class="skeleton-content" style="padding: 20px; gap: 14px;">
+          <div style="display: flex; gap: 8px;">
+            <div class="skeleton-pill skeleton-shimmer" style="width: 80px; height: 22px;"></div>
+            <div class="skeleton-pill skeleton-shimmer" style="width: 60px; height: 22px;"></div>
+          </div>
+          <div class="skeleton-pill skeleton-shimmer" style="width: 75%; height: 22px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="skeleton-pill skeleton-shimmer" style="width: 100%; height: 14px;"></div>
+            <div class="skeleton-pill skeleton-shimmer" style="width: 80%; height: 14px;"></div>
+            <div class="skeleton-pill skeleton-shimmer" style="width: 50%; height: 14px;"></div>
+          </div>
         </div>
       </div>
     </div>

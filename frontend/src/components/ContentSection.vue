@@ -4,12 +4,21 @@
       <h2 :id="`${id}-title`">{{ title }}</h2>
     </div>
 
-    <!-- État de chargement (Skeleton) -->
-    <div v-if="loading" :class="layout === 'zig-zag' ? 'zig-zag-grid' : 'cards-grid'">
-      <div v-for="n in 3" :key="n" class="skeleton-card" style="min-height: 170px; padding: 20px;">
-        <div class="skeleton-title" style="width: 45%; height: 22px; margin-bottom: 12px;"></div>
-        <div class="skeleton-text" style="width: 90%; margin-bottom: 8px;"></div>
-        <div class="skeleton-text short" style="width: 60%;"></div>
+    <!-- État de chargement (Skeleton style moderne) -->
+    <div v-if="loading" :class="layout === 'zig-zag' ? 'zig-zag-grid' : 'cards-grid'" aria-label="Chargement...">
+      <div v-for="n in 3" :key="n" class="skeleton-card" style="padding: 24px; gap: 16px;">
+        <div style="display: flex; gap: 14px; align-items: center;">
+          <div class="skeleton-circle skeleton-shimmer" style="width: 44px; height: 44px;"></div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <div class="skeleton-pill skeleton-shimmer" style="width: 50%; height: 18px;"></div>
+            <div class="skeleton-pill skeleton-shimmer" style="width: 30%; height: 12px;"></div>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <div class="skeleton-pill skeleton-shimmer" style="width: 100%; height: 14px;"></div>
+          <div class="skeleton-pill skeleton-shimmer" style="width: 85%; height: 14px;"></div>
+          <div class="skeleton-pill skeleton-shimmer" style="width: 55%; height: 14px;"></div>
+        </div>
       </div>
     </div>
 
