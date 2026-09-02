@@ -1795,7 +1795,7 @@ async function handleContactSubmit() {
     notifySuccess('Votre message a bien été envoyé !');
   } catch (error) {
     contactStatus.value = '';
-    notifyError("Oups, notre serveur semble faire une pause. Veuillez vérifier votre connexion et réessayer.");
+    notifyError(error.message || "Oups, impossible d'envoyer le message. Veuillez réessayer.");
   }
 }
 </script>
