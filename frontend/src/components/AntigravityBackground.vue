@@ -6,7 +6,10 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useBgAnimation } from '../composables/useBgAnimation.js';
 
+import { useTheme } from '../composables/useTheme.js';
+
 const { bgEnabled } = useBgAnimation();
+const { isDark } = useTheme();
 
 // ── Props ────────────────────────────────────────────────────────────────────
 const props = defineProps({
@@ -16,24 +19,37 @@ const props = defineProps({
   },
 });
 
-// ── Palette Ubuntu pondérée ───────────────────────────────────────────────────
-// Poids : Orange 30%, Orange clair 15%, Aubergine foncée 20%, Aubergine 25%, Gris 10%
-const PALETTE_WEIGHTED = [];
-(function buildPalette() {
-  const entries = [
-    { color: '#E95420', weight: 30 }, // Orange principal
-    { color: '#F7A16E', weight: 15 }, // Orange clair
-    { color: '#2C001E', weight: 20 }, // Aubergine foncée
-    { color: '#77216F', weight: 25 }, // Aubergine
-    { color: '#AEA79F', weight: 10 }, // Gris chaud
-  ];
+// ── Palettes pondérées (Adaptation Light / Dark) ──────────────────────────────
+const PALETTE_LIGHT = [
+  { color: '#E95420', weight: 30 },
+  { color: '#F7A16E', weight: 15 },
+  { color: '#2C001E', weight: 20 },
+  { color: '#77216F', weight: 25 },
+  { color: '#AEA79F', weight: 10 },
+];
+
+const PALETTE_DARK = [
+  { color: '#FF7844', weight: 30 }, // Orange vif
+  { color: '#F7A16E', weight: 15 }, // Orange clair
+  { color: '#38BDF8', weight: 25 }, // Cyber cyan
+  { color: '#A855F7', weight: 20 }, // Violet néon
+  { color: '#94A3B8', weight: 10 }, // Slate lumineux
+];
+
+function buildWeightedList(entries) {
+  const list = [];
   for (const { color, weight } of entries) {
-    for (let i = 0; i < weight; i++) PALETTE_WEIGHTED.push(color);
+    for (let i = 0; i < weight; i++) list.push(color);
   }
-})();
+  return list;
+}
+
+const listLight = buildWeightedList(PALETTE_LIGHT);
+const listDark = buildWeightedList(PALETTE_DARK);
 
 function pickColor() {
-  return PALETTE_WEIGHTED[Math.floor(Math.random() * PALETTE_WEIGHTED.length)];
+  const list = isDark.value ? listDark : listLight;
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 // ── Paramètres ────────────────────────────────────────────────────────────────

@@ -5,15 +5,15 @@ import en from './en.js';
 const STORAGE_KEY = 'portfolio-locale';
 
 function getInitialLocale() {
+  // Le français est la langue officielle par défaut du portfolio
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'fr' || stored === 'en') return stored;
-    // Detect browser language
-    const lang = navigator.language || navigator.userLanguage || 'fr';
-    return lang.startsWith('fr') ? 'fr' : 'en';
-  } catch {
-    return 'fr';
-  }
+    // Si l'utilisateur avait 'en' stocké lors d'anciens tests, on réinitialise à 'fr'
+    if (stored === 'en') {
+      localStorage.setItem(STORAGE_KEY, 'fr');
+    }
+  } catch {}
+  return 'fr';
 }
 
 const locale = ref(getInitialLocale());
