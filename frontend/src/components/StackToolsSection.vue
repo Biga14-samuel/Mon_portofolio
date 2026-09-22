@@ -578,4 +578,121 @@ const filteredRealizationGroups = computed(() => {
   color: var(--muted);
   margin-bottom: 1rem;
 }
+
+/* ==========================================================================
+   DARK MODE ADAPTATION (Scoped Component Overrides)
+   ========================================================================== */
+:global([data-theme="dark"]) .stack-section.blueprint-bg {
+  background-color: #0b1120 !important;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.6) !important;
+}
+
+:global([data-theme="dark"]) .stack-heading h2 {
+  color: #ffffff !important;
+}
+
+:global([data-theme="dark"]) .stack-intro {
+  color: #94a3b8 !important;
+}
+
+:global([data-theme="dark"]) .stack-badge {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #cbd5e1 !important;
+}
+
+:global([data-theme="dark"]) .stack-search-bar input {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
+}
+
+:global([data-theme="dark"]) .stack-search-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+:global([data-theme="dark"]) .stack-search-bar input:focus {
+  border-color: #ff7844 !important;
+  box-shadow: 0 0 0 3px rgba(255, 120, 68, 0.22) !important;
+}
+
+:global([data-theme="dark"]) .search-icon {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+:global([data-theme="dark"]) .clear-search-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+:global([data-theme="dark"]) .clear-search-btn:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+:global([data-theme="dark"]) .stack-group-block {
+  background: #111827 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45) !important;
+}
+
+:global([data-theme="dark"]) .stack-realization-banner {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+:global([data-theme="dark"]) .realization-title-text {
+  color: #ffffff !important;
+}
+
+:global([data-theme="dark"]) .realization-badge-pill {
+  color: #94a3b8 !important;
+}
+
+:global([data-theme="dark"]) .realization-count-badge {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #34d399 !important;
+}
+
+:global([data-theme="dark"]) .stack-compact-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+:global([data-theme="dark"]) .stack-compact-card:hover {
+  background: #243248 !important;
+  border-color: rgba(255, 120, 68, 0.5) !important;
+  box-shadow: 0 8px 24px rgba(233, 84, 32, 0.25) !important;
+}
+
+:global([data-theme="dark"]) .compact-card-title {
+  color: #f8fafc !important;
+}
+
+:global([data-theme="dark"]) .compact-card-subtitle {
+  color: #fb923c !important;
+}
+
+:global([data-theme="dark"]) .compact-card-action {
+  color: #ff7844 !important;
+  border-top-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+:global([data-theme="dark"]) .stack-compact-card:hover .compact-card-action {
+  color: #ff9a74 !important;
+}
+
+:global([data-theme="dark"]) .stack-no-results {
+  background: #111827 !important;
+  color: #94a3b8 !important;
+}
+
+:global([data-theme="dark"]) .icon-button.small {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+}
 </style>

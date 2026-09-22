@@ -820,7 +820,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
+import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
 import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX, ShieldCheck, Terminal, Share2, Moon, Sun, Sparkles } from 'lucide-vue-next';
 import { useTheme } from './composables/useTheme.js';
 import { useI18n } from './i18n/index.js';
@@ -831,18 +831,20 @@ import ItemCard from './components/ItemCard.vue';
 import RealisationsSection from './components/RealisationsSection.vue';
 import ProjectGallery from './components/ProjectGallery.vue';
 import ProjectTimeline from './components/ProjectTimeline.vue';
-import ImageLightbox from './components/ImageLightbox.vue';
 import DynamicLogo from './components/DynamicLogo.vue';
 import Preloader from './components/Preloader.vue';
 import AntigravityBackground from './components/AntigravityBackground.vue';
 import { toggleSound, isSoundEnabled, playHover, playClick, playSuccess, playError } from './services/sounds';
 import Lenis from '@studio-freight/lenis';
-import ItemForm from './components/ItemForm.vue';
 import PillBadge from './components/PillBadge.vue';
 import StackToolsSection from './components/StackToolsSection.vue';
-import SkillDetailView from './components/SkillDetailView.vue';
-import TagManager from './components/TagManager.vue';
 import { authState, clearToken, setToken } from './store/auth';
+
+// Composants différés (code-splitting pour accélérer le chargement initial sur mobile)
+const ItemForm = defineAsyncComponent(() => import('./components/ItemForm.vue'));
+const ImageLightbox = defineAsyncComponent(() => import('./components/ImageLightbox.vue'));
+const SkillDetailView = defineAsyncComponent(() => import('./components/SkillDetailView.vue'));
+const TagManager = defineAsyncComponent(() => import('./components/TagManager.vue'));
 
 // ── Thème & i18n ──────────────────────────────────────────────
 const { isDark, toggleTheme } = useTheme();
@@ -1519,17 +1521,22 @@ onMounted(async () => {
 
   // -----------------------------
 
-  lenis = new Lenis({
-    duration: 1.2,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    smooth: true,
-  });
+  // Initialisation conditionnelle de Lenis : sur mobile / écran tactile,
+  // le défilement inertiel natif du navigateur est beaucoup plus performant et fluide (0 CPU)
+  const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+  if (!isTouchDevice) {
+    lenis = new Lenis({
+      duration: 1.1,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true,
+    });
 
-  function raf(time) {
-    lenis.raf(time);
+    function raf(time) {
+      lenis?.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
     rafId = requestAnimationFrame(raf);
   }
-  rafId = requestAnimationFrame(raf);
 
   prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   runTypewriter();
@@ -1541,7 +1548,9 @@ onMounted(async () => {
   clockTimer = window.setInterval(updateClock, 1000);
   veilleTimer = window.setInterval(loadVeille, 60000);
   window.addEventListener('scroll', handleScroll, { passive: true });
-  window.addEventListener('pointermove', handlePointerMove, { passive: true });
+  if (!isTouchDevice) {
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+  }
 });
 
 onUnmounted(() => {

@@ -1,13 +1,13 @@
 /* ==========================================================================
-   SKELETON LOADERS — DESIGN YOUTUBE / MODERN SHIMMER WAVE
+   SKELETON LOADERS — DESIGN YOUTUBE / GPU-ACCELERATED SHIMMER WAVE
    ========================================================================== */
 
 @keyframes skeletonShimmer {
   0% {
-    background-position: -200% 0;
+    transform: translateX(-100%);
   }
   100% {
-    background-position: 200% 0;
+    transform: translateX(100%);
   }
 }
 
@@ -20,16 +20,35 @@
 .skeleton-badge,
 .skeleton-bar,
 .skeleton-block {
+  position: relative;
+  overflow: hidden;
+  background: rgba(119, 33, 111, 0.07);
+}
+
+.skeleton-shimmer::after,
+.skeleton-img::after,
+.skeleton-title::after,
+.skeleton-text::after,
+.skeleton-circle::after,
+.skeleton-pill::after,
+.skeleton-badge::after,
+.skeleton-bar::after,
+.skeleton-block::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(255, 255, 255, 0.08) 25%,
-    rgba(255, 255, 255, 0.16) 50%,
-    rgba(255, 255, 255, 0.08) 75%,
-    rgba(255, 255, 255, 0.04) 100%
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 100%
   );
-  background-size: 200% 100%;
-  animation: skeletonShimmer 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform: translateX(-100%);
+  animation: skeletonShimmer 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
 }
 
 /* ── Formes génériques ─────────────────────────────────────────────────── */

@@ -478,7 +478,7 @@
   color: var(--muted);
 }
 
-/* ── Skeleton loaders dark ── */
+/* ── Skeleton loaders dark (GPU Composited) ── */
 [data-theme="dark"] .skeleton-card {
   background: var(--surface-card);
   border-color: var(--outline);
@@ -486,20 +486,23 @@
 [data-theme="dark"] .skeleton-shimmer,
 [data-theme="dark"] .skeleton-pill,
 [data-theme="dark"] .skeleton-img,
+[data-theme="dark"] .skeleton-title,
+[data-theme="dark"] .skeleton-text,
 [data-theme="dark"] .skeleton-circle {
+  background: rgba(255, 255, 255, 0.05);
+}
+[data-theme="dark"] .skeleton-shimmer::after,
+[data-theme="dark"] .skeleton-pill::after,
+[data-theme="dark"] .skeleton-img::after,
+[data-theme="dark"] .skeleton-title::after,
+[data-theme="dark"] .skeleton-text::after,
+[data-theme="dark"] .skeleton-circle::after {
   background: linear-gradient(
     90deg,
-    var(--surface-soft) 25%,
-    rgba(255, 255, 255, 0.06) 50%,
-    var(--surface-soft) 75%
+    transparent 0%,
+    rgba(255, 255, 255, 0.09) 50%,
+    transparent 100%
   );
-  background-size: 200% 100%;
-  animation: skeletonShimmerDark 1.5s infinite;
-}
-
-@keyframes skeletonShimmerDark {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
 }
 
 /* ── Footer dark ── */

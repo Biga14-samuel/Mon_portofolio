@@ -177,8 +177,10 @@ onMounted(() => {
   }
 
   function rebuildParticles(keepExisting = false) {
-    const area = W * H;
-    const target = Math.round(Math.min(280, Math.max(200, area / 3000)) * props.density);
+    const isMobile = W < 768 || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    const target = isMobile
+      ? Math.round(Math.min(45, Math.max(20, (W * H) / 16000)) * props.density)
+      : Math.round(Math.min(160, Math.max(70, (W * H) / 6000)) * props.density);
     if (!keepExisting || particles.length === 0) {
       particles = [];
       for (let i = 0; i < target; i++) {
@@ -193,6 +195,10 @@ onMounted(() => {
 
   // ── Boucle d'animation ────────────────────────────────────────────────────
   function animate() {
+    if (typeof document !== 'undefined' && document.hidden) {
+      raf = requestAnimationFrame(animate);
+      return;
+    }
     ctx.clearRect(0, 0, W, H);
 
     for (let i = 0, n = particles.length; i < n; i++) {
