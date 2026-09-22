@@ -144,17 +144,15 @@ const isSocProject = computed(() => {
   return haystack.includes('soc') || haystack.includes('wazuh') || haystack.includes('siem');
 });
 
-// Tech badges: subtitle (comma-split) + content.tools
+// Tech badges: uniquement depuis content.tools
+// On n'inclut PAS subtitle qui contient la date/période (déjà affichée dans la zone meta)
 const techBadges = computed(() => {
-  const parts = [];
-  if (props.item.content?.tools) {
-    parts.push(...props.item.content.tools.split(',').map(s => stripEmojis(s.trim())).filter(Boolean));
-  }
-  if (props.item.subtitle) {
-    const subs = props.item.subtitle.split(',').map(s => stripEmojis(s.trim())).filter(Boolean);
-    subs.forEach(s => { if (!parts.includes(s)) parts.push(s); });
-  }
-  return parts.slice(0, 8);
+  if (!props.item.content?.tools) return [];
+  return props.item.content.tools
+    .split(',')
+    .map(s => stripEmojis(s.trim()))
+    .filter(Boolean)
+    .slice(0, 8);
 });
 
 // Dynamic category badge color based on tagTone
@@ -438,6 +436,51 @@ onBeforeUnmount(() => {
   background: rgba(119, 33, 111, 0.07);
   color: var(--aubergine-dark);
   box-shadow: 0 4px 10px rgba(119, 33, 111, 0.08);
+}
+
+/* ── Dark mode scoped ── */
+:global([data-theme="dark"]) .project-card {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+:global([data-theme="dark"]) .project-card:hover {
+  border-color: rgba(255, 120, 68, 0.4);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+}
+:global([data-theme="dark"]) .project-card__title {
+  color: #f8fafc;
+}
+:global([data-theme="dark"]) .project-card__subtitle {
+  color: #94a3b8;
+}
+:global([data-theme="dark"]) .tech-badge {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+:global([data-theme="dark"]) .project-card:hover .tech-badge {
+  background: rgba(255, 120, 68, 0.12);
+  color: #ff9a74;
+  box-shadow: 0 3px 8px rgba(233, 84, 32, 0.2);
+}
+:global([data-theme="dark"]) .project-card__link {
+  color: #64748b;
+}
+:global([data-theme="dark"]) .project-card__link:hover {
+  color: #ff7844;
+}
+:global([data-theme="dark"]) .project-card__cta {
+  background: transparent;
+  border-color: rgba(255,255,255,0.15);
+  color: #e2e8f0;
+}
+:global([data-theme="dark"]) .project-card__cta:hover {
+  background: var(--ubuntu-orange-dark);
+  border-color: var(--ubuntu-orange-dark);
+  color: #fff;
+}
+:global([data-theme="dark"]) .project-card__visual {
+  background: #0f172a;
 }
 
 @keyframes badge-float-in {

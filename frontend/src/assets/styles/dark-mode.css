@@ -606,3 +606,202 @@ footer {
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE — CORRECTIONS COMPLÉMENTAIRES
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Section headings (Parcours, Réalisations, etc.) ── */
+[data-theme="dark"] .section-heading h2,
+[data-theme="dark"] .section-heading h3 {
+  color: #ffffff !important;
+}
+
+/* ── Tags pill-badge : color-mix(white) donne fond blanc en dark → fix ── */
+[data-theme="dark"] :where(.pill-badge, .filter-pill).tag-cyber {
+  background: rgba(244, 63, 94, 0.18) !important;
+  border-color: rgba(244, 63, 94, 0.35) !important;
+  color: #f87171 !important;
+}
+[data-theme="dark"] :where(.pill-badge, .filter-pill).tag-network {
+  background: rgba(56, 189, 248, 0.15) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+  color: #7dd3fc !important;
+}
+[data-theme="dark"] :where(.pill-badge, .filter-pill).tag-system {
+  background: rgba(52, 211, 153, 0.15) !important;
+  border-color: rgba(52, 211, 153, 0.3) !important;
+  color: #6ee7b7 !important;
+}
+[data-theme="dark"] :where(.pill-badge, .filter-pill).tag-web {
+  background: rgba(168, 85, 247, 0.15) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  color: #c4b5fd !important;
+}
+[data-theme="dark"] :where(.pill-badge, .filter-pill).tag-data {
+  background: rgba(45, 212, 191, 0.15) !important;
+  border-color: rgba(45, 212, 191, 0.3) !important;
+  color: #5eead4 !important;
+}
+[data-theme="dark"] :where(.pill-badge, .filter-pill).tag-method {
+  background: rgba(251, 146, 60, 0.15) !important;
+  border-color: rgba(251, 146, 60, 0.3) !important;
+  color: #fdba74 !important;
+}
+[data-theme="dark"] :where(.pill-badge, .filter-pill).tag-design {
+  background: rgba(248, 113, 113, 0.15) !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
+  color: #fca5a5 !important;
+}
+[data-theme="dark"] :where(.pill-badge, .filter-pill).tag-learning {
+  background: rgba(163, 230, 53, 0.13) !important;
+  border-color: rgba(163, 230, 53, 0.28) !important;
+  color: #bef264 !important;
+}
+
+/* Tags orange/aubergine (type badge PARCOURS / CERTIFICATION) */
+[data-theme="dark"] .pill-badge.orange {
+  background: rgba(255, 120, 68, 0.18) !important;
+  border-color: rgba(255, 120, 68, 0.35) !important;
+  color: #fb923c !important;
+}
+[data-theme="dark"] .pill-badge.aubergine {
+  background: rgba(167, 139, 250, 0.18) !important;
+  border-color: rgba(167, 139, 250, 0.35) !important;
+  color: #c4b5fd !important;
+}
+[data-theme="dark"] .pill-badge.neutral {
+  background: rgba(148, 163, 184, 0.15) !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+  color: #94a3b8 !important;
+}
+
+/* Filter pills actifs en dark */
+[data-theme="dark"] .filter-pill.active.tag-cyber   { background: #f43f5e !important; color: #fff !important; }
+[data-theme="dark"] .filter-pill.active.tag-network { background: #0ea5e9 !important; color: #fff !important; }
+[data-theme="dark"] .filter-pill.active.tag-system  { background: #10b981 !important; color: #fff !important; }
+[data-theme="dark"] .filter-pill.active.tag-web     { background: #a855f7 !important; color: #fff !important; }
+[data-theme="dark"] .filter-pill.active.tag-data    { background: #14b8a6 !important; color: #fff !important; }
+[data-theme="dark"] .filter-pill.active.tag-method  { background: #f97316 !important; color: #fff !important; }
+[data-theme="dark"] .filter-pill.active.tag-design  { background: #ef4444 !important; color: #fff !important; }
+[data-theme="dark"] .filter-pill.active.tag-learning{ background: #84cc16 !important; color: #0f172a !important; }
+
+/* ── Section Parcours (ItemCard) dark ── */
+[data-theme="dark"] .item-card {
+  background: #111827 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  border-left-color: rgba(255, 120, 68, 0.6) !important;
+}
+[data-theme="dark"] .item-card:hover {
+  border-color: rgba(255, 120, 68, 0.5) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5) !important;
+}
+[data-theme="dark"] .item-card h3 {
+  color: #ffffff !important;
+}
+[data-theme="dark"] .item-card p {
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .item-card__meta span {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .external-link {
+  color: #64748b !important;
+}
+[data-theme="dark"] .external-link:hover {
+  color: #ff7844 !important;
+}
+[data-theme="dark"] .button-pill {
+  background: transparent;
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+[data-theme="dark"] .button-pill:hover {
+  background: var(--ubuntu-orange-dark);
+  border-color: var(--ubuntu-orange-dark);
+  color: #fff;
+}
+
+/* ── Stack & Outils (fond orange + cartes blanches) dark ── */
+[data-theme="dark"] .stack-section.blueprint-bg {
+  background-color: #0f172a !important;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.5) !important;
+}
+[data-theme="dark"] .stack-heading h2 {
+  color: #ffffff !important;
+}
+[data-theme="dark"] .stack-intro {
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .stack-badge {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #cbd5e1 !important;
+}
+[data-theme="dark"] .stack-search-bar input {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
+}
+[data-theme="dark"] .stack-search-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+[data-theme="dark"] .stack-search-bar input:focus {
+  border-color: #ff7844 !important;
+  box-shadow: 0 0 0 3px rgba(255, 120, 68, 0.18);
+}
+[data-theme="dark"] .search-icon {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+[data-theme="dark"] .stack-group-block {
+  background: rgba(17, 24, 39, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+[data-theme="dark"] .stack-realization-banner {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .realization-title-text {
+  color: #ffffff !important;
+}
+[data-theme="dark"] .realization-badge-pill {
+  color: #64748b !important;
+}
+[data-theme="dark"] .realization-count-badge {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #34d399 !important;
+}
+[data-theme="dark"] .stack-compact-card {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+[data-theme="dark"] .stack-compact-card:hover {
+  border-color: rgba(255, 120, 68, 0.5) !important;
+  box-shadow: 0 8px 24px rgba(233, 84, 32, 0.25) !important;
+}
+[data-theme="dark"] .compact-card-title {
+  color: #f8fafc !important;
+}
+[data-theme="dark"] .compact-card-subtitle {
+  color: #fb923c !important;
+}
+[data-theme="dark"] .compact-card-action {
+  color: #ff7844 !important;
+  border-top-color: rgba(255, 255, 255, 0.06) !important;
+}
+[data-theme="dark"] .stack-no-results {
+  background: #111827 !important;
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] .icon-button.small {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+}
+
