@@ -5,14 +5,14 @@
       <div>
         <span class="stack-badge">
           <Terminal :size="14" aria-hidden="true" />
-          Compétences par Réalisation
+          {{ t('sections.stack_by_project') }}
         </span>
         <h2 :id="`${id}-title`">
-          <span>Stack &amp; Outils</span>
+          <span>{{ t('sections.stack') }}</span>
         </h2>
       </div>
       <p class="stack-intro">
-        Savoir-faire et technologies validés en conditions opérationnelles, classés par réalisation. Cliquez sur une compétence pour consulter sa fiche détaillée.
+        {{ t('sections.stack_intro') }}
       </p>
     </div>
 
@@ -23,8 +23,8 @@
         <input
           v-model.trim="searchQuery"
           type="text"
-          placeholder="Filtrer une compétence ou un outil (Wazuh, Suricata, Docker, Python, Linux...)..."
-          aria-label="Recherche de compétences"
+          :placeholder="t('sections.stack_search_placeholder')"
+          :aria-label="t('sections.stack_search_label')"
         />
         <button 
           v-if="searchQuery" 
@@ -75,7 +75,7 @@
             </div>
           </div>
           <span class="realization-count-badge">
-            {{ group.items.length }} compétence{{ group.items.length > 1 ? 's' : '' }}
+            {{ group.items.length }} {{ locale === 'en' ? (group.items.length > 1 ? 'skills' : 'skill') : (group.items.length > 1 ? 'compétences' : 'compétence') }}
           </span>
         </div>
 
@@ -102,7 +102,7 @@
               </div>
 
               <div class="compact-card-action">
-                <span>Fiche détaillée</span>
+                <span>{{ t('sections.skill_detail') }}</span>
                 <ArrowUpRight :size="14" aria-hidden="true" />
               </div>
             </button>
@@ -134,9 +134,9 @@
     <!-- État vide si recherche sans résultat -->
     <div v-else class="stack-no-results glass-card">
       <Search :size="32" class="empty-search-icon" />
-      <h3>Aucune compétence trouvée pour "{{ searchQuery }}"</h3>
+      <h3>{{ locale === 'en' ? `No skill found for "${searchQuery}"` : `Aucune compétence trouvée pour "${searchQuery}"` }}</h3>
       <button type="button" class="button secondary" @click="searchQuery = ''">
-        Réinitialiser la recherche
+        {{ locale === 'en' ? 'Reset search' : 'Réinitialiser la recherche' }}
       </button>
     </div>
   </section>
@@ -157,6 +157,8 @@ import {
   FileCode2, 
   Layers
 } from 'lucide-vue-next';
+import { useI18n } from '../i18n/index.js';
+const { t, locale } = useI18n();
 
 const props = defineProps({
   id: { type: String, required: true },

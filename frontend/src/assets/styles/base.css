@@ -33,6 +33,7 @@ html {
   scroll-padding-top: 86px;
   scrollbar-width: thin;
   scrollbar-color: var(--outline) var(--surface);
+  transition: background-color 0.4s ease, color 0.35s ease;
 }
 
 ::-webkit-scrollbar {
@@ -171,6 +172,56 @@ nav a:hover {
 
 .nav-button--sound:hover {
   background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+/* ── Theme toggle ── */
+.nav-button--theme {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition: background 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease;
+}
+.nav-button--theme:hover {
+  background: rgba(255, 255, 255, 0.26);
+  transform: translateY(-1px) rotate(20deg);
+  color: #ffffff;
+}
+.nav-button--theme svg {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-button--theme:active svg {
+  transform: rotate(90deg) scale(0.85);
+}
+
+/* ── Lang toggle ── */
+.nav-button--lang {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  transition: background 0.25s ease, transform 0.2s ease, border-color 0.25s ease;
+}
+.nav-button--lang:hover {
+  background: rgba(196, 138, 188, 0.35);
+  border-color: rgba(196, 138, 188, 0.5);
+  transform: translateY(-1px);
   color: #ffffff;
 }
 

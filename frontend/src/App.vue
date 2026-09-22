@@ -17,7 +17,7 @@
       <header class="topbar">
         <a href="#accueil" class="brand" @click="playClick" @mouseenter="playHover">
           <DynamicLogo />
-          <span style="margin-left: 12px;">Mon portfolio</span>
+          <span style="margin-left: 12px;">{{ t('nav.brand') }}</span>
         </a>
         <button class="hamburger" @click.stop="menuOpen = !menuOpen; playClick()" aria-label="Menu">
           <span class="hamburger-line"></span>
@@ -25,19 +25,42 @@
           <span class="hamburger-line"></span>
         </button>
         <nav class="nav-links" :class="{ 'is-open': menuOpen }" aria-label="Navigation principale" @click="menuOpen = false">
-          <button class="nav-button nav-button--sound" @click.stop="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
-            {{ audioEnabled ? 'Son ON' : 'Son OFF' }}
+          <!-- Theme toggle -->
+          <button
+            class="nav-button nav-button--theme"
+            @click.stop="toggleTheme(); playClick()"
+            @mouseenter="playHover"
+            :aria-label="isDark ? 'Mode clair' : 'Mode sombre'"
+            :title="isDark ? 'Passer au mode clair' : 'Passer au mode sombre'"
+          >
+            <Sun v-if="isDark" :size="15" />
+            <Moon v-else :size="15" />
           </button>
-          <a href="#apropos" @click="playClick" @mouseenter="playHover">À propos</a>
-          <a href="#parcours" @click="playClick" @mouseenter="playHover">Parcours</a>
-          <a href="#competences" @click="playClick" @mouseenter="playHover">Stack & outils</a>
-          <a href="#realisations" @click="playClick" @mouseenter="playHover">Réalisations</a>
-          <a href="#blog" @click="playClick" @mouseenter="playHover">Blog</a>
-          <a href="#temoignages" @click="playClick" @mouseenter="playHover">Témoignages</a>
-          <a href="#veille" @click="playClick" @mouseenter="playHover">Veille</a>
-          <a href="#contact" @click="playClick" @mouseenter="playHover">Contact</a>
-          <button v-if="!authState.token" class="nav-button" type="button" @click.stop="showLogin = true; menuOpen = false; playClick()" @mouseenter="playHover">Admin</button>
-          <button v-else class="nav-button" type="button" @click.stop="logout(); menuOpen = false; playClick()" @mouseenter="playHover">Déconnexion</button>
+          <!-- Lang toggle — visible admin seulement -->
+          <button
+            v-if="authState.token"
+            class="nav-button nav-button--lang"
+            @click.stop="toggleLocale(); playClick()"
+            @mouseenter="playHover"
+            aria-label="Changer de langue / Switch language"
+            :title="locale === 'fr' ? 'Switch to English' : 'Passer en Français'"
+          >
+            {{ locale === 'fr' ? 'EN' : 'FR' }}
+          </button>
+          <!-- Sound toggle -->
+          <button class="nav-button nav-button--sound" @click.stop="handleToggleSound" @mouseenter="playHover" aria-label="Activer/Désactiver le son">
+            {{ audioEnabled ? t('nav.soundOn') : t('nav.soundOff') }}
+          </button>
+          <a href="#apropos" @click="playClick" @mouseenter="playHover">{{ t('nav.about') }}</a>
+          <a href="#parcours" @click="playClick" @mouseenter="playHover">{{ t('nav.journey') }}</a>
+          <a href="#competences" @click="playClick" @mouseenter="playHover">{{ t('nav.stack') }}</a>
+          <a href="#realisations" @click="playClick" @mouseenter="playHover">{{ t('nav.projects') }}</a>
+          <a href="#blog" @click="playClick" @mouseenter="playHover">{{ t('nav.blog') }}</a>
+          <a href="#temoignages" @click="playClick" @mouseenter="playHover">{{ t('nav.testimonials') }}</a>
+          <a href="#veille" @click="playClick" @mouseenter="playHover">{{ t('nav.watch') }}</a>
+          <a href="#contact" @click="playClick" @mouseenter="playHover">{{ t('nav.contact') }}</a>
+          <button v-if="!authState.token" class="nav-button" type="button" @click.stop="showLogin = true; menuOpen = false; playClick()" @mouseenter="playHover">{{ t('nav.admin') }}</button>
+          <button v-else class="nav-button" type="button" @click.stop="logout(); menuOpen = false; playClick()" @mouseenter="playHover">{{ t('nav.logout') }}</button>
         </nav>
       </header>
     </div>
@@ -47,8 +70,8 @@
         <div class="hero-copy">
           <div class="availability-card" aria-label="Statut professionnel">
             <span class="availability-dot" aria-hidden="true"></span>
-            <strong>Disponible</strong>
-            <span>Stage, emploi junior, mission IT ou cybersécurité.</span>
+            <strong>{{ t('hero.available') }}</strong>
+            <span>{{ t('hero.availableDesc') }}</span>
           </div>
           <h1 class="wave-name" aria-label="SAMNICK BIGA RAOUL AUBIN">
             <span
@@ -73,36 +96,33 @@
             <span class="terminal-typewriter__text">{{ currentTypedText }}</span>
             <span class="terminal-typewriter__cursor" aria-hidden="true">_</span>
           </h2>
-          <p>
-            Je conçois, sécurise et documente des environnements réseau avec une attention particulière pour la
-            supervision, la détection et la réponse aux incidents.
-          </p>
+          <p>{{ t('hero.description') }}</p>
           <ul class="hero-facts" aria-label="Informations principales">
-            <li>Yaoundé, Cameroun</li>
-            <li>Réseaux (Cisco, PfSense), Systèmes (Linux/Windows), Sécurité (SIEM, EDR)</li>
-            <li>Détection, réponse aux incidents et hardening</li>
+            <li>{{ t('hero.location') }}</li>
+            <li>{{ t('hero.skills') }}</li>
+            <li>{{ t('hero.work') }}</li>
           </ul>
           <div class="hero-actions">
             <a class="button button-pill primary" href="#realisations" @click="playClick" @mouseenter="playHover">
-              Voir mes projets
+              {{ t('hero.cta_projects') }}
               <span class="icon-circle"><ArrowDown :size="16" /></span>
             </a>
             <a class="button button-pill secondary" href="#contact" @click="playClick" @mouseenter="playHover">
-              Me contacter
+              {{ t('hero.cta_contact') }}
               <span class="icon-circle"><ArrowRight :size="16" /></span>
             </a>
             <a class="button button-pill tertiary" href="/CV_Samnick_Biga_Raoul_Aubin.pdf" download="CV_Samnick_Biga_Raoul_Aubin.pdf" @click="playClick" @mouseenter="playHover">
-              Télécharger mon CV
+              {{ t('hero.cta_cv') }}
               <span class="icon-circle"><FileDown :size="16" /></span>
             </a>
             <button class="button button-pill quaternary" type="button" @click="sharePortfolio" @mouseenter="playHover">
-              Partager
+              {{ t('hero.cta_share') }}
               <span class="icon-circle"><Share2 :size="16" /></span>
             </button>
           </div>
-          <a class="scroll-cue" href="#realisations" aria-label="Descendre vers les projets" @click="playClick" @mouseenter="playHover">
+          <a class="scroll-cue" href="#realisations" :aria-label="t('footer.scroll_top')" @click="playClick" @mouseenter="playHover">
             <span></span>
-            Défiler
+            {{ t('hero.scroll') }}
           </a>
         </div>
         <figure class="hero-visual profile-photo-card">
@@ -111,7 +131,7 @@
       </section>
 
       <section class="logo-wall-section reveal-on-scroll">
-        <p class="logo-wall-title">Ils m'ont fait confiance</p>
+        <p class="logo-wall-title">{{ t('trust') }}</p>
         <div class="logo-wall-grid">
           <img src="/Logos/paness.jpg" alt="PANESS IT" title="PANESS IT" @error="handleImgError" />
           <img src="/Logos/ihtm.png" alt="IHTM" title="IHTM" @error="handleImgError" />
@@ -124,46 +144,40 @@
       </section>
 
       <section class="about-section reveal-on-scroll" id="apropos" aria-labelledby="about-title" style="position: relative; overflow: hidden;">
-        <div class="giant-watermark" aria-hidden="true">ÉVOLUER</div>
+        <div class="giant-watermark" aria-hidden="true">{{ t('about.watermark') }}</div>
         <div class="section-heading" style="position: relative; z-index: 1;">
-          <h2 id="about-title">À propos</h2>
+          <h2 id="about-title">{{ t('about.title') }}</h2>
         </div>
         <div class="about-lead" style="position: relative; z-index: 1;">
           <h3>
-            Construire, déployer et sécuriser des infrastructures fiables, résilientes et prêtes à contrer les menaces modernes.
+            {{ t('about.lead') }}
           </h3>
           <p>
-            Jeune ingénieur de réalisation en Réseaux et Sécurité Informatique (diplômé en Licence Professionnelle à l'IHTM), j'allie rigueur d'ingénierie terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d'architectures réseau haute disponibilité (Cisco, PfSense), l'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.
+            {{ t('about.bio') }}
           </p>
         </div>
         <div class="about-grid" style="position: relative; z-index: 1;">
           <article class="about-card">
             <span>01</span>
-            <h3>Ce que je réalise</h3>
-            <p>
-              Conception et déploiement d'architectures réseau sécurisées, intégration de SIEM/SOC (Wazuh, Suricata, Sysmon), durcissement (Hardening) de serveurs, segmentation VLAN/Firewalling et automatisation via scripts Python/Bash.
-            </p>
+            <h3>{{ t('about.card1_title') }}</h3>
+            <p>{{ t('about.card1_body') }}</p>
           </article>
           <article class="about-card">
             <span>02</span>
-            <h3>Ma démarche d'ingénieur</h3>
-            <p>
-              Approche méthodique : analyse des risques, modélisation topologique, validation rigoureuse par scénarios d'attaque/défense, puis formalisation d'une documentation technique claire et de playbooks opérationnels.
-            </p>
+            <h3>{{ t('about.card2_title') }}</h3>
+            <p>{{ t('about.card2_body') }}</p>
           </article>
           <article class="about-card">
             <span>03</span>
-            <h3>Ce que j'apporte</h3>
-            <p>
-              Une force de réalisation concrète au sein d'une équipe IT ou SOC, avec une capacité avérée à concevoir des infrastructures robustes, assurer leur maintien en conditions de sécurité et répondre efficacement aux incidents.
-            </p>
+            <h3>{{ t('about.card3_title') }}</h3>
+            <p>{{ t('about.card3_body') }}</p>
           </article>
         </div>
       </section>
 
       <section class="featured-section reveal-on-scroll" id="projet-a-la-une" aria-labelledby="featured-title">
         <div class="section-heading">
-          <h2 id="featured-title">Projet à la une</h2>
+          <h2 id="featured-title">{{ t('featured.title') }}</h2>
         </div>
         <div class="featured-grid featured-grid--single">
           <!-- Chargement (Skeleton style moderne) -->
@@ -196,23 +210,23 @@
                   <span>VirtualBox NAT</span>
                 </div>
                 <div class="metric-pill">
-                  <strong>9 Phases</strong>
-                  <span>Déploiement</span>
+                  <strong>9 {{ t('featured.phases') }}</strong>
+                  <span>{{ t('featured.deployment') }}</span>
                 </div>
                 <div class="metric-pill">
-                  <strong>4 Scénarios</strong>
-                  <span>Tests réels &amp; Attaques</span>
+                  <strong>4 {{ locale === 'en' ? 'Scenarios' : 'Scénarios' }}</strong>
+                  <span>{{ t('featured.real_tests') }}</span>
                 </div>
                 <div class="metric-pill">
                   <strong>0 FCFA</strong>
-                  <span>Licences Open-Source</span>
+                  <span>{{ t('featured.licenses') }}</span>
                 </div>
               </div>
 
               <div class="featured-actions">
                 <button class="button primary" type="button" @click="openCaseStudy(featuredProject); playClick()" @mouseenter="playHover">
                   <Terminal :size="16" aria-hidden="true" />
-                  <span>Explorer l'architecture &amp; les scénarios d'attaque</span>
+                  <span>{{ t('featured.explore') }}</span>
                 </button>
               </div>
             </div>
@@ -220,10 +234,10 @@
           <!-- État vide -->
           <article v-else class="featured-project-card empty-featured">
             <div class="featured-project-card__content">
-              <PillBadge tone="neutral">À sélectionner</PillBadge>
-              <h3>Aucun projet à la une pour le moment</h3>
+              <PillBadge tone="neutral">{{ t('featured.empty_badge') }}</PillBadge>
+              <h3>{{ t('featured.empty_title') }}</h3>
               <p>
-                Connecte-toi en administrateur, ajoute une réalisation puis coche “Mettre cette réalisation à la une”.
+                {{ t('featured.empty_body') }}
               </p>
             </div>
           </article>
@@ -232,16 +246,27 @@
 
       <section v-if="authState.token" class="admin-strip reveal-on-scroll" aria-label="Administration du portfolio">
         <div>
-          <PillBadge tone="aubergine">Mode administration</PillBadge>
-          <strong>Tu peux ajouter, modifier ou supprimer les éléments affichés aux visiteurs.</strong>
+          <PillBadge tone="aubergine">{{ t('admin.badge') }}</PillBadge>
+          <strong>{{ t('admin.desc') }}</strong>
         </div>
-        <div style="display: flex; gap: 1rem; align-items: center;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <!-- Toggle animation fond d'écran -->
+          <button
+            class="button secondary admin-anim-toggle"
+            type="button"
+            :title="bgEnabled ? 'Désactiver l\'animation de fond' : 'Activer l\'animation de fond'"
+            @click="toggleBgAnimation(); playClick()"
+            @mouseenter="playHover"
+          >
+            <Sparkles :size="16" aria-hidden="true" />
+            {{ bgEnabled ? 'Anim. fond : ON' : 'Anim. fond : OFF' }}
+          </button>
           <button class="button secondary" type="button" @click="showTagManager = true; playClick()" @mouseenter="playHover">
-            Gérer les tags
+            {{ t('admin.manage_tags') }}
           </button>
           <button class="button primary" type="button" @click="openCreate(); playClick()" @mouseenter="playHover">
             <Plus :size="18" aria-hidden="true" />
-            Ajouter un element
+            {{ t('admin.add') }}
           </button>
         </div>
       </section>
@@ -256,7 +281,7 @@
           @click="selectedCategory = ''; playClick()"
           @mouseenter="playHover"
         >
-          Tous les tags
+          {{ t('filter.all') }}
         </button>
         <button
           v-for="category in categoryFilters"
@@ -278,10 +303,10 @@
 
           <ContentSection
             id="parcours"
-            title="Mon parcours"
+            :title="t('sections.journey')"
             :items="grouped.parcours"
             :loading="loading"
-            empty="Aucun parcours publié pour le moment."
+            :empty="t('empty.journey')"
             :editable="Boolean(authState.token)"
             @edit="openEdit"
             @delete="remove"
@@ -292,7 +317,7 @@
             :items="grouped.competence"
             :realisations="grouped.realisation"
             :loading="loading"
-            empty="Aucune compétence publiée pour le moment."
+            :empty="t('empty.stack')"
             :editable="Boolean(authState.token)"
             @edit="openEdit"
             @delete="remove"
@@ -314,9 +339,9 @@
             aria-labelledby="blog-title"
           >
             <div class="section-heading">
-              <h2 id="blog-title">Blog</h2>
+              <h2 id="blog-title">{{ t('sections.blog') }}</h2>
             </div>
-            <p v-if="authState.token" class="blog-intro">Articles, notes et retours d'expérience publiés depuis l'administration. Les PDF peuvent être attachés à chaque article.</p>
+            <p v-if="authState.token" class="blog-intro">{{ t('sections.blog_intro') }}</p>
             
             <!-- Chargement Blog (Skeleton style moderne) -->
             <div v-if="loading" class="blog-grid blog-grid--managed" aria-label="Chargement du blog...">
@@ -345,8 +370,8 @@
             </div>
             <div v-else class="empty-state-card blog-empty-state">
               <SearchX class="empty-icon" :size="48" />
-              <p>Aucun article publié pour le moment. Les articles seront disponibles ici dès qu'ils seront ajoutés.</p>
-              <button v-if="authState.token" class="button primary" type="button" @click="openCreate('blog'); playClick()" @mouseenter="playHover">Ajouter un article</button>
+              <p>{{ t('empty.blog') }}</p>
+              <button v-if="authState.token" class="button primary" type="button" @click="openCreate('blog'); playClick()" @mouseenter="playHover">{{ t('blog.add') }}</button>
             </div>
           </section>
         </div>
@@ -363,12 +388,12 @@
 
       <section class="content-section watch-section reveal-on-scroll" id="veille" aria-labelledby="veille-title">
         <div class="section-heading">
-          <h2 id="veille-title">Veille automatique</h2>
+          <h2 id="veille-title">{{ t('sections.watch') }}</h2>
         </div>
         <div class="veille-status-bar">
-          <span>Surveillance active</span>
-          <span>Dernière mise à jour : {{ veilleUpdatedAtLabel || '—' }}</span>
-          <span>{{ veilleItems.length }} vulnérabilités affichées</span>
+          <span>{{ t('watch.active') }}</span>
+          <span>{{ t('watch.last_update') }} {{ veilleUpdatedAtLabel || '—' }}</span>
+          <span>{{ veilleItems.length }} {{ t('watch.displayed') }}</span>
         </div>
         <div class="veille-grid">
           <article v-for="item in veilleItems" :key="item.cveID" class="veille-card">
@@ -379,46 +404,44 @@
             <h3>{{ item.vendorProject }} {{ item.product }}</h3>
             <p>{{ item.shortDescription }}</p>
             <div class="veille-actions">
-              <a :href="veilleSourceUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Source officielle</a>
+              <a :href="veilleSourceUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">{{ t('watch.source') }}</a>
             </div>
           </article>
         </div>
       </section>
       <section class="contact-section contact-section--artistic reveal-on-scroll" id="contact" aria-labelledby="contact-title">
         <div class="contact-copy">
-          <h2 id="contact-title">Contact</h2>
-          <p>
-            Posez-moi vos questions ou faites-moi part de vos projets. Envoyez-moi un message directement ci-dessous !
-          </p>
+          <h2 id="contact-title">{{ t('contact.title') }}</h2>
+          <p>{{ t('contact.intro') }}</p>
           
 
           <form @submit.prevent="handleContactSubmit" class="styled-contact-form">
             <div class="form-row">
-              <span class="row-label">À</span>
+              <span class="row-label">{{ t('contact.to') }}</span>
               <span class="row-static-text">{{ contactEmail }}</span>
-              <span class="row-feedback" v-if="contactStatus === 'success'">Bien reçu</span>
+              <span class="row-feedback" v-if="contactStatus === 'success'">{{ t('contact.received') }}</span>
             </div>
             
             <div class="form-row">
-              <label for="contact-email" class="row-label">De</label>
-              <input id="contact-email" v-model.trim="contactDraft.email" type="email" required placeholder="vous@exemple.com" class="row-input" />
+              <label for="contact-email" class="row-label">{{ t('contact.from') }}</label>
+              <input id="contact-email" v-model.trim="contactDraft.email" type="email" required :placeholder="locale === 'en' ? 'you@example.com' : 'vous@exemple.com'" class="row-input" />
             </div>
 
             <div class="form-row">
-              <label for="contact-subject" class="row-label">Sujet</label>
-              <input id="contact-subject" v-model.trim="contactDraft.subject" type="text" placeholder="Entrez le sujet de votre message" class="row-input" />
+              <label for="contact-subject" class="row-label">{{ t('contact.subject') }}</label>
+              <input id="contact-subject" v-model.trim="contactDraft.subject" type="text" :placeholder="t('contact.subject_placeholder')" class="row-input" />
             </div>
 
             <div class="form-row textarea-row">
-              <label for="contact-msg" class="row-label">Message</label>
-              <textarea id="contact-msg" v-model.trim="contactDraft.message" required rows="5" placeholder="Bonjour..." class="row-input"></textarea>
+              <label for="contact-msg" class="row-label">{{ t('contact.message') }}</label>
+              <textarea id="contact-msg" v-model.trim="contactDraft.message" required rows="5" :placeholder="t('contact.message_placeholder')" class="row-input"></textarea>
             </div>
 
             <p v-if="contactStatus === 'error'" class="form-error" role="alert" style="margin-top: 1rem;">{{ contactError }}</p>
 
             <div class="form-footer">
               <button class="send-button" type="submit" :disabled="contactStatus === 'sending'" @mouseenter="playHover">
-                {{ contactStatus === 'sending' ? 'Envoi...' : 'Envoyer' }}
+                {{ contactStatus === 'sending' ? t('contact.sending') : t('contact.send') }}
               </button>
             </div>
           </form>
@@ -443,15 +466,15 @@
             <strong>github.com/Biga14-samuel</strong>
           </a>
           <div>
-            <span>Localisation</span>
+            <span>{{ t('contact.location') }}</span>
             <strong>Yaoundé, Cameroun</strong>
           </div>
         </div>
 
           <div class="contact-suggestions" aria-label="Questions rapides">
-            <span class="contact-suggestions__title">Questions rapides</span>
+            <span class="contact-suggestions__title">{{ t('contact.quick_q') }}</span>
             <div class="suggestions-chips">
-              <button v-for="q in suggestedQuestions" :key="q" type="button" class="chip-button" @click="fillQuestion(q); playClick()" @mouseenter="playHover">
+              <button v-for="q in suggestedQuestionsComputed" :key="q" type="button" class="chip-button" @click="fillQuestion(q); playClick()" @mouseenter="playHover">
                 {{ q }}
               </button>
             </div>
@@ -481,9 +504,9 @@
           <span :style="{ width: `${caseProgress}%` }"></span>
         </div>
         <div class="case-nav-header">
-          <button class="case-back-button" type="button" aria-label="Retourner en arrière" @click="closeCaseStudy(); playClick()" @mouseenter="playHover">
+          <button class="case-back-button" type="button" :aria-label="t('modals.back')" @click="closeCaseStudy(); playClick()" @mouseenter="playHover">
             <ArrowLeft :size="20" aria-hidden="true" />
-            <span>Retour</span>
+            <span>{{ t('modals.back') }}</span>
           </button>
         </div>
 
@@ -494,9 +517,9 @@
             <h2 id="case-title">{{ stripEmojis(caseStudyItem.title) }}</h2>
             <p>{{ stripEmojis(caseStudyItem.description) }}</p>
             <div v-if="normalizeType(caseStudyItem.type) === 'realisation' && (caseStudyItem.demo_url || caseStudyItem.github_url || (!isSocProject && casePdfUrl))" class="project-quick-actions">
-              <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="project-action project-action--primary" @click="playClick" @mouseenter="playHover"><ExternalLink :size="18" aria-hidden="true" /><span>Voir la démo</span></a>
-              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><Github :size="18" aria-hidden="true" /><span>Code source</span></a>
-              <a v-if="!isSocProject && casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><FileText :size="18" aria-hidden="true" /><span>Documentation PDF</span></a>
+              <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="project-action project-action--primary" @click="playClick" @mouseenter="playHover"><ExternalLink :size="18" aria-hidden="true" /><span>{{ t('modals.demo') }}</span></a>
+              <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><Github :size="18" aria-hidden="true" /><span>{{ t('modals.source') }}</span></a>
+              <a v-if="!isSocProject && casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="project-action" @click="playClick" @mouseenter="playHover"><FileText :size="18" aria-hidden="true" /><span>{{ t('modals.pdf') }}</span></a>
             </div>
           </div>
           <figure v-if="casePrimaryImage" class="case-hero-visual case-main-visual" :class="{ 'is-loaded': caseHeroImageLoaded }" :style="storyStyle(1)">
@@ -510,7 +533,7 @@
               @load="handleCaseHeroImageLoad"
               @error="handleCaseHeroImageError"
             />
-            <figcaption class="case-gallery-caption">Cliquer pour agrandir</figcaption>
+            <figcaption class="case-gallery-caption">{{ t('modals.click_enlarge') }}</figcaption>
           </figure>
         </div>
 
@@ -538,12 +561,12 @@
             <!-- Case study sections -->
             <div class="case-layout">
               <aside class="case-summary" aria-label="Informations du projet" :style="storyStyle(casePrimaryImage ? 3 : 2)">
-                <strong>Informations clés</strong>
+                <strong>{{ t('modals.key_info') }}</strong>
                 <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
                 <ul v-if="caseStudyStack.length">
                   <li v-for="entry in caseStudyStack" :key="entry">{{ entry }}</li>
                 </ul>
-                <p v-else class="case-summary-empty">Les compétences associées seront précisées prochainement.</p>
+                <p v-else class="case-summary-empty">{{ t('empty.skills_coming') }}</p>
               </aside>
               <div class="case-timeline">
                 <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :class="{ 'is-active': activeCaseStepIndex === index, 'is-past': activeCaseStepIndex > index }" :style="storyStyle((casePrimaryImage ? 4 : 3) + index)">
@@ -553,10 +576,10 @@
                     <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
                     <div v-if="section.images?.length" class="case-section-gallery">
                       <figure class="case-section-image-wrapper case-gallery-card case-section-image-wrapper--interactive" :class="{ 'is-loaded': true, 'is-multi': section.images.length > 1 }" @click="openImageViewer(section.images, getSectionImageIndex(section), stripEmojis(section.title)); playClick()" @mouseenter="playHover">
-                        <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) - 1); playClick()" aria-label="Image précédente"><ArrowLeft :size="18" aria-hidden="true" /></button>
+                        <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) - 1); playClick()" :aria-label="t('modals.prev')"><ArrowLeft :size="18" aria-hidden="true" /></button>
                         <img :src="section.images[getSectionImageIndex(section)]" :alt="`Illustration de ${stripEmojis(section.title)}`" data-hide-on-error="1" @load="markImageLoaded" @error="handleImgError" />
-                        <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) + 1); playClick()" aria-label="Image suivante"><ArrowRight :size="18" aria-hidden="true" /></button>
-                        <span class="case-gallery-hint">Cliquer pour agrandir</span>
+                        <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) + 1); playClick()" :aria-label="t('modals.next')"><ArrowRight :size="18" aria-hidden="true" /></button>
+                        <span class="case-gallery-hint">{{ t('modals.click_enlarge') }}</span>
                       </figure>
                     </div>
                   </div>
@@ -566,11 +589,11 @@
 
             <!-- Resources (shown for non-SOC realisations) -->
             <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle(10)">
-              <strong>Ressources du projet</strong>
+              <strong>{{ t('modals.project_resources') }}</strong>
               <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-                 <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
-                 <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Documentation PDF</a>
-                 <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
+                 <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">{{ t('modals.github') }}</a>
+                 <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">{{ t('modals.pdf') }}</a>
+                 <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">{{ t('modals.demo_online') }}</a>
               </div>
             </div>
           </template>
@@ -595,13 +618,13 @@
         <!-- ===== PARCOURS & BLOG: Vue classique chronologique / article ===== -->
         <template v-else>
           <div class="case-layout">
-            <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? 'Repères du parcours' : 'Informations du projet'" :style="storyStyle(casePrimaryImage ? 2 : 1)">
-              <strong>{{ caseStudyItem.type === 'parcours' ? 'Repères' : 'Informations clés' }}</strong>
+            <aside class="case-summary" :aria-label="caseStudyItem.type === 'parcours' ? (locale === 'en' ? 'Journey landmarks' : 'Repères du parcours') : (locale === 'en' ? 'Project information' : 'Informations du projet')" :style="storyStyle(casePrimaryImage ? 2 : 1)">
+              <strong>{{ caseStudyItem.type === 'parcours' ? t('modals.landmarks') : t('modals.key_info') }}</strong>
               <p v-if="caseStudyItem.subtitle" class="case-summary-period">{{ stripEmojis(caseStudyItem.subtitle) }}</p>
               <ul v-if="caseStudyStack.length">
                 <li v-for="entry in caseStudyStack" :key="entry">{{ entry }}</li>
               </ul>
-              <p v-else class="case-summary-empty">Les compétences associées seront précisées prochainement.</p>
+              <p v-else class="case-summary-empty">{{ t('empty.skills_coming') }}</p>
             </aside>
             <div class="case-timeline">
               <article v-for="(section, index) in activeCaseStudy" :key="section.title" class="case-step" :class="{ 'is-active': activeCaseStepIndex === index, 'is-past': activeCaseStepIndex > index }" :style="storyStyle((casePrimaryImage ? 3 : 2) + index)">
@@ -611,10 +634,10 @@
                   <p style="white-space: pre-wrap;">{{ stripEmojis(section.body) }}</p>
                   <div v-if="section.images?.length" class="case-section-gallery">
                     <figure class="case-section-image-wrapper case-gallery-card case-section-image-wrapper--interactive" :class="{ 'is-loaded': true, 'is-multi': section.images.length > 1 }" @click="openImageViewer(section.images, getSectionImageIndex(section), stripEmojis(section.title)); playClick()" @mouseenter="playHover">
-                      <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) - 1); playClick()" aria-label="Image précédente"><ArrowLeft :size="18" aria-hidden="true" /></button>
+                      <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--prev" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) - 1); playClick()" :aria-label="t('modals.prev')"><ArrowLeft :size="18" aria-hidden="true" /></button>
                       <img :src="section.images[getSectionImageIndex(section)]" :alt="`Illustration de ${stripEmojis(section.title)}`" data-hide-on-error="1" @load="markImageLoaded" @error="handleImgError" />
-                      <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) + 1); playClick()" aria-label="Image suivante"><ArrowRight :size="18" aria-hidden="true" /></button>
-                      <span class="case-gallery-hint">Cliquer pour agrandir</span>
+                      <button v-if="section.images.length > 1" type="button" class="case-gallery-nav case-gallery-nav--next" @click.stop="setSectionImageIndex(section, getSectionImageIndex(section) + 1); playClick()" :aria-label="t('modals.next')"><ArrowRight :size="18" aria-hidden="true" /></button>
+                      <span class="case-gallery-hint">{{ t('modals.click_enlarge') }}</span>
                     </figure>
                     <div v-if="section.images.length > 1" class="case-gallery-thumbs">
                       <button v-for="(image, imageIndex) in section.images" :key="image" type="button" class="case-gallery-thumb" :class="{ active: imageIndex === getSectionImageIndex(section) }" @click="setSectionImageIndex(section, imageIndex); playClick()" @mouseenter="playHover" :aria-label="`Voir la miniature ${imageIndex + 1}`">
@@ -628,8 +651,8 @@
           </div>
 
           <section v-if="caseGalleryImages.length" class="case-gallery-section" :style="storyStyle((casePrimaryImage ? 3 : 2) + activeCaseStudy.length)">
-            <strong>Galerie d'images</strong>
-            <p>Quelques vues supplémentaires pour explorer le contexte, les écrans ou les certificats associés.</p>
+            <strong>{{ t('modals.gallery_title') }}</strong>
+            <p>{{ t('modals.gallery_desc') }}</p>
             <div class="case-gallery-grid">
               <button v-for="(image, imageIndex) in caseGalleryImages" :key="image" type="button" class="case-gallery-card case-gallery-tile" @click="openImageViewer(caseDetailImages, imageIndex + (casePrimaryImage ? 1 : 0), stripEmojis(caseStudyItem.title)); playClick()" @mouseenter="playHover" :aria-label="`Ouvrir l'image ${imageIndex + 1}`">
                 <img :src="image" :alt="`Galerie ${imageIndex + 1} de ${stripEmojis(caseStudyItem.title)}`" data-hide-on-error="1" @error="handleImgError" />
@@ -638,11 +661,11 @@
           </section>
 
           <div v-if="caseStudyItem.github_url || caseStudyItem.demo_url || casePdfUrl" class="case-resources" :style="storyStyle((casePrimaryImage ? 4 : 3) + activeCaseStudy.length + (caseGalleryImages.length ? 1 : 0))">
-            <strong>Ressources du projet</strong>
+            <strong>{{ t('modals.project_resources') }}</strong>
             <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-               <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Code source (GitHub)</a>
-               <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">Documentation PDF</a>
-               <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">Démonstration en ligne</a>
+               <a v-if="caseStudyItem.github_url" :href="caseStudyItem.github_url" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">{{ t('modals.github') }}</a>
+               <a v-if="casePdfUrl" :href="casePdfUrl" target="_blank" rel="noreferrer" class="button secondary" @click="playClick" @mouseenter="playHover">{{ t('modals.pdf') }}</a>
+               <a v-if="caseStudyItem.demo_url" :href="caseStudyItem.demo_url" target="_blank" rel="noreferrer" class="button primary" @click="playClick" @mouseenter="playHover">{{ t('modals.demo_online') }}</a>
             </div>
           </div>
         </template>
@@ -659,20 +682,20 @@
     <div v-if="showLogin" class="modal-backdrop" role="presentation" @click.self="showLogin = false; playClick()">
       <section class="modal login-card" role="dialog" aria-modal="true" aria-labelledby="login-title">
         <LockKeyhole aria-hidden="true" :size="34" />
-        <h2 id="login-title">Administration du portfolio</h2>
-        <p>Connexion reservee au proprietaire du portfolio.</p>
+        <h2 id="login-title">{{ t('login.title') }}</h2>
+        <p>{{ t('login.desc') }}</p>
         <form @submit.prevent="handleLogin">
           <label>
-            Identifiant
+            {{ t('login.username') }}
             <input v-model.trim="credentials.username" required autocomplete="username" />
           </label>
           <label>
-            Mot de passe
+            {{ t('login.password') }}
             <input v-model="credentials.password" required type="password" autocomplete="current-password" />
           </label>
           <div class="form-actions">
-            <button class="button secondary" type="button" @click="showLogin = false; playClick()" @mouseenter="playHover">Annuler</button>
-            <button class="button primary" type="submit" @mouseenter="playHover">Se connecter</button>
+            <button class="button secondary" type="button" @click="showLogin = false; playClick()" @mouseenter="playHover">{{ t('login.cancel') }}</button>
+            <button class="button primary" type="submit" @mouseenter="playHover">{{ t('login.submit') }}</button>
           </div>
         </form>
       </section>
@@ -680,17 +703,17 @@
 
     <div v-if="showTagManager" class="modal-backdrop" role="presentation" @click.self="showTagManager = false; playClick()">
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="tag-manager-title">
-        <h2 id="tag-manager-title">Gestion des tags</h2>
+        <h2 id="tag-manager-title">{{ t('tags.title') }}</h2>
         <TagManager @session-expired="handleSessionExpired" />
         <div class="form-actions" style="margin-top: 1.5rem;">
-          <button class="button secondary" type="button" @click="showTagManager = false; playClick()" @mouseenter="playHover">Fermer</button>
+          <button class="button secondary" type="button" @click="showTagManager = false; playClick()" @mouseenter="playHover">{{ t('tags.close') }}</button>
         </div>
       </section>
     </div>
 
     <div v-if="editing" class="modal-backdrop" role="presentation" @click.self="closeForm(); playClick()">
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="form-title">
-        <h2 id="form-title">{{ editing.id ? 'Modifier un element' : 'Ajouter un element' }}</h2>
+        <h2 id="form-title">{{ editing.id ? t('form.edit') : t('form.add') }}</h2>
         <ItemForm :item="editing" @submit="saveItem" @cancel="closeForm(); playClick()" />
       </section>
     </div>
@@ -698,29 +721,29 @@
     <div v-if="showTestimonialForm" class="modal-backdrop" role="presentation" @click.self="closeTestimonialModal(); playClick()">
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="testimonial-form-title">
         <template v-if="!showTestimonialSuccess">
-          <h2 id="testimonial-form-title">Laisser un témoignage</h2>
+          <h2 id="testimonial-form-title">{{ t('testimonials.form_title') }}</h2>
           <form @submit.prevent="handleCreateTestimonial">
             <label>
-              Votre nom complet *
+              {{ t('testimonials.name') }}
               <input v-model.trim="testimonialDraft.client_name" required minlength="2" maxlength="140" />
             </label>
             <label>
-              Votre profession, entreprise ou poste (optionnel)
+              {{ t('testimonials.company') }}
               <input v-model.trim="testimonialDraft.client_company" maxlength="140" />
             </label>
             <label>
-              Lien de votre profil LinkedIn (optionnel)
+              {{ t('testimonials.linkedin') }}
               <input v-model.trim="testimonialDraft.linkedin_url" type="url" maxlength="500" />
             </label>
             <label>
-              Votre message *
+              {{ t('testimonials.message') }}
               <textarea v-model.trim="testimonialDraft.content" required minlength="5" maxlength="2000" rows="5"></textarea>
             </label>
             <div class="form-actions">
-              <button class="button secondary" type="button" @click="closeTestimonialModal(); playClick()" @mouseenter="playHover">Annuler</button>
+              <button class="button secondary" type="button" @click="closeTestimonialModal(); playClick()" @mouseenter="playHover">{{ t('testimonials.cancel') }}</button>
               <button class="button primary" type="submit" @mouseenter="playHover">
-                <span v-if="testimonialStatus === 'sending'">Envoi en cours...</span>
-                <span v-else>Envoyer</span>
+                <span v-if="testimonialStatus === 'sending'">{{ t('testimonials.sending') }}</span>
+                <span v-else>{{ t('testimonials.send') }}</span>
               </button>
             </div>
           </form>
@@ -730,17 +753,17 @@
             <div class="success-icon-wrapper">
               <CheckCircle class="success-icon" :size="64" />
             </div>
-            <h2>Merci beaucoup, {{ testimonialDraft.client_name }} !</h2>
-            <p>Votre témoignage a bien été reçu. Il sera examiné et publié très bientôt. Cela me fait énormément plaisir !</p>
-            <button class="button primary" type="button" @click="closeTestimonialModal(); playClick()" @mouseenter="playHover">Fermer</button>
+            <h2>{{ t('testimonials.success_title', { name: testimonialDraft.client_name }) }}</h2>
+            <p>{{ t('testimonials.success_body') }}</p>
+            <button class="button primary" type="button" @click="closeTestimonialModal(); playClick()" @mouseenter="playHover">{{ t('testimonials.close') }}</button>
           </div>
         </template>
       </section>
     </div>
     <footer class="footer footer-compact">
       <div class="footer-brand">
-        <strong>Mon portfolio</strong>
-        <p>Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior</p>
+        <strong>{{ t('footer.brand') }}</strong>
+        <p>{{ t('footer.tagline') }}</p>
       </div>
       <div class="footer-right">
         <span class="footer-clock">{{ clockLabel }}</span>
@@ -781,14 +804,14 @@
           </a>
         </div>
       </div>
-      <p class="footer-copy">© 2026 Raoul BIGA. Tous droits réservés.</p>
+      <p class="footer-copy">{{ t('footer.rights') }}</p>
     </footer>
 
     <button 
       class="scroll-to-top" 
       :class="{ visible: showScrollToTop }" 
       @click="scrollToTop(); playClick()" 
-      aria-label="Retour en haut"
+      :aria-label="t('footer.scroll_top')"
       @mouseenter="playHover"
     >
       <ArrowUp :size="24" />
@@ -798,7 +821,10 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, onUnmounted, onErrorCaptured } from 'vue';
-import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX, ShieldCheck, Terminal, Share2 } from 'lucide-vue-next';
+import { LockKeyhole, Plus, ArrowLeft, ArrowUp, ArrowRight, ArrowDown, CheckCircle, FileDown, FileText, ExternalLink, Github, Linkedin, Mail, X, SearchX, ShieldCheck, Terminal, Share2, Moon, Sun, Sparkles } from 'lucide-vue-next';
+import { useTheme } from './composables/useTheme.js';
+import { useI18n } from './i18n/index.js';
+import { useBgAnimation } from './composables/useBgAnimation.js';
 import { Toaster, toast } from 'vue-sonner';
 import ContentSection from './components/ContentSection.vue';
 import ItemCard from './components/ItemCard.vue';
@@ -817,6 +843,13 @@ import StackToolsSection from './components/StackToolsSection.vue';
 import SkillDetailView from './components/SkillDetailView.vue';
 import TagManager from './components/TagManager.vue';
 import { authState, clearToken, setToken } from './store/auth';
+
+// ── Thème & i18n ──────────────────────────────────────────────
+const { isDark, toggleTheme } = useTheme();
+const { locale, t, toggleLocale } = useI18n();
+
+// ── Animation de fond ─────────────────────────────────────────
+const { bgEnabled, toggleBgAnimation } = useBgAnimation();
 import {
   createItem,
   deleteItem,
@@ -873,7 +906,9 @@ const sharePortfolio = async () => {
   const shareUrl = 'https://raoulbiga-phi.vercel.app/';
   const shareData = {
     title: 'Samnick Biga Raoul Aubin | Portfolio IT & Cybersécurité',
-    text: 'Découvrez le portfolio professionnel de Samnick Biga Raoul Aubin (Réseau, Systèmes & Cybersécurité SOC) :',
+    text: locale.value === 'en'
+      ? 'Discover the professional portfolio of Samnick Biga Raoul Aubin (Network, Systems & SOC Cybersecurity):'
+      : 'Découvrez le portfolio professionnel de Samnick Biga Raoul Aubin (Réseau, Systèmes & Cybersécurité SOC) :',
     url: shareUrl,
   };
 
@@ -881,7 +916,7 @@ const sharePortfolio = async () => {
     try {
       await navigator.share(shareData);
       playSuccess();
-      toast.success('Lien partagé avec succès !');
+      toast.success(t('errors.share_success'));
       return;
     } catch (err) {
       if (err?.name === 'AbortError') return;
@@ -892,14 +927,14 @@ const sharePortfolio = async () => {
     if (navigator?.clipboard?.writeText) {
       await navigator.clipboard.writeText(shareUrl);
       playSuccess();
-      toast.success('Lien du portfolio copié dans le presse-papiers !');
+      toast.success(t('errors.share_copied'));
       return;
     }
   } catch {
     // fallback
   }
 
-  toast.info(`Lien du portfolio : ${shareUrl}`);
+  toast.info(`${locale.value === 'en' ? 'Portfolio link' : 'Lien du portfolio'} : ${shareUrl}`);
 };
 
 onErrorCaptured((err) => {
@@ -914,6 +949,26 @@ const isNotFound = computed(() => {
 
 const audioEnabled = ref(isSoundEnabled());
 const nameWords = ['SAMNICK', 'BIGA', 'RAOUL', 'AUBIN'];
+
+// Questions suggérées dynamiques selon la langue
+const suggestedQuestionsComputed = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      'Are you available for an opportunity?',
+      'What are your rates for a mission?',
+      'Can you configure a PfSense firewall?',
+      'What is your level in Python and automation?',
+      'Do you work on Linux/Windows networks and systems?',
+    ];
+  }
+  return [
+    'Êtes-vous disponible pour une opportunité ?',
+    'Quels sont vos tarifs pour une mission ?',
+    'Pouvez-vous configurer un firewall PfSense ?',
+    'Quel est votre niveau en Python et automatisation ?',
+    'Intervenez-vous sur les réseaux et systèmes Linux/Windows ?',
+  ];
+});
 const charStyles = reactive({});
 let lastMouseX = 0;
 let lenis;
@@ -1009,7 +1064,7 @@ const testimonialError = ref('');
 const contactDraft = reactive({ email: '', subject: '', message: '' });
 const contactStatus = ref('');
 const contactError = ref('');
-const typedRoles = [
+const typedRolesFr = [
   'Ingénieur Réalisation Réseau & Sécurité',
   'Administrateur Réseau & Sécurité',
   'SOC Analyst Junior',
@@ -1017,13 +1072,22 @@ const typedRoles = [
   'Administrateur Systèmes Linux / Windows',
   'Spécialiste Détection & Réponse aux Incidents',
 ];
+const typedRolesEn = [
+  'Network & Security Engineer',
+  'Network & Security Administrator',
+  'SOC Analyst Junior',
+  'IT & Cybersecurity Consultant',
+  'Linux / Windows Systems Admin',
+  'Incident Detection & Response Specialist',
+];
+const typedRoles = computed(() => locale.value === 'en' ? typedRolesEn : typedRolesFr);
 const currentRoleIndex = ref(0);
 const currentTypedText = ref('');
 const isDeleting = ref(false);
 let typewriterTimeout = null;
 
 function runTypewriter() {
-  const currentRole = typedRoles[currentRoleIndex.value];
+  const currentRole = typedRoles.value[currentRoleIndex.value];
   if (!isDeleting.value) {
     currentTypedText.value = currentRole.slice(0, currentTypedText.value.length + 1);
     if (currentTypedText.value === currentRole) {
@@ -1039,13 +1103,22 @@ function runTypewriter() {
     currentTypedText.value = currentRole.slice(0, currentTypedText.value.length - 1);
     if (currentTypedText.value === '') {
       isDeleting.value = false;
-      currentRoleIndex.value = (currentRoleIndex.value + 1) % typedRoles.length;
+      currentRoleIndex.value = (currentRoleIndex.value + 1) % typedRoles.value.length;
       typewriterTimeout = setTimeout(runTypewriter, 500);
       return;
     }
     typewriterTimeout = setTimeout(runTypewriter, 35);
   }
 }
+
+// Reset typewriter when language changes
+watch(locale, () => {
+  if (typewriterTimeout) clearTimeout(typewriterTimeout);
+  currentRoleIndex.value = 0;
+  currentTypedText.value = '';
+  isDeleting.value = false;
+  typewriterTimeout = setTimeout(runTypewriter, 300);
+});
 
 const clockLabel = ref('');
 const veilleItems = ref([]);
@@ -1415,11 +1488,7 @@ const featuredProject = computed(() => {
 });
 
 onMounted(async () => {
-  // S'assurer que le thème clair est actif par défaut
-  try {
-    document.documentElement.removeAttribute('data-theme');
-    localStorage.removeItem('portfolio-theme');
-  } catch (e) {}
+  // Le thème est géré par useTheme (watchEffect) — ne pas forcer ici
 
   // --- PROTECTION DU CONTENU ---
   // Désactiver le clic droit
@@ -1515,7 +1584,7 @@ async function loadItems() {
     await nextTick();
     setupScrollReveal();
   } catch (error) {
-    loadError.value = "Impossible de charger les elements du portfolio. Verifie que l'API est lancee.";
+    loadError.value = t('errors.load');
     if (error.status === 401 || error.status === 403) clearToken();
   } finally {
     loading.value = false;
@@ -1530,7 +1599,7 @@ async function handleLogin() {
     setToken(data.access_token);
     credentials.password = '';
     showLogin.value = false;
-    notifySuccess('Connexion réussie');
+    notifySuccess(locale.value === 'en' ? 'Login successful' : 'Connexion réussie');
     await loadItems();
   } catch (error) {
     notifyError(error.message);
@@ -1550,7 +1619,7 @@ function handleSessionExpired() {
   showTagManager.value = false;
   closeForm();
   showLogin.value = true;
-  notifyError('Session expirée. Veuillez vous reconnecter.');
+  notifyError(t('errors.session'));
 }
 
 function openCreate(type = 'parcours') {
@@ -2238,6 +2307,22 @@ async function handleContactSubmit() {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+}
+
+/* ── Bouton toggle animation de fond (admin) ── */
+.admin-anim-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1.5px solid var(--outline);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.admin-anim-toggle:hover {
+  border-color: var(--aubergine);
+  box-shadow: 0 0 0 3px rgba(119, 33, 111, 0.12);
 }
 </style>
 

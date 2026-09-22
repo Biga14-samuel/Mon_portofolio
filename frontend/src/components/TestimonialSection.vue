@@ -1,7 +1,7 @@
 <template>
   <section id="temoignages" class="content-section testimonials-section" aria-labelledby="testimonials-title">
     <div class="section-heading">
-      <h2 id="testimonials-title">Selon leurs propres mots</h2>
+      <h2 id="testimonials-title">{{ t('sections.testimonials') }}</h2>
     </div>
 
     <div v-if="loading" class="carousel-container">
@@ -20,7 +20,7 @@
 
     <div v-else-if="testimonials.length === 0 && !editable" class="empty-state-card" style="margin: 0 2rem;">
       <MessageSquarePlus class="empty-icon" :size="48" />
-      <p>Aucun témoignage pour le moment.<br>Soyez le premier à partager votre expérience !</p>
+      <p>{{ t('empty.testimonials') }}</p>
     </div>
 
     <div v-else class="carousel-container" :class="{ 'is-marquee': shouldMarquee }">
@@ -73,7 +73,7 @@
     </div>
 
     <div class="testimonials-actions" style="margin-top: 2rem; text-align: center;">
-      <button class="button primary" @click="$emit('add-testimonial')">Laisser un témoignage</button>
+      <button class="button primary" @click="$emit('add-testimonial')">{{ t('testimonials.leave') }}</button>
     </div>
   </section>
 </template>
@@ -81,6 +81,8 @@
 <script setup>
 import { computed } from 'vue';
 import { Trash2, MessageSquarePlus } from 'lucide-vue-next';
+import { useI18n } from '../i18n/index.js';
+const { t } = useI18n();
 
 const props = defineProps({
   testimonials: {

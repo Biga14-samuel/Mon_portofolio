@@ -3,7 +3,10 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { useBgAnimation } from '../composables/useBgAnimation.js';
+
+const { bgEnabled } = useBgAnimation();
 
 // ── Props ────────────────────────────────────────────────────────────────────
 const props = defineProps({
@@ -203,6 +206,16 @@ onMounted(() => {
 
   resize();
   animate();
+
+  // Pause / resume selon bgEnabled
+  watch(bgEnabled, (val) => {
+    if (val) {
+      if (!raf) animate();
+    } else {
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      ctx.clearRect(0, 0, W, H);
+    }
+  }, { immediate: false });
 
   onUnmounted(() => {
     if (raf) cancelAnimationFrame(raf);

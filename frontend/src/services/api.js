@@ -134,13 +134,26 @@ export function deleteTestimonial(id, token) {
 export async function sendContactMessage(email, subject, message) {
   const WEB3FORMS_KEY = 'b8b2578f-5ef6-4fe5-a2f5-485c99ae5985';
 
+  const cleanSubject = (subject || '').trim() || 'Prise de contact';
+  const cleanEmail = (email || '').trim();
+  const cleanMessage = (message || '').trim();
+  const now = new Date().toLocaleString('fr-FR', {
+    dateStyle: 'full',
+    timeStyle: 'medium',
+    timeZone: 'Africa/Douala',
+  });
+
   try {
     const formData = new FormData();
     formData.append('access_key', WEB3FORMS_KEY);
-    formData.append('email', email);
-    formData.append('from_name', email);
-    formData.append('subject', subject || 'Nouveau message depuis votre portfolio');
-    formData.append('message', message);
+    formData.append('from_name', 'Portfolio Raoul BIGA');
+    formData.append('subject', `[Portfolio Contact] ${cleanSubject} — (${cleanEmail})`);
+    formData.append('replyto', cleanEmail);
+    formData.append('Expediteur', cleanEmail);
+    formData.append('Objet', cleanSubject);
+    formData.append('Message', cleanMessage);
+    formData.append('Date_Envoi', now);
+    formData.append('Provenance', 'https://raoulbiga-phi.vercel.app');
     formData.append('botcheck', '');
 
     const response = await fetch('https://api.web3forms.com/submit', {
@@ -157,7 +170,7 @@ export async function sendContactMessage(email, subject, message) {
     // Fallback automatique vers l'API backend si besoin
     return request('/api/contact', {
       method: 'POST',
-      body: JSON.stringify({ email, subject, message }),
+      body: JSON.stringify({ email: cleanEmail, subject: cleanSubject, message: cleanMessage }),
     });
   }
 }
