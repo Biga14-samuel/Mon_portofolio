@@ -39,14 +39,14 @@ export default {
   about: {
     title: 'À propos',
     watermark: 'ÉVOLUER',
-    lead: 'Construire, déployer et sécuriser des infrastructures fiables, résilientes et prêtes à contrer les menaces modernes.',
-    bio: 'Administrateur Réseau & Sécurité, titulaire d\'une Licence en Génie Informatique (Bachelor of Science ; B.Sc.), option Réseaux et Sécurité, obtenue avec mention Bien. J\'allie rigueur méthodologique terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d\'architectures réseau haute disponibilité (Cisco, PfSense), l\'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d\'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence). Passionné par la résilience des systèmes d\'information, je m\'engage à bâtir des infrastructures pérennes, documentées et capables d\'anticiper et neutraliser les menaces actuelles.',
-    card1_title: 'Ce que je réalise',
-    card1_body: 'Conception et déploiement d\'architectures réseau sécurisées, intégration de SIEM/SOC (Wazuh, Suricata, Sysmon), durcissement (Hardening) de serveurs, segmentation VLAN/Firewalling et automatisation via scripts Python/Bash.',
-    card2_title: 'Ma démarche d\'administrateur réseau & sécurité',
-    card2_body: 'Approche méthodique : analyse des risques, modélisation topologique, validation rigoureuse par scénarios d\'attaque/défense, puis formalisation d\'une documentation technique claire et de playbooks opérationnels.',
-    card3_title: 'Ce que j\'apporte',
-    card3_body: 'Une force de réalisation concrète au sein d\'une équipe IT ou SOC, avec une capacité avérée à concevoir des infrastructures robustes, assurer leur maintien en conditions de sécurité et répondre efficacement aux incidents.',
+    lead: 'Rigueur d\'analyse, sens pratique et engagement pour bâtir des solutions technologiques fiables et pérennes.',
+    bio: 'Professionnel de l\'informatique diplômé d\'une Licence en Génie Informatique (Bachelor of Science ; B.Sc.) avec mention Bien, j\'aborde chaque projet avec curiosité, méthode et un haut niveau d\'exigence. Mon parcours allie de solides fondations théoriques à une réelle maîtrise opérationnelle du terrain. Au-delà des outils et technologies, ma force réside dans ma capacité à comprendre rapidement les enjeux, à anticiper les contraintes et à structurer des solutions pragmatiques, documentées et durables. Autonome, persévérant et soucieux du détail, je place la qualité d\'exécution et la satisfaction des utilisateurs au centre de mon travail.',
+    card1_title: 'Méthode & Rigueur',
+    card1_body: 'Une démarche structurée à chaque étape : analyse approfondie des besoins, conception soignée, validation par des tests complets et formalisation d\'une documentation claire pour garantir la maintenabilité et la continuité.',
+    card2_title: 'Adaptabilité & Évolution',
+    card2_body: 'Un esprit d\'apprentissage continu et une grande aisance pour appréhender de nouveaux contextes, technologies et méthodologies de travail, transformant la complexité en solutions opérationnelles.',
+    card3_title: 'Engagement & Collaboration',
+    card3_body: 'Un sens aigu des responsabilités, une communication transparente et une volonté constante de collaborer efficacement pour créer de la valeur concrète et faire progresser les projets d\'équipe.',
   },
 
   // Featured project

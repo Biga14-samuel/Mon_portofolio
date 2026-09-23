@@ -39,14 +39,14 @@ export default {
   about: {
     title: 'About',
     watermark: 'EVOLVE',
-    lead: 'Build, deploy and secure reliable, resilient infrastructures ready to counter modern threats.',
-    bio: 'Network & IT Security Administrator, holding a Bachelor of Science (B.Sc.) in Computer Engineering, Network & Security option, graduated with Honors (mention Bien). I combine hands-on operational rigour with a strategic cybersecurity vision. My expertise covers high-availability network architecture design (Cisco, PfSense), advanced system administration (Linux/Windows) and full SOC monitoring environments (Wazuh SIEM, Suricata IDS/IPS, EDR, Threat Intelligence). Driven by infrastructure resilience, I build secure, well-documented, and production-ready environments able to anticipate and counter modern cyber threats.',
-    card1_title: 'What I build',
-    card1_body: 'Design and deployment of secure network architectures, SIEM/SOC integration (Wazuh, Suricata, Sysmon), server hardening, VLAN/Firewall segmentation and automation via Python/Bash scripts.',
-    card2_title: 'My approach as Network & Security Administrator',
-    card2_body: 'Methodical approach: risk analysis, topological modelling, rigorous validation through attack/defence scenarios, then formalization of clear technical documentation and operational playbooks.',
-    card3_title: 'What I bring',
-    card3_body: 'Concrete delivery capability within an IT or SOC team, with a proven ability to design robust infrastructures, maintain their security posture and respond effectively to incidents.',
+    lead: 'Analytical rigour, practical execution and strong commitment to building resilient technological solutions.',
+    bio: 'As an IT professional holding a Bachelor of Science (B.Sc.) in Computer Engineering graduated with Honors (mention Bien), I approach every project with curiosity, methodology, and high standards. My background pairs strong theoretical foundations with solid hands-on operational experience. Beyond tools and technologies, my strength lies in quickly understanding challenges, anticipating constraints, and structuring pragmatic, well-documented, and sustainable solutions. Autonomous, thorough, and quality-driven, I place operational excellence and stakeholder satisfaction at the heart of everything I do.',
+    card1_title: 'Method & Rigour',
+    card1_body: 'A structured methodology at every stage: thorough requirement analysis, careful architectural design, rigorous validation testing, and clear documentation to ensure long-term maintainability and business continuity.',
+    card2_title: 'Adaptability & Continuous Growth',
+    card2_body: 'A strong drive for continuous self-learning and a proven ability to quickly master new contexts, emerging technologies, and collaborative workflows, turning complexity into clean operational results.',
+    card3_title: 'Ownership & Teamwork',
+    card3_body: 'A deep sense of accountability, transparent communication, and an eagerness to collaborate effectively across technical and cross-functional teams to create concrete, lasting value.',
   },
 
   // Featured project
