@@ -178,7 +178,7 @@ export async function sendContactMessage(email, subject, message) {
   try {
     const formData = new FormData();
     formData.append('access_key', WEB3FORMS_KEY);
-    formData.append('from_name', 'Portfolio Raoul BIGA');
+    formData.append('from_name', 'Portfolio Samnick Biga Raoul Aubin');
     formData.append('subject', `[Portfolio Contact] ${cleanSubject} — (${cleanEmail})`);
     formData.append('replyto', cleanEmail);
     formData.append('Expediteur', cleanEmail);

@@ -1,5 +1,5 @@
 PORTFOLIO PROFESSIONNEL — SAMNICK BIGA RAOUL AUBIN
-Ingénieur Réseaux, Systèmes et Cybersécurité — SOC Analyst Junior — IT Consultant
+Administrateur Réseau & Sécurité — SOC Analyst Junior — IT Consultant
 Yaoundé, Cameroun
 
 Site en ligne : https://raoulbiga-phi.vercel.app

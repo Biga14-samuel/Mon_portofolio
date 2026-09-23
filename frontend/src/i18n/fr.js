@@ -40,10 +40,10 @@ export default {
     title: 'À propos',
     watermark: 'ÉVOLUER',
     lead: 'Construire, déployer et sécuriser des infrastructures fiables, résilientes et prêtes à contrer les menaces modernes.',
-    bio: 'Jeune ingénieur de réalisation en Réseaux et Sécurité Informatique (diplômé en Licence Professionnelle à l\'IHTM), j\'allie rigueur d\'ingénierie terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d\'architectures réseau haute disponibilité (Cisco, PfSense), l\'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d\'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.',
+    bio: 'Administrateur Réseau & Sécurité (diplômé en Licence Professionnelle à l\'IHTM), j\'allie rigueur méthodologique terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d\'architectures réseau haute disponibilité (Cisco, PfSense), l\'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d\'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.',
     card1_title: 'Ce que je réalise',
     card1_body: 'Conception et déploiement d\'architectures réseau sécurisées, intégration de SIEM/SOC (Wazuh, Suricata, Sysmon), durcissement (Hardening) de serveurs, segmentation VLAN/Firewalling et automatisation via scripts Python/Bash.',
-    card2_title: 'Ma démarche d\'ingénieur',
+    card2_title: 'Ma démarche d\'administrateur réseau & sécurité',
     card2_body: 'Approche méthodique : analyse des risques, modélisation topologique, validation rigoureuse par scénarios d\'attaque/défense, puis formalisation d\'une documentation technique claire et de playbooks opérationnels.',
     card3_title: 'Ce que j\'apporte',
     card3_body: 'Une force de réalisation concrète au sein d\'une équipe IT ou SOC, avec une capacité avérée à concevoir des infrastructures robustes, assurer leur maintien en conditions de sécurité et répondre efficacement aux incidents.',
@@ -196,7 +196,7 @@ export default {
   footer: {
     brand: 'Mon portfolio',
     tagline: 'Administrateur réseau & sécurité | IT Consultant | SOC Analyst Junior',
-    rights: '© 2026 Raoul BIGA. Tous droits réservés.',
+    rights: '© 2026 Samnick Biga Raoul Aubin. Tous droits réservés.',
     scroll_top: 'Retour en haut',
   },
 
@@ -221,4 +221,13 @@ export default {
     share_success: 'Lien partagé avec succès !',
     share_copied: 'Lien du portfolio copié dans le presse-papiers !',
   },
+
+  // Suggested questions (contact)
+  suggested_questions: [
+    'Êtes-vous disponible pour une opportunité ?',
+    'Quels types de projets ou missions acceptez-vous ?',
+    'Pouvez-vous configurer un firewall PfSense ?',
+    'Quel est votre niveau en Python et automatisation ?',
+    'Intervenez-vous sur les réseaux et systèmes Linux/Windows ?',
+  ],
 };

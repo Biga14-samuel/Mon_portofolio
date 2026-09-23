@@ -40,10 +40,10 @@ export default {
     title: 'About',
     watermark: 'EVOLVE',
     lead: 'Build, deploy and secure reliable, resilient infrastructures ready to counter modern threats.',
-    bio: 'Junior Network & IT Security Engineer (Professional Bachelor\'s degree from IHTM), I combine hands-on engineering rigour with a strategic cybersecurity vision. My expertise covers high-availability network architecture design (Cisco, PfSense), advanced system administration (Linux/Windows) and full SOC monitoring environments (Wazuh SIEM, Suricata IDS/IPS, EDR, Threat Intelligence) as deployed at PANESS IT.',
+    bio: 'Network & IT Security Administrator (Professional Bachelor\'s degree from IHTM), I combine hands-on operational rigour with a strategic cybersecurity vision. My expertise covers high-availability network architecture design (Cisco, PfSense), advanced system administration (Linux/Windows) and full SOC monitoring environments (Wazuh SIEM, Suricata IDS/IPS, EDR, Threat Intelligence) as deployed at PANESS IT.',
     card1_title: 'What I build',
     card1_body: 'Design and deployment of secure network architectures, SIEM/SOC integration (Wazuh, Suricata, Sysmon), server hardening, VLAN/Firewall segmentation and automation via Python/Bash scripts.',
-    card2_title: 'My engineering approach',
+    card2_title: 'My approach as Network & Security Administrator',
     card2_body: 'Methodical approach: risk analysis, topological modelling, rigorous validation through attack/defence scenarios, then formalization of clear technical documentation and operational playbooks.',
     card3_title: 'What I bring',
     card3_body: 'Concrete delivery capability within an IT or SOC team, with a proven ability to design robust infrastructures, maintain their security posture and respond effectively to incidents.',
@@ -196,7 +196,7 @@ export default {
   footer: {
     brand: 'My Portfolio',
     tagline: 'Network & Security Administrator | IT Consultant | Junior SOC Analyst',
-    rights: '© 2026 Raoul BIGA. All rights reserved.',
+    rights: '© 2026 Samnick Biga Raoul Aubin. All rights reserved.',
     scroll_top: 'Back to top',
   },
 
@@ -225,7 +225,7 @@ export default {
   // Suggested questions (contact)
   suggested_questions: [
     'Are you available for an opportunity?',
-    'What are your rates for a mission?',
+    'What types of projects or missions do you accept?',
     'Can you configure a PfSense firewall?',
     'What is your level in Python and automation?',
     'Do you work on Linux/Windows networks and systems?',

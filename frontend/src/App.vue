@@ -56,7 +56,7 @@
           <a href="#competences" @click="playClick" @mouseenter="playHover">{{ t('nav.stack') }}</a>
           <a href="#realisations" @click="playClick" @mouseenter="playHover">{{ t('nav.projects') }}</a>
           <a href="#blog" @click="playClick" @mouseenter="playHover">{{ t('nav.blog') }}</a>
-          <a href="#temoignages" @click="playClick" @mouseenter="playHover">{{ t('nav.testimonials') }}</a>
+          <a v-if="Boolean(authState.token) || testimonials.length >= 3" href="#temoignages" @click="playClick" @mouseenter="playHover">{{ t('nav.testimonials') }}</a>
           <a href="#veille" @click="playClick" @mouseenter="playHover">{{ t('nav.watch') }}</a>
           <a href="#contact" @click="playClick" @mouseenter="playHover">{{ t('nav.contact') }}</a>
           <button v-if="!authState.token" class="nav-button" type="button" @click.stop="showLogin = true; menuOpen = false; playClick()" @mouseenter="playHover">{{ t('nav.admin') }}</button>
@@ -388,6 +388,7 @@
       </div>
 
       <TestimonialSection 
+        v-if="Boolean(authState.token) || testimonials.length >= 3"
         :testimonials="testimonials"
         :editable="Boolean(authState.token)"
         :loading="loading"
@@ -435,7 +436,7 @@
           >
             <div class="form-row">
               <span class="row-label">{{ t('contact.to') }}</span>
-              <span class="row-static-text">{{ contactEmail }}</span>
+              <span class="row-static-text">{{ contactRecipient }}</span>
               <span class="row-feedback" v-if="contactStatus === 'success'">{{ t('contact.received') }}</span>
             </div>
             
@@ -974,7 +975,7 @@ const suggestedQuestionsComputed = computed(() => {
   if (locale.value === 'en') {
     return [
       'Are you available for an opportunity?',
-      'What are your rates for a mission?',
+      'What types of projects or missions do you accept?',
       'Can you configure a PfSense firewall?',
       'What is your level in Python and automation?',
       'Do you work on Linux/Windows networks and systems?',
@@ -982,7 +983,7 @@ const suggestedQuestionsComputed = computed(() => {
   }
   return [
     'Êtes-vous disponible pour une opportunité ?',
-    'Quels sont vos tarifs pour une mission ?',
+    'Quels types de projets ou missions acceptez-vous ?',
     'Pouvez-vous configurer un firewall PfSense ?',
     'Quel est votre niveau en Python et automatisation ?',
     'Intervenez-vous sur les réseaux et systèmes Linux/Windows ?',
@@ -1031,9 +1032,10 @@ function handleCharMouseLeave(idx) {
 const profilePhoto = `${import.meta.env.BASE_URL}profile-photo.webp`;
 const profilePhotoSm = `${import.meta.env.BASE_URL}profile-photo-380.webp`;
 const contactEmail = 'samuelbiga10@gmail.com';
+const contactRecipient = 'Samnick Biga Raoul Aubin';
 const suggestedQuestions = [
   'Êtes-vous disponible pour une opportunité ?',
-  'Quels sont vos tarifs pour une mission ?',
+  'Quels types de projets ou missions acceptez-vous ?',
   'Pouvez-vous configurer un firewall PfSense ?',
   'Quel est votre niveau en Python et automatisation ?',
   'Intervenez-vous sur les réseaux et systèmes Linux/Windows ?',
@@ -1085,7 +1087,6 @@ const contactDraft = reactive({ email: '', subject: '', message: '' });
 const contactStatus = ref('');
 const contactError = ref('');
 const typedRolesFr = [
-  'Ingénieur Réalisation Réseau & Sécurité',
   'Administrateur Réseau & Sécurité',
   'SOC Analyst Junior',
   'Consultant IT & Cybersécurité',
@@ -1093,7 +1094,6 @@ const typedRolesFr = [
   'Spécialiste Détection & Réponse aux Incidents',
 ];
 const typedRolesEn = [
-  'Network & Security Engineer',
   'Network & Security Administrator',
   'SOC Analyst Junior',
   'IT & Cybersecurity Consultant',

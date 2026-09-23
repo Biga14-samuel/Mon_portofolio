@@ -1,5 +1,5 @@
 <template>
-  <section id="temoignages" class="content-section testimonials-section" aria-labelledby="testimonials-title">
+  <section v-if="editable || testimonials.length >= 3" id="temoignages" class="content-section testimonials-section" aria-labelledby="testimonials-title">
     <div class="section-heading">
       <h2 id="testimonials-title">{{ t('sections.testimonials') }}</h2>
     </div>
@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div v-else-if="testimonials.length === 0 && !editable" class="empty-state-card" style="margin: 0 2rem;">
+    <div v-else-if="testimonials.length === 0" class="empty-state-card" style="margin: 0 2rem;">
       <MessageSquarePlus class="empty-icon" :size="48" />
       <p>{{ t('empty.testimonials') }}</p>
     </div>
