@@ -1550,10 +1550,20 @@ onMounted(async () => {
   runTypewriter();
   setupScrollReveal();
   setupPhotoParallax();
-  loadItems();
   updateClock();
-  loadVeille();
   clockTimer = window.setInterval(updateClock, 1000);
+
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    window.requestIdleCallback(() => {
+      loadItems();
+      loadVeille();
+    }, { timeout: 2500 });
+  } else {
+    window.setTimeout(() => {
+      loadItems();
+      loadVeille();
+    }, 1200);
+  }
   veilleTimer = window.setInterval(loadVeille, 60000);
   window.addEventListener('scroll', handleScroll, { passive: true });
   if (!isTouchDevice) {
@@ -1593,16 +1603,20 @@ async function loadItems() {
   loadError.value = '';
   try {
     const rawItems = await getItems();
-    items.value = (rawItems || []).map((item) => ({
-      ...item,
-      type: normalizeType(item.type),
-    }));
-    testimonials.value = await getTestimonials(authState.token);
+    if (rawItems && rawItems.length) {
+      items.value = rawItems.map((item) => ({
+        ...item,
+        type: normalizeType(item.type),
+      }));
+    }
+    const rawTestimonials = await getTestimonials(authState.token);
+    if (rawTestimonials && rawTestimonials.length) {
+      testimonials.value = rawTestimonials;
+    }
     await nextTick();
     setupScrollReveal();
   } catch (error) {
-    loadError.value = t('errors.load');
-    if (error.status === 401 || error.status === 403) clearToken();
+    if (error?.status === 401 || error?.status === 403) clearToken();
   } finally {
     loading.value = false;
   }

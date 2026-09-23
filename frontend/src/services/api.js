@@ -54,9 +54,14 @@ async function request(path, options = {}) {
   }
 }
 
-export function getItems(type = '') {
-  const query = type ? `?type=${encodeURIComponent(type)}` : '';
-  return request(`/api/items${query}`);
+export async function getItems(type = '') {
+  try {
+    const query = type ? `?type=${encodeURIComponent(type)}` : '';
+    const res = await request(`/api/items${query}`, { timeout: 3500 });
+    return Array.isArray(res) ? res : [];
+  } catch {
+    return [];
+  }
 }
 
 export function login(username, password) {
@@ -89,9 +94,14 @@ export function deleteItem(id, token) {
   });
 }
 
-export function getTags(type = '') {
-  const query = type ? `?type=${encodeURIComponent(type)}` : '';
-  return request(`/api/tags${query}`);
+export async function getTags(type = '') {
+  try {
+    const query = type ? `?type=${encodeURIComponent(type)}` : '';
+    const res = await request(`/api/tags${query}`, { timeout: 3500 });
+    return Array.isArray(res) ? res : [];
+  } catch {
+    return [];
+  }
 }
 
 export function createTag(tag, token) {
@@ -109,16 +119,26 @@ export function deleteTag(id, token) {
   });
 }
 
-export function getTestimonials(token = null) {
-  const options = {};
-  if (token) {
-    options.headers = authHeaders(token);
+export async function getTestimonials(token = null) {
+  try {
+    const options = { timeout: 3500 };
+    if (token) {
+      options.headers = authHeaders(token);
+    }
+    const res = await request('/api/testimonials', options);
+    return Array.isArray(res) ? res : [];
+  } catch {
+    return [];
   }
-  return request('/api/testimonials', options);
 }
 
-export function getVeille(limit = 8) {
-  return request(`/api/veille?limit=${encodeURIComponent(limit)}`);
+export async function getVeille(limit = 8) {
+  try {
+    const res = await request(`/api/veille?limit=${encodeURIComponent(limit)}`, { timeout: 3500 });
+    return res && typeof res === 'object' ? res : { items: [], sourceUrl: '' };
+  } catch {
+    return { items: [], sourceUrl: '' };
+  }
 }
 
 export function createTestimonial(testimonial) {
