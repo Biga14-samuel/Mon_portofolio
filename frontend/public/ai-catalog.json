@@ -1,0 +1,57 @@
+{
+  "$schema": "https://agenticresourcediscovery.org/schema/ai-catalog.json",
+  "version": "1.0",
+  "name": "Portfolio Samnick Biga Raoul Aubin",
+  "description": "Portfolio professionnel d'un Administrateur Réseau & Sécurité, Analyste SOC Junior et Consultant IT basé à Yaoundé, Cameroun.",
+  "url": "https://raoulbiga-phi.vercel.app",
+  "contact": {
+    "email": "samuelbiga10@gmail.com",
+    "name": "Samnick Biga Raoul Aubin"
+  },
+  "resources": [
+    {
+      "id": "portfolio-home",
+      "name": "Portfolio Principal",
+      "description": "Portfolio interactif complet avec présentation, compétences, réalisations et formulaire de contact.",
+      "url": "https://raoulbiga-phi.vercel.app",
+      "type": "webpage"
+    },
+    {
+      "id": "cv-pdf",
+      "name": "Curriculum Vitae (PDF)",
+      "description": "CV à jour de Samnick Biga Raoul Aubin, Administrateur Réseau & Sécurité, Analyste SOC Junior.",
+      "url": "https://raoulbiga-phi.vercel.app/CV_Samnick_Biga_Raoul_Aubin.pdf",
+      "type": "document",
+      "format": "application/pdf"
+    },
+    {
+      "id": "llms-txt",
+      "name": "llms.txt",
+      "description": "Résumé structuré du portfolio pour les LLMs et agents IA.",
+      "url": "https://raoulbiga-phi.vercel.app/llms.txt",
+      "type": "text/plain"
+    },
+    {
+      "id": "memoire-soc",
+      "name": "Mémoire SOC Open-Source PANESS",
+      "description": "Rapport complet sur la conception et la mise en place d'un SOC open-source pour PANESS IT.",
+      "url": "https://raoulbiga-phi.vercel.app/Memoire_SOC_PANESS_Samnick_Biga.pdf",
+      "type": "document",
+      "format": "application/pdf"
+    }
+  ],
+  "actions": [
+    {
+      "id": "contact-form",
+      "name": "Formulaire de contact",
+      "description": "Envoyer un message de prise de contact à Samnick Biga Raoul Aubin via le formulaire du portfolio.",
+      "url": "https://raoulbiga-phi.vercel.app/#contact",
+      "type": "form",
+      "fields": [
+        { "name": "email", "type": "email", "required": true, "description": "Adresse email de l'expéditeur" },
+        { "name": "subject", "type": "text", "required": false, "description": "Sujet du message" },
+        { "name": "message", "type": "textarea", "required": true, "description": "Corps du message à envoyer" }
+      ]
+    }
+  ]
+}

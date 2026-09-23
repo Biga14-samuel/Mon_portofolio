@@ -1,0 +1,35 @@
+# SAMNICK BIGA RAOUL AUBIN
+
+> Administrateur Réseau & Sécurité, Analyste SOC Junior et Consultant IT basé à Yaoundé, Cameroun.
+
+Portfolio professionnel présentant les compétences, les réalisations en architecture réseau et sécurité des systèmes d'information, les déploiements de centres de surveillance SOC (Wazuh, Suricata, DFIR-IRIS), les laboratoires d'expérimentation et le parcours académique de Samnick Biga Raoul Aubin.
+
+## Informations Clés
+
+- Titre : Administrateur Réseau & Sécurité / Analyste SOC Junior
+- Localisation : Yaoundé, Cameroun
+- Email : aubinbiga1@gmail.com / samuelbiga10@gmail.com
+- Téléphone : +237 654 88 11 01
+- GitHub : https://github.com/Biga14-samuel
+- LinkedIn : https://linkedin.com/in/aubinbiga
+- CV Téléchargeable : https://raoulbiga-phi.vercel.app/CV_Samnick_Biga_Raoul_Aubin.pdf
+
+## Compétences & Spécialités
+
+- Réseaux : Routage, VLANs (MikroTik), NAT/PAT, DHCP, ACL, VPN IPsec site-à-site, Portails captifs, Analyse de trafic (Wireshark).
+- Sécurité & SOC : SIEM/EDR Wazuh, IDS Suricata & Snort, YARA, Auditd, Sysmon, MISP, DFIR-IRIS, Shuffle SOAR, Pare-feu pfSense, Notions d'audit et pentest.
+- Systèmes : Ubuntu Server, Active Directory, Samba4, Scripts Bash/Linux et Python, Virtualisation VirtualBox, Docker.
+- Cloud & DevOps : Git, GitHub Actions (CI/CD), Déploiement Vercel, Notions de Cloud Computing.
+
+## Projets et Réalisations Phares
+
+- [Projet SOC Open-Source PANESS](https://raoulbiga-phi.vercel.app/#realisations): Déploiement d'un SOC complet (Wazuh, Suricata, MISP, IRIS, Shuffle) sur 5 machines virtuelles, validé par 4 scénarios d'attaque simulés.
+- [Laboratoire Active Directory](https://raoulbiga-phi.vercel.app/#realisations): Architecture de contrôleurs de domaine, GPO, DNS et durcissement des identités sous Windows Server.
+- [Interconnexion LAN & VPN IPsec](https://raoulbiga-phi.vercel.app/#realisations): Tunnel IPsec sécurisé site-à-site pour relier des infrastructures distantes.
+- [Portail Captif MikroTik & Squid](https://raoulbiga-phi.vercel.app/#parcours): Sécurisation des accès Internet et traçabilité pour le Ministère des Sports et de l'Éducation Physique (MINSEP).
+
+## Liens Rapides
+
+- [Portfolio Principal](https://raoulbiga-phi.vercel.app): Accès direct à l'ensemble du portfolio interactif.
+- [Télécharger le CV](https://raoulbiga-phi.vercel.app/CV_Samnick_Biga_Raoul_Aubin.pdf): Version PDF à jour du curriculum vitae.
+- [Contact Direct](https://raoulbiga-phi.vercel.app/#contact): Formulaire et coordonnées de prise de contact.

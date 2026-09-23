@@ -423,7 +423,14 @@
           <p>{{ t('contact.intro') }}</p>
           
 
-          <form @submit.prevent="handleContactSubmit" class="styled-contact-form">
+          <form
+            @submit.prevent="handleContactSubmit"
+            class="styled-contact-form"
+            id="contact-form"
+            aria-label="Formulaire de contact — Envoyer un message à Samnick Biga Raoul Aubin"
+            data-mcp-form="contact"
+            data-mcp-description="Formulaire permettant d'envoyer un message de prise de contact à Samnick Biga Raoul Aubin, Administrateur Réseau et Consultant IT."
+          >
             <div class="form-row">
               <span class="row-label">{{ t('contact.to') }}</span>
               <span class="row-static-text">{{ contactEmail }}</span>
@@ -432,23 +439,23 @@
             
             <div class="form-row">
               <label for="contact-email" class="row-label">{{ t('contact.from') }}</label>
-              <input id="contact-email" v-model.trim="contactDraft.email" type="email" required :placeholder="locale === 'en' ? 'you@example.com' : 'vous@exemple.com'" class="row-input" />
+              <input id="contact-email" v-model.trim="contactDraft.email" type="email" required :placeholder="locale === 'en' ? 'you@example.com' : 'vous@exemple.com'" class="row-input" data-mcp-field="sender_email" aria-required="true" />
             </div>
 
             <div class="form-row">
               <label for="contact-subject" class="row-label">{{ t('contact.subject') }}</label>
-              <input id="contact-subject" v-model.trim="contactDraft.subject" type="text" :placeholder="t('contact.subject_placeholder')" class="row-input" />
+              <input id="contact-subject" v-model.trim="contactDraft.subject" type="text" :placeholder="t('contact.subject_placeholder')" class="row-input" data-mcp-field="subject" />
             </div>
 
             <div class="form-row textarea-row">
               <label for="contact-msg" class="row-label">{{ t('contact.message') }}</label>
-              <textarea id="contact-msg" v-model.trim="contactDraft.message" required rows="5" :placeholder="t('contact.message_placeholder')" class="row-input"></textarea>
+              <textarea id="contact-msg" v-model.trim="contactDraft.message" required rows="5" :placeholder="t('contact.message_placeholder')" class="row-input" data-mcp-field="message" aria-required="true"></textarea>
             </div>
 
             <p v-if="contactStatus === 'error'" class="form-error" role="alert" style="margin-top: 1rem;">{{ contactError }}</p>
 
             <div class="form-footer">
-              <button class="send-button" type="submit" :disabled="contactStatus === 'sending'" @mouseenter="playHover">
+              <button class="send-button" type="submit" :disabled="contactStatus === 'sending'" @mouseenter="playHover" data-mcp-action="submit">
                 {{ contactStatus === 'sending' ? t('contact.sending') : t('contact.send') }}
               </button>
             </div>
