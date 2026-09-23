@@ -126,20 +126,28 @@
           </a>
         </div>
         <figure class="hero-visual profile-photo-card">
-          <img :src="profilePhoto" alt="Portrait de SAMNICK BIGA RAOUL AUBIN" @error="handleImgError" />
+          <img
+            :src="profilePhoto"
+            alt="Portrait de SAMNICK BIGA RAOUL AUBIN"
+            width="488"
+            height="1024"
+            fetchpriority="high"
+            decoding="async"
+            @error="handleImgError"
+          />
         </figure>
       </section>
 
       <section class="logo-wall-section reveal-on-scroll">
         <p class="logo-wall-title">{{ t('trust') }}</p>
         <div class="logo-wall-grid">
-          <img src="/Logos/paness.jpg" alt="PANESS IT" title="PANESS IT" @error="handleImgError" />
-          <img src="/Logos/ihtm.png" alt="IHTM" title="IHTM" @error="handleImgError" />
-          <img src="/Logos/minat.png" alt="MINAT" title="MINAT" @error="handleImgError" />
-          <img src="/Logos/minsep.jpg" alt="MINSEP" title="MINSEP" @error="handleImgError" />
-          <img src="/Logos/hgy.png" alt="Hôpital Général de Yaoundé" title="Hôpital Général de Yaoundé" @error="handleImgError" />
-          <img src="/Logos/hcy.jpg" alt="Hôpital Central de Yaoundé" title="Hôpital Central de Yaoundé" @error="handleImgError" />
-          <img src="/Logos/cury.jpg" alt="CURY" title="CURY" @error="handleImgError" />
+          <img src="/Logos/paness.jpg" alt="PANESS IT" title="PANESS IT" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/ihtm.png" alt="IHTM" title="IHTM" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/minat.png" alt="MINAT" title="MINAT" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/minsep.jpg" alt="MINSEP" title="MINSEP" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/hgy.png" alt="Hôpital Général de Yaoundé" title="Hôpital Général de Yaoundé" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/hcy.jpg" alt="Hôpital Central de Yaoundé" title="Hôpital Central de Yaoundé" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/cury.jpg" alt="CURY" title="CURY" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
         </div>
       </section>
 
@@ -1084,21 +1092,21 @@ const typedRolesEn = [
 ];
 const typedRoles = computed(() => locale.value === 'en' ? typedRolesEn : typedRolesFr);
 const currentRoleIndex = ref(0);
-const currentTypedText = ref('');
+const currentTypedText = ref(locale.value === 'en' ? typedRolesEn[0] : typedRolesFr[0]);
 const isDeleting = ref(false);
 let typewriterTimeout = null;
 
 function runTypewriter() {
   const currentRole = typedRoles.value[currentRoleIndex.value];
   if (!isDeleting.value) {
-    currentTypedText.value = currentRole.slice(0, currentTypedText.value.length + 1);
     if (currentTypedText.value === currentRole) {
       typewriterTimeout = setTimeout(() => {
         isDeleting.value = true;
         runTypewriter();
-      }, 2200);
+      }, 2500);
       return;
     }
+    currentTypedText.value = currentRole.slice(0, currentTypedText.value.length + 1);
     const typingSpeed = 65 + Math.random() * 30;
     typewriterTimeout = setTimeout(runTypewriter, typingSpeed);
   } else {
@@ -1715,13 +1723,13 @@ function setupScrollReveal() {
 }
 
 function setupPhotoParallax() {
-  updatePhotoParallax();
   window.addEventListener('scroll', updatePhotoParallax, { passive: true });
 }
 
 function updatePhotoParallax() {
+  if (prefersReducedMotion || !window.scrollY) return;
   const photo = document.querySelector('.profile-photo-card img');
-  if (!photo || prefersReducedMotion) return;
+  if (!photo) return;
 
   const offset = Math.min(18, Math.max(-18, window.scrollY * -0.035));
   photo.style.transform = `translateY(${offset}px) scale(1.035)`;

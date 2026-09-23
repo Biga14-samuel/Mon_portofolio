@@ -322,7 +322,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 4px 12px rgba(233, 84, 32, 0.4);
 }
 
-/* ---- SOC Pulse ---- */
+/* ---- SOC Pulse (GPU Composited) ---- */
 .project-card__soc-pulse {
   position: absolute;
   top: 12px;
@@ -331,14 +331,31 @@ onBeforeUnmount(() => {
   height: 10px;
   border-radius: 50%;
   background: #e95420;
-  box-shadow: 0 0 0 0 rgba(233, 84, 32, 0.7);
-  animation: soc-pulse 2s ease-out infinite;
+}
+
+.project-card__soc-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  background: #e95420;
+  animation: soc-pulse 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
 }
 
 @keyframes soc-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(233, 84, 32, 0.7); }
-  70%  { box-shadow: 0 0 0 10px rgba(233, 84, 32, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(233, 84, 32, 0); }
+  0% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  70% {
+    transform: scale(2.3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.3);
+    opacity: 0;
+  }
 }
 
 /* ---- Dots ---- */

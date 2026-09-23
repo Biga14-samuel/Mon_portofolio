@@ -33,7 +33,14 @@ const scramble = () => {
 };
 
 onMounted(() => {
-  intervalId = setInterval(scramble, 3500); // Change shapes every 3.5 seconds
+  if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+  intervalId = setInterval(() => {
+    if (typeof document !== 'undefined' && !document.hidden) {
+      scramble();
+    }
+  }, 4500);
 });
 
 onUnmounted(() => {
@@ -54,8 +61,8 @@ onUnmounted(() => {
 }
 
 .shape {
-  transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-  will-change: width, height, border-radius, transform, background-color;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s ease, opacity 0.3s ease;
+  will-change: transform;
   transform-origin: center;
   box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); /* very subtle inner line */
 }

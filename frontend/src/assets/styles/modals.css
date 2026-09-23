@@ -215,11 +215,12 @@ td {
 }
 
 .logo-wall-grid img {
+  width: 50px;
   height: 50px;
-  width: auto;
+  aspect-ratio: 1;
   object-fit: contain;
   filter: grayscale(100%) opacity(40%);
-  transition: all 0.4s ease;
+  transition: filter 0.3s ease, transform 0.3s ease;
   cursor: pointer;
 }
 
@@ -229,8 +230,8 @@ td {
 }
 
 @media (max-width: 768px) {
-  .logo-wall-grid { gap: 30px; }
-  .logo-wall-grid img { height: 40px; }
+  .logo-wall-grid { gap: 24px; }
+  .logo-wall-grid img { width: 42px; height: 42px; }
 }
 
 /* =========================================
