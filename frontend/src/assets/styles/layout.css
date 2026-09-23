@@ -126,15 +126,20 @@
 }
 
 .button.button-pill.tertiary {
-  background: rgba(196, 65, 17, 0.08);
-  color: #b83a0e;
-  border: 1px solid rgba(196, 65, 17, 0.35);
+  background: rgba(184, 58, 14, 0.09) !important;
+  color: #a8320b !important;
+  border: 1px solid rgba(184, 58, 14, 0.35) !important;
   font-weight: 600;
 }
 
 .button.button-pill.tertiary .icon-circle {
-  background: #c44111;
+  background: #a8320b;
   color: #ffffff;
+}
+
+.terminal-typewriter,
+.terminal-typewriter__text {
+  color: #5e1657 !important;
 }
 
 .button.button-pill.quaternary {
