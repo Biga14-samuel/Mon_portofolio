@@ -14,7 +14,7 @@ ORDER_RULES = [
     (6, ('ethical hacking', 'hacker éthique', 'hacker ethique')),
     (7, ('ccna', 'routage, switching')),
     (8, ('sécurité des réseaux', 'securite des reseaux', 'défense du réseau', 'defense du reseau')),
-    (9, ('licence professionnelle', 'réseaux & sécurité', 'reseaux & securite')),
+    (9, ('licence en génie informatique', 'licence professionnelle', 'génie informatique', 'réseaux & sécurité', 'reseaux & securite')),
     (10, ('stagiaire technique', 'administration')),
 ]
 

@@ -16,7 +16,7 @@
       <p class="soc-hero-desc">
         Conception, déploiement et validation d'un Centre d'Opérations de Sécurité (SOC) complet
         pour l'entreprise <strong>PANESS IT</strong>, fondé exclusivement sur des technologies open‑source et
-        validé par 4 scénarios d'attaque réels. Mémoire de fin de cycle — Samnick Biga Raoul Aubin (IHTM).
+        validé par 4 scénarios d'attaque réels. Mémoire de fin de cycle — Samnick Biga Raoul Aubin (Université Adventiste Cosendai / IHTM).
       </p>
       <div class="soc-hero-pills">
         <span class="soc-pill pill--orange">Wazuh v4.14.5</span>
@@ -526,7 +526,7 @@ const phases = [
     image: '/soc/soc-architecture.jpg',
     imageAlt: 'Architecture VirtualBox NAT — 5 VMs SOC-Network PANESS IT',
     snippetLabel: 'objectif du mémoire',
-    body: 'Architecture complète d\'un centre d\'opérations de sécurité (SOC) fondé exclusivement sur des outils open‑source, conçue, déployée et validée en environnement virtualisé pour l\'entreprise PANESS IT (PME informatique de Yaoundé). Mémoire de Licence Professionnelle RSI — IHTM.',
+    body: 'Architecture complète d\'un centre d\'opérations de sécurité (SOC) fondé exclusivement sur des outils open‑source, conçue, déployée et validée en environnement virtualisé pour l\'entreprise PANESS IT (PME informatique de Yaoundé). Mémoire de fin d\'études pour l\'obtention de la Licence en Génie Informatique (Option Réseaux et Sécurité) — Université Adventiste Cosendai / IHTM.',
     snippet: `Architecture SOC Open-Source — PANESS IT (2026)
 Infrastructure : VirtualBox NAT 192.168.100.0/24
 Auteur        : Samnick Biga Raoul Aubin

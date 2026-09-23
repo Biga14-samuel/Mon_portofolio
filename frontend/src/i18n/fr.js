@@ -40,7 +40,7 @@ export default {
     title: 'À propos',
     watermark: 'ÉVOLUER',
     lead: 'Construire, déployer et sécuriser des infrastructures fiables, résilientes et prêtes à contrer les menaces modernes.',
-    bio: 'Administrateur Réseau & Sécurité (diplômé en Licence Professionnelle à l\'IHTM), j\'allie rigueur méthodologique terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d\'architectures réseau haute disponibilité (Cisco, PfSense), l\'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d\'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.',
+    bio: 'Administrateur Réseau & Sécurité, titulaire d\'une Licence en Génie Informatique (Bachelor of Science ; B.Sc.), option Réseaux et Sécurité, obtenue avec mention Bien à l\'Université Adventiste Cosendai (Faculté de Gestion & Informatique / IHTM). J\'allie rigueur méthodologique terrain et vision stratégique de la cybersécurité. Mon expertise couvre la conception d\'architectures réseau haute disponibilité (Cisco, PfSense), l\'administration avancée de systèmes (Linux/Windows) et le déploiement opérationnel d\'environnements de surveillance SOC complets (SIEM Wazuh, IDS/IPS Suricata, EDR, Threat Intelligence) comme réalisé chez PANESS IT.',
     card1_title: 'Ce que je réalise',
     card1_body: 'Conception et déploiement d\'architectures réseau sécurisées, intégration de SIEM/SOC (Wazuh, Suricata, Sysmon), durcissement (Hardening) de serveurs, segmentation VLAN/Firewalling et automatisation via scripts Python/Bash.',
     card2_title: 'Ma démarche d\'administrateur réseau & sécurité',
