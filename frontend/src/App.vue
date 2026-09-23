@@ -141,13 +141,13 @@
       <section class="logo-wall-section reveal-on-scroll">
         <p class="logo-wall-title">{{ t('trust') }}</p>
         <div class="logo-wall-grid">
-          <img src="/Logos/paness.jpg" alt="PANESS IT" title="PANESS IT" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
-          <img src="/Logos/ihtm.png" alt="IHTM" title="IHTM" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
-          <img src="/Logos/minat.png" alt="MINAT" title="MINAT" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
-          <img src="/Logos/minsep.jpg" alt="MINSEP" title="MINSEP" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
-          <img src="/Logos/hgy.png" alt="Hôpital Général de Yaoundé" title="Hôpital Général de Yaoundé" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
-          <img src="/Logos/hcy.jpg" alt="Hôpital Central de Yaoundé" title="Hôpital Central de Yaoundé" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
-          <img src="/Logos/cury.jpg" alt="CURY" title="CURY" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/paness.webp" alt="PANESS IT" title="PANESS IT" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/ihtm.webp" alt="IHTM" title="IHTM" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/minat.webp" alt="MINAT" title="MINAT" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/minsep.webp" alt="MINSEP" title="MINSEP" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/hgy.webp" alt="Hôpital Général de Yaoundé" title="Hôpital Général de Yaoundé" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/hcy.webp" alt="Hôpital Central de Yaoundé" title="Hôpital Central de Yaoundé" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
+          <img src="/Logos/cury.webp" alt="CURY" title="CURY" width="50" height="50" loading="lazy" decoding="async" @error="handleImgError" />
         </div>
       </section>
 
@@ -1019,7 +1019,7 @@ function handleCharMouseLeave(idx) {
   };
 }
 
-const profilePhoto = `${import.meta.env.BASE_URL}profile-photo.jpg`;
+const profilePhoto = `${import.meta.env.BASE_URL}profile-photo.webp`;
 const contactEmail = 'samuelbiga10@gmail.com';
 const suggestedQuestions = [
   'Êtes-vous disponible pour une opportunité ?',
@@ -1230,7 +1230,7 @@ async function loadVeille() {
       veilleUpdatedAtLabel.value = new Date(data.updatedAt * 1000).toLocaleString('fr-FR');
     }
   } catch (error) {
-    console.error(error);
+    console.warn('[Veille] API unavailable (offline cache active)');
   }
 }
 

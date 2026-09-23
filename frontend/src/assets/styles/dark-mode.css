@@ -384,9 +384,14 @@
   color: var(--ubuntu-orange);
 }
 [data-theme="dark"] .button.button-pill.tertiary {
-  background: rgba(233, 84, 32, 0.14);
-  color: var(--ubuntu-orange);
-  border-color: rgba(233, 84, 32, 0.3);
+  background: rgba(255, 120, 68, 0.14);
+  color: #ffaa85;
+  border-color: rgba(255, 120, 68, 0.35);
+  font-weight: 600;
+}
+[data-theme="dark"] .button.button-pill.tertiary .icon-circle {
+  background: #ff7844;
+  color: #0a0e17;
 }
 
 /* ── Testimonials dark ── */

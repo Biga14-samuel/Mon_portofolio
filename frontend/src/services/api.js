@@ -21,25 +21,37 @@ async function request(path, options = {}) {
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  const timeoutMs = options.timeout || 4000;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const signal = options.signal || controller.signal;
 
-  let data = null;
-  const contentType = response.headers.get('content-type') || '';
-  if (contentType.includes('application/json')) {
-    data = await response.json();
+  try {
+    const response = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers,
+      signal,
+    });
+    clearTimeout(timer);
+
+    let data = null;
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      data = await response.json();
+    }
+
+    if (!response.ok) {
+      const message = data?.detail || 'Une erreur est survenue.';
+      const error = new Error(Array.isArray(message) ? message.map((entry) => entry.msg).join(' ') : message);
+      error.status = response.status;
+      throw error;
+    }
+
+    return data;
+  } catch (err) {
+    clearTimeout(timer);
+    throw err;
   }
-
-  if (!response.ok) {
-    const message = data?.detail || 'Une erreur est survenue.';
-    const error = new Error(Array.isArray(message) ? message.map((entry) => entry.msg).join(' ') : message);
-    error.status = response.status;
-    throw error;
-  }
-
-  return data;
 }
 
 export function getItems(type = '') {
