@@ -128,6 +128,8 @@
         <figure class="hero-visual profile-photo-card">
           <img
             :src="profilePhoto"
+            :srcset="`${profilePhotoSm} 380w, ${profilePhoto} 488w`"
+            sizes="(max-width: 600px) 380px, 488px"
             alt="Portrait de SAMNICK BIGA RAOUL AUBIN"
             width="488"
             height="1024"
@@ -1027,6 +1029,7 @@ function handleCharMouseLeave(idx) {
 }
 
 const profilePhoto = `${import.meta.env.BASE_URL}profile-photo.webp`;
+const profilePhotoSm = `${import.meta.env.BASE_URL}profile-photo-380.webp`;
 const contactEmail = 'samuelbiga10@gmail.com';
 const suggestedQuestions = [
   'Êtes-vous disponible pour une opportunité ?',

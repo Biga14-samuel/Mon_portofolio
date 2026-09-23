@@ -61,10 +61,10 @@ onUnmounted(() => {
 }
 
 .shape {
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s ease, opacity 0.3s ease;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform;
   transform-origin: center;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); /* very subtle inner line */
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
 }
 
 /* Shapes */

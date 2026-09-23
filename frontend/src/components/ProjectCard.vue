@@ -443,7 +443,7 @@ onBeforeUnmount(() => {
   font-weight: 600;
   color: var(--muted);
   letter-spacing: 0.03em;
-  transition: transform 0.2s ease, background 0.2s, color 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   animation: badge-float-in 0.4s ease both;
   animation-delay: var(--badge-delay, 0ms);
 }
