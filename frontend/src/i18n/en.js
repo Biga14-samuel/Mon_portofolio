@@ -40,7 +40,7 @@ export default {
     title: 'About',
     watermark: 'EVOLVE',
     lead: 'Build, deploy and secure reliable, resilient infrastructures ready to counter modern threats.',
-    bio: 'Network & IT Security Administrator, holding a Bachelor of Science (B.Sc.) in Computer Engineering, Network & Security option, graduated with Honors (mention Bien) from Cosendai Adventist University (Faculty of Management & IT / IHTM). I combine hands-on operational rigour with a strategic cybersecurity vision. My expertise covers high-availability network architecture design (Cisco, PfSense), advanced system administration (Linux/Windows) and full SOC monitoring environments (Wazuh SIEM, Suricata IDS/IPS, EDR, Threat Intelligence) as deployed at PANESS IT.',
+    bio: 'Network & IT Security Administrator, holding a Bachelor of Science (B.Sc.) in Computer Engineering, Network & Security option, graduated with Honors (mention Bien). I combine hands-on operational rigour with a strategic cybersecurity vision. My expertise covers high-availability network architecture design (Cisco, PfSense), advanced system administration (Linux/Windows) and full SOC monitoring environments (Wazuh SIEM, Suricata IDS/IPS, EDR, Threat Intelligence). Driven by infrastructure resilience, I build secure, well-documented, and production-ready environments able to anticipate and counter modern cyber threats.',
     card1_title: 'What I build',
     card1_body: 'Design and deployment of secure network architectures, SIEM/SOC integration (Wazuh, Suricata, Sysmon), server hardening, VLAN/Firewall segmentation and automation via Python/Bash scripts.',
     card2_title: 'My approach as Network & Security Administrator',
