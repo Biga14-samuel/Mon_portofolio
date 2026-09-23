@@ -203,7 +203,7 @@
   border-radius: 999px;
   border: 1px solid rgba(119, 33, 111, 0.24);
   background: rgba(119, 33, 111, 0.1);
-  color: var(--aubergine);
+  color: var(--aubergine-dark);
   font-weight: 700;
 }
 
@@ -235,7 +235,7 @@
 }
 
 .filter-pill.active {
-  background: var(--aubergine);
+  background: var(--aubergine-dark);
   color: #fff;
   box-shadow: 0 10px 22px rgba(119, 33, 111, 0.2);
 }

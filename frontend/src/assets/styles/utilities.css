@@ -3,7 +3,7 @@
   width: min(1160px, calc(100% - 32px));
   margin: 0 auto 14px;
   text-align: center;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 13px;
 }
 

@@ -255,11 +255,15 @@ td {
   transform: translate(-50%, -50%);
   font-size: 15vw;
   font-weight: 900;
-  color: var(--text);
-  opacity: 0.025;
   white-space: nowrap;
   pointer-events: none;
   z-index: 0;
   user-select: none;
   letter-spacing: -0.05em;
+}
+
+.giant-watermark::before {
+  content: attr(data-text);
+  color: var(--text);
+  opacity: 0.035;
 }

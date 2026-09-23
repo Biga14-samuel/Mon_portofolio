@@ -31,13 +31,13 @@
       <p>{{ sanitizedDescription }}</p>
       
       <div class="item-card__links" v-if="item.github_url || item.demo_url || pdfUrl">
-        <a v-if="item.github_url" :href="item.github_url" target="_blank" rel="noreferrer" class="external-link">
+        <a v-if="item.github_url" :href="item.github_url" target="_blank" rel="noreferrer" class="external-link" :aria-label="`Consulter le code source de ${sanitizedTitle}`">
           <Github :size="16" aria-hidden="true" /> Code
         </a>
-        <a v-if="item.demo_url" :href="item.demo_url" target="_blank" rel="noreferrer" class="external-link">
+        <a v-if="item.demo_url" :href="item.demo_url" target="_blank" rel="noreferrer" class="external-link" :aria-label="`Consulter la démo de ${sanitizedTitle}`">
           <ExternalLink :size="16" aria-hidden="true" /> Démo
         </a>
-        <a v-if="pdfUrl" :href="pdfUrl" target="_blank" rel="noreferrer" class="external-link">
+        <a v-if="pdfUrl" :href="pdfUrl" target="_blank" rel="noreferrer" class="external-link" :aria-label="`Consulter le document PDF de ${sanitizedTitle}`">
           <FileText :size="16" aria-hidden="true" /> PDF
         </a>
       </div>

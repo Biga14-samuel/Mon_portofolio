@@ -148,7 +148,7 @@ nav a:hover {
 
 .nav-button {
   border: 0;
-  background: var(--ubuntu-orange-dark);
+  background: #b83200;
   color: #ffffff;
   cursor: pointer;
   font-weight: 700;
@@ -161,8 +161,8 @@ nav a:hover {
 
 .nav-button:hover {
   transform: translateY(-1px);
-  background: var(--ubuntu-orange);
-  color: var(--aubergine-dark);
+  background: #942500;
+  color: #ffffff;
 }
 
 .nav-button--sound {

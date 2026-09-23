@@ -68,14 +68,14 @@
       <!-- Actions -->
       <div class="project-card__actions">
         <div class="project-card__links" v-if="item.github_url || item.demo_url || pdfUrl">
-          <a v-if="item.github_url" :href="item.github_url" target="_blank" rel="noreferrer" class="project-card__link" @click.stop>
-            <Github :size="14" /> Code
+          <a v-if="item.github_url" :href="item.github_url" target="_blank" rel="noreferrer" class="project-card__link" :aria-label="`Consulter le code source de ${sanitizedTitle}`" @click.stop>
+            <Github :size="14" aria-hidden="true" /> Code
           </a>
-          <a v-if="item.demo_url" :href="item.demo_url" target="_blank" rel="noreferrer" class="project-card__link" @click.stop>
-            <ExternalLink :size="14" /> Démo
+          <a v-if="item.demo_url" :href="item.demo_url" target="_blank" rel="noreferrer" class="project-card__link" :aria-label="`Consulter la démo en ligne de ${sanitizedTitle}`" @click.stop>
+            <ExternalLink :size="14" aria-hidden="true" /> Démo
           </a>
-          <a v-if="pdfUrl" :href="pdfUrl" target="_blank" rel="noreferrer" class="project-card__link" @click.stop>
-            <FileText :size="14" /> PDF
+          <a v-if="pdfUrl" :href="pdfUrl" target="_blank" rel="noreferrer" class="project-card__link" :aria-label="`Consulter le document PDF de ${sanitizedTitle}`" @click.stop>
+            <FileText :size="14" aria-hidden="true" /> PDF
           </a>
         </div>
 

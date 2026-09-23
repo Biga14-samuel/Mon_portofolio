@@ -152,7 +152,7 @@
       </section>
 
       <section class="about-section reveal-on-scroll" id="apropos" aria-labelledby="about-title" style="position: relative; overflow: hidden;">
-        <div class="giant-watermark" aria-hidden="true">{{ t('about.watermark') }}</div>
+        <div class="giant-watermark" aria-hidden="true" role="presentation" :data-text="t('about.watermark')"></div>
         <div class="section-heading" style="position: relative; z-index: 1;">
           <h2 id="about-title">{{ t('about.title') }}</h2>
         </div>
@@ -2198,19 +2198,20 @@ async function handleContactSubmit() {
 }
 
 .send-button {
-  background: var(--ubuntu-orange);
+  background: #b83200;
   border: none;
-  color: #fff;
+  color: #ffffff;
   padding: 0.6rem 1.5rem;
   border-radius: 999px;
   font-weight: 700;
   font-size: 0.95rem;
   cursor: pointer;
+  box-shadow: 0 4px 14px rgba(184, 50, 0, 0.28);
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .send-button:hover:not(:disabled) {
-  background: var(--ubuntu-orange-dark);
+  background: #942500;
   transform: translateY(-2px);
   box-shadow: var(--shadow-lift);
 }

@@ -231,18 +231,24 @@
 }
 
 .button.primary {
-  background: var(--ubuntu-orange);
-  color: #fff;
+  background: #b83200;
+  color: #ffffff;
 }
 
 .button.primary:hover {
-  background: var(--ubuntu-orange-dark);
+  background: #942500;
+  color: #ffffff;
 }
 
 .button.secondary {
   background: transparent;
-  color: var(--aubergine);
-  border-color: var(--aubergine);
+  color: var(--aubergine-dark);
+  border-color: var(--aubergine-dark);
+}
+
+.button.secondary:hover {
+  background: var(--aubergine-dark);
+  color: #ffffff;
 }
 
 .button.tertiary {

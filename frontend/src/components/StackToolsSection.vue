@@ -508,7 +508,7 @@ const filteredRealizationGroups = computed(() => {
 .compact-card-subtitle {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--ubuntu-orange-dark);
+  color: #b83200;
   line-height: 1.3;
 }
 
@@ -530,13 +530,13 @@ const filteredRealizationGroups = computed(() => {
   gap: 0.35rem;
   font-size: 0.8rem;
   font-weight: 800;
-  color: var(--ubuntu-orange-dark);
+  color: #b83200;
   padding-top: 0.35rem;
   border-top: 1px dashed rgba(119, 33, 111, 0.1);
 }
 
 .stack-compact-card:hover .compact-card-action {
-  color: #a92e07;
+  color: #872400;
 }
 
 .compact-admin-actions {

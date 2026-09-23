@@ -181,12 +181,12 @@ textarea {
 .metric-pill strong {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #ff9d6c;
+  color: #ffffff;
 }
 
 .metric-pill span {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .featured-actions {
@@ -204,18 +204,18 @@ textarea {
   font-size: 1rem;
   font-weight: 700;
   border-radius: 999px;
-  background: var(--ubuntu-orange-dark);
-  color: #fff;
+  background: #b83200;
+  color: #ffffff;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(233, 84, 32, 0.35);
+  box-shadow: 0 4px 16px rgba(184, 50, 0, 0.35);
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .featured-actions .button.primary:hover {
-  background: #c84112;
+  background: #942500;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(233, 84, 32, 0.45);
+  box-shadow: 0 8px 24px rgba(184, 50, 0, 0.45);
 }
 
 .empty-featured {
